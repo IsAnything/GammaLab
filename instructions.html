@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Istruzioni — GammaLab IACT</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <main style="max-width:1000px;margin:20px auto;padding:16px;">
+    <h1>Istruzioni e guida didattica — GammaLab IACT</h1>
+
+    <h2>Obiettivo</h2>
+    <p>Studiare come un flash Cherenkov proiettato su una camera forma un'immagine ellittica e come usare i parametri di Hillas per discriminare tra un primario gamma e un primario protone.</p>
+
+    <h2>Cosa osservare nell'immagine IACT</h2>
+    <ul>
+      <li><strong>Shape</strong>: immagini gamma tendono ad avere una forma ellittica regolare, stretta e allungata; immagini da nuclei hadronici (protoni) sono spesso più larghe e irregolari.</li>
+      <li><strong>Length / Width</strong>: il rapporto length/width è uno dei discriminanti principali; valori alti indicano "gamma-like".</li>
+      <li><strong>Clumps e substructure</strong>: protoni producono con maggiore probabilità piccoli addensamenti e asimmetrie nella luce.</li>
+      <li><strong>Asimmetry</strong>: misure di asimmetria (skewness lungo l'asse maggiore) sono spesso maggiori per i casi hadronici.</li>
+      <li><strong>Intensità totale</strong>: può variare con l'energia ma non è discriminante da sola.</li>
+    </ul>
+
+    <h2>Linee guida pratiche per insegnare</h2>
+    <ol>
+      <li>Mostra 10 simulazioni gamma e 10 protoni; chiedi agli studenti di annotare length e width e confrontare le medie.</li>
+      <li>Introduci la regola semplice: se length/width > soglia (es. 3) → vota "Gamma-like". Mostra i falsi positivi/negativi.</li>
+      <li>Proponi esercizi blind: gli studenti classificano 20 immagini, poi rivelate le sorgenti per discutere errori.</li>
+    </ol>
+
+    <h2>Limitazioni e attenzione</h2>
+    <p>Anche con regole semplici si avranno errori: rumore, angolo di proiezione, energia e fluttuazioni statistiche possono cambiare la forma. Usa molte simulazioni per mostrare la statistica.</p>
+
+    <h2>Esempi interattivi</h2>
+    <p>Premi "Rigenera esempi" per creare una immagine campione per gamma e per protone e confrontare il rapporto length/width.</p>
+
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div>
+        <canvas id="exGamma" width="320" height="240" style="border:1px solid #ccc"></canvas>
+        <div style="text-align:center">Gamma example — length/width: <span id="gStats">—</span></div>
+      </div>
+      <div>
+        <canvas id="exProton" width="320" height="240" style="border:1px solid #ccc"></canvas>
+        <div style="text-align:center">Proton example — length/width: <span id="pStats">—</span></div>
+      </div>
+      <div style="min-width:160px">
+        <button id="regenExamples" class="controls">Rigenera esempi</button>
+        <p class="small muted" style="margin-top:8px">I numeri sono length/width calcolati sui campioni</p>
+      </div>
+    </div>
+
+    <h2>Attività suggerite</h2>
+    <ul>
+      <li>Esercizio 1: classificazione blind su 20 immagini; calcola accuracy e discuti casi dubbiosi.</li>
+      <li>Esercizio 2: raccogli 100 simulazioni per ciascun primario; plottare istogramma di length/width e stimare una soglia che separa meglio le classi.</li>
+      <li>Esercizio 3: applica il classificatore Hillas e misura precision/recall; discuti possibili miglioramenti (feature addizionali, ML).</li>
+    </ul>
+
+    <div style="margin-top:20px;">
+      <a href="index.html">Torna alla simulazione</a>
+    </div>
+
+    <script>
+    // utilities: riutilizzano funzioni presenti nello script principale, ma qui includiamo versioni leggere
+    function randNormal(){ let u=0,v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+    function heatColor(t){
+      const r = Math.min(255, Math.round(255 * Math.pow(t,0.6)));
+      const g = Math.min(255, Math.round(200 * Math.pow(t,0.9)));
+      const b = Math.min(255, Math.round(255 * (1 - t)));
+      return [r,g,b];
+    }
+
+    // riproduci la logica simulateIactImage / computeHillas ridotta per la pagina istruzioni
+    const CAM_W = 480, CAM_H = 360;
+    function simulateIactImageLocal(energy, primary='gamma'){
+      const scale = Math.log10(Math.max(energy,50));
+      const cx = CAM_W/2 + (randNormal()*CAM_W*0.06);
+      const cy = CAM_H/2 + (randNormal()*CAM_H*0.06);
+      const lengthGamma = 50 + scale*5 + Math.random()*4;
+      const widthGamma  = Math.max(2, 4 + scale*0.4 + Math.random()*1.2);
+      const lengthProton = lengthGamma * (1.0 + Math.random()*0.5);
+      const widthProton  = widthGamma  * (2.0 + Math.random()*1.0);
+      const theta = Math.random()*Math.PI;
+      const img = new Float32Array(CAM_W * CAM_H);
+      const sigmaNoise = 0.35 * (1 + Math.random()*0.15);
+      for(let y=0;y<CAM_H;y++){
+        for(let x=0;x<CAM_W;x++){
+          const dx = x-cx, dy = y-cy;
+          const xr = dx*Math.cos(theta) + dy*Math.sin(theta);
+          const yr = -dx*Math.sin(theta) + dy*Math.cos(theta);
+          let ellVal;
+          if(primary === 'gamma'){
+            ellVal = Math.exp(-0.5*((xr*xr)/(lengthGamma*lengthGamma) + (yr*yr)/(widthGamma*widthGamma)));
+          } else {
+            const L=lengthProton, W=widthProton;
+            ellVal = Math.exp(-0.5*((xr*xr)/(L*L) + (yr*yr)/(W*W)));
+            if(Math.random() < 0.03){
+              const clumpX = cx + (randNormal()*L*0.6);
+              const clumpY = cy + (randNormal()*W*0.6);
+              const d2 = (x-clumpX)*(x-clumpX)+(y-clumpY)*(y-clumpY);
+              ellVal += 0.6 * Math.exp(-d2/(2*(Math.max(3,Math.random()*8))**2));
+            }
+          }
+          const intensity = Math.max(0, (scale*1.1 + (Math.random()-0.5))*ellVal - sigmaNoise*0.18);
+          img[y*CAM_W + x] = intensity;
+        }
+      }
+      for(let i=0;i<img.length;i++) img[i] += Math.max(0, 0.05*(Math.random()));
+      return img;
+    }
+
+    function computeHillasLocal(img){
+      let sum=0,xsum=0,ysum=0;
+      for(let y=0;y<CAM_H;y++) for(let x=0;x<CAM_W;x++){
+        const w = Math.max(0, img[y*CAM_W + x]);
+        sum+=w; xsum+=x*w; ysum+=y*w;
+      }
+      if(sum<=0) return null;
+      const xc = xsum/sum, yc = ysum/sum;
+      let Sxx=0,Syy=0,Sxy=0;
+      for(let y=0;y<CAM_H;y++) for(let x=0;x<CAM_W;x++){
+        const w = Math.max(0, img[y*CAM_W + x]);
+        const dx = x-xc, dy=y-yc;
+        Sxx += w*dx*dx; Syy += w*dy*dy; Sxy += w*dx*dy;
+      }
+      Sxx/=sum; Syy/=sum; Sxy/=sum;
+      const trace = Sxx+Syy;
+      const det = Sxx*Syy - Sxy*Sxy;
+      const tmp = Math.sqrt(Math.max(0, trace*trace/4 - det));
+      const lambda1 = trace/2 + tmp;
+      const lambda2 = trace/2 - tmp;
+      const length = Math.sqrt(Math.max(0, lambda1));
+      const width  = Math.sqrt(Math.max(0, lambda2));
+      return { length, width };
+    }
+
+    function renderCameraInCtxLocal(img, ctx, W, H){
+      if(!ctx) return;
+      const imageData = ctx.createImageData(W,H);
+      let maxv=0; for(let i=0;i<img.length;i++) if(img[i]>maxv) maxv=img[i]; maxv = Math.max(maxv,1e-6);
+      for(let y=0;y<H;y++){
+        for(let x=0;x<W;x++){
+          const sx = Math.floor(x * CAM_W / W);
+          const sy = Math.floor(y * CAM_H / H);
+          const v = img[sy*CAM_W + sx] / maxv;
+          const idx = (y*W + x)*4;
+          const rgb = heatColor(v);
+          imageData.data[idx]=rgb[0]; imageData.data[idx+1]=rgb[1]; imageData.data[idx+2]=rgb[2];
+          imageData.data[idx+3]=Math.round(200 + 55*v);
+        }
+      }
+      ctx.putImageData(imageData,0,0);
+    }
+
+    function regenExamples(){
+      const g = simulateIactImageLocal(500,'gamma');
+      const p = simulateIactImageLocal(500,'proton');
+      const cg = document.getElementById('exGamma').getContext('2d');
+      const cp = document.getElementById('exProton').getContext('2d');
+      renderCameraInCtxLocal(g, cg, 320, 240);
+      renderCameraInCtxLocal(p, cp, 320, 240);
+      const hg = computeHillasLocal(g);
+      const hp = computeHillasLocal(p);
+      document.getElementById('gStats').textContent = hg ? (hg.length/hg.width).toFixed(2) : '—';
+      document.getElementById('pStats').textContent = hp ? (hp.length/hp.width).toFixed(2) : '—';
+    }
+
+    document.getElementById('regenExamples').addEventListener('click', regenExamples);
+    regenExamples();
+    </script>
+  </main>
+</body>
+</html>

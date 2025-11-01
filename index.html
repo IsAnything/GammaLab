@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GammaLab IACT — Stereoscopia con dettagli generati</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>GammaLab — IACT stereoscopica</h1>
+      <p class="subtitle">3 camere · dettagli generati · zoom/pan</p>
+    </div>
+    <nav class="topnav" aria-label="Navigazione principale">
+      <button id="btnInstructions" class="navBtn">Istruzioni</button>
+      <button id="btnScores" class="navBtn">Classifica</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="iact-panel" class="card">
+      <h2>IACT: simulazione stereoscopica</h2>
+
+      <div class="top-row">
+        <div class="iact-controls">
+          <label for="iactEnergy">Energia (GeV)</label>
+          <input id="iactEnergy" type="number" value="500" style="width:100px" />
+          <label for="iactPrim">Primario</label>
+          <select id="iactPrim">
+            <option value="gamma">gamma</option>
+            <option value="proton">proton</option>
+          </select>
+          <button id="iactSimBtn">Simula Flash</button>
+          <button id="exportHillas">Esporta Hillas</button>
+        </div>
+      </div>
+
+      <div class="iact-area">
+        <div class="cameras">
+          <canvas id="cameraC1" class="thumb" width="320" height="240"></canvas>
+          <canvas id="cameraC2" class="thumb" width="320" height="240"></canvas>
+          <canvas id="cameraC3" class="thumb" width="320" height="240"></canvas>
+        </div>
+
+        <div class="metrics">
+          <div id="hillasText">Nessuna Hillas</div>
+        </div>
+      </div>
+
+      <!-- dettaglio: canvas base generati + overlay -->
+      <div class="detail-row">
+        <div class="detail-block">
+          <canvas id="viewer1Base" class="viewer" width="320" height="240"></canvas>
+          <canvas id="viewer1Overlay" class="viewerOverlay" width="320" height="240"></canvas>
+        </div>
+
+        <div class="detail-block">
+          <canvas id="viewer2Base" class="viewer" width="320" height="240"></canvas>
+          <canvas id="viewer2Overlay" class="viewerOverlay" width="320" height="240"></canvas>
+        </div>
+
+        <div class="detail-block">
+          <canvas id="viewer3Base" class="viewer" width="320" height="240"></canvas>
+          <canvas id="viewer3Overlay" class="viewerOverlay" width="320" height="240"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="mission-panel" class="card">
+      <h2>Missione</h2>
+      <p id="missionText">Premi Genera per iniziare una missione.</p>
+      <div class="controls">
+        <button id="generateBtn">Genera</button>
+        <button id="hintBtn">Suggerimento</button>
+      </div>
+      <p id="progressiveHint" class="muted small" style="margin-top:8px"></p>
+    </section>
+
+    <section id="answer-panel" class="card">
+      <h2>Indovina la sorgente</h2>
+      <div id="options" role="radiogroup" aria-label="Opzioni sorgente"></div>
+      <div class="controls">
+        <button id="submitAnswer">Invia</button>
+        <div id="feedback" style="display:inline-block;margin-left:12px"></div>
+      </div>
+    </section>
+
+    <section id="score-panel" class="card hidden">
+      <h2>Classifica</h2>
+      <ol id="scoreList"></ol>
+      <div class="controls"><button id="clearScores" class="secondary">Svuota</button></div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Versione didattica — stereoscopia semplificata</small>
+  </footer>
+</body>
+</html>
