@@ -695,6 +695,22 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
     const camActive = CAMERAS[0].id;
     const hv = (window.lastHillas && window.lastHillas[camActive]) ? window.lastHillas[camActive] : null;
     if(hbox) hbox.textContent = hv ? `len=${(hv.length||0).toFixed(1)} width=${(hv.width||0).toFixed(1)}` : 'Nessuna Hillas';
+    // attach simulation id and render stereo reconstruction + logging
+    const simId = Date.now() + '-' + Math.floor(Math.random()*1000000);
+    window.__lastSimId = simId;
+    try{
+      const rec = (typeof computeStereoEllipse === 'function') ? computeStereoEllipse() : null;
+      console.log('runSimulationAndRender:', { simId, energy, primary, rec });
+      // store last reconstruction for comparison
+      if(rec){
+        if(window.__lastStereoRec){
+          const same = Math.abs((window.__lastStereoRec.xc||0) - (rec.xc||0)) < 1e-6 && Math.abs((window.__lastStereoRec.yc||0)-(rec.yc||0)) < 1e-6 && Math.abs((window.__lastStereoRec.length||0)-(rec.length||0))<1e-6 && Math.abs((window.__lastStereoRec.width||0)-(rec.width||0))<1e-6 && Math.abs((window.__lastStereoRec.angle||0)-(rec.angle||0))<1e-6;
+          if(same) console.warn('Stereo reconstruction unchanged from previous run', { simId });
+        }
+        window.__lastStereoRec = rec;
+      }
+    }catch(e){ console.warn('stereo debug compute failed', e); }
+    try{ renderStereoReconstruction(); }catch(e){ /* ignore */ }
     return sim;
   }
 
