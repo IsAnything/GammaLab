@@ -182,7 +182,10 @@ function computeHillasForImage(img, CAM_W, CAM_H){
 
 // --- computeHillasRobust (preprocessing + robust moments + fit)
 function computeHillasRobust(img, W, H, opts){
-  opts = Object.assign({ blurSigma:0.8, threshK:1.2, minArea:6, mahalanobisT:9, iterMax:3, sigmaToAxis:2.0, returnMask:false }, opts||{});
+  // Stricter defaults to avoid merging multiple tracks:
+  // - Higher threshold (threshK=1.8) to separate tracks better
+  // - Smaller sigmaToAxis (1.5) for tighter ellipses around single tracks
+  opts = Object.assign({ blurSigma:0.8, threshK:1.8, minArea:6, mahalanobisT:9, iterMax:3, sigmaToAxis:1.5, returnMask:false }, opts||{});
   const data = (img && img.data) ? img.data : img;
   if(!data || data.length < W*H) return null;
   const arr = Array.from(data);
@@ -194,7 +197,21 @@ function computeHillasRobust(img, W, H, opts){
   const mask = new Uint8Array(W*H); let cntMask = 0;
   for(let i=0;i<W*H;i++){ if(blurred[i] > thresh){ mask[i]=1; cntMask++; } }
   if(cntMask < opts.minArea) return null;
-  const comps = connectedComponents(mask, W, H, opts.minArea);
+  
+  // Apply morphological erosion to better separate nearby tracks
+  // This helps prevent multiple tracks from being merged into one component
+  const erodedMask = new Uint8Array(W*H);
+  for(let y=1; y<H-1; y++){
+    for(let x=1; x<W-1; x++){
+      const idx = y*W + x;
+      // Keep pixel only if all 4-neighbors are also above threshold
+      if(mask[idx] && mask[idx-1] && mask[idx+1] && mask[idx-W] && mask[idx+W]){
+        erodedMask[idx] = 1;
+      }
+    }
+  }
+  
+  const comps = connectedComponents(erodedMask, W, H, opts.minArea);
   if(!comps || comps.length===0) return null;
   let bestComp = null, bestScore = -Infinity;
   for(const c of comps){ let score=0; for(const idx of c.idxs) score += blurred[idx]; if(score>bestScore){ bestScore=score; bestComp=c; } }
@@ -421,9 +438,11 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
       const td = trackDefs[t] || {};
       const cx = (typeof td.cx === 'number') ? td.cx : (CAM_W*0.2 + Math.random()*CAM_W*0.6);
       const cy = (typeof td.cy === 'number') ? td.cy : (CAM_H*0.2 + Math.random()*CAM_H*0.6);
-      // slightly shorter average length, larger width to favor ellipses over thin sticks
-      const len = (typeof td.len === 'number') ? td.len : (30 + scaleBase*6 + Math.random()*30);
-      const wid = (typeof td.wid === 'number') ? td.wid : Math.max(4, 8 + (primary==='proton'? 6:0) + Math.random()*6);
+      // Elliptical tracks characteristic of gamma-ray Cherenkov radiation
+      // Length: moderate (not too long to avoid rod-like appearance)
+      // Width: substantial relative to length for clear elliptical shape
+      const len = (typeof td.len === 'number') ? td.len : (20 + scaleBase*4 + Math.random()*15);
+      const wid = (typeof td.wid === 'number') ? td.wid : Math.max(8, 12 + (primary==='proton'? 4:0) + Math.random()*8);
       const theta = (typeof td.theta === 'number') ? td.theta : (Math.random()*Math.PI);
       const amp = (typeof td.amp === 'number') ? td.amp : (0.9 + Math.random()*1.6) * Math.log10(Math.max(energy,50))/2;
  
@@ -478,8 +497,8 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
        baseTracks.push({
          cx: CAM_W*(0.25 + Math.random()*0.5),
          cy: CAM_H*(0.25 + Math.random()*0.5),
-         len: 30 + Math.random()*40,
-         wid: 2 + Math.random()*3,
+         len: 20 + Math.random()*25,  // shorter for more elliptical appearance
+         wid: 10 + Math.random()*8,   // wider for elliptical shape
          theta: Math.random()*Math.PI,
          amp: 0.7 + Math.random()
        });
@@ -508,8 +527,8 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
         defs.push({
           cx: clamp(CAM_W*(0.15 + Math.random()*0.7) + camDef.ox*0.5, 5, CAM_W-5),
           cy: clamp(CAM_H*(0.15 + Math.random()*0.7) + camDef.oy*0.5, 5, CAM_H-5),
-          len: 20 + Math.random()*80,
-          wid: 3 + Math.random()*6,
+          len: 18 + Math.random()*30,  // moderate length for elliptical tracks
+          wid: 10 + Math.random()*10,  // larger width for clear ellipse
           theta: Math.random()*Math.PI,
           amp: 0.4 + Math.random()*1.4
         });
@@ -595,17 +614,22 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
     ctx.scale(s, s);
     ctx.translate(-srcRect.x, -srcRect.y);
 
-    // choose the single most significant hillas to draw:
-    // score = pixelsUsed (preferred) else W; tie-breaker uses W.
+    // IMPORTANT: Draw only the single largest/brightest track from the camera image
+    // This ensures that only the main track (most significant) is enclosed by an ellipse
+    // in the detail viewers (windows 4, 5, 6), matching the brightest track visible
+    // in the corresponding upper camera window (windows 1, 2, 3)
     const best = hillasList.reduce((bestSoFar, h)=>{
       if(!h) return bestSoFar;
+      // Score based on pixelsUsed (size) and W (total intensity/brightness)
       const score = (h.pixelsUsed || 0) + 0.001 * (h.W || 0);
       if(!bestSoFar || score > bestSoFar.score) return { h, score };
       return bestSoFar;
     }, null);
     if(best && best.h){
       const h = best.h;
-      const sizeScale = Number(window.HILLAS_SIZE_SCALE) || 1.6;
+      // Reduced sizeScale to draw tighter ellipses around single tracks
+      // This prevents the ellipse from visually enclosing nearby secondary tracks
+      const sizeScale = Number(window.HILLAS_SIZE_SCALE) || 1.2;
       const a = Math.max(8, (h.length || 40) * 0.6 * sizeScale);
       const b = Math.max(5, (h.width  || 10) * 0.9 * Math.sqrt(sizeScale));
       const ang = h.angle || 0;
@@ -1154,8 +1178,8 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
       panel.appendChild(label);
       const cv = document.createElement('canvas');
       cv.id = 'stereoReconstruction';
-      cv.width = 640;
-      cv.height = 240;
+      cv.width = 960;  // increased from 640 for larger display
+      cv.height = 480; // increased from 240 for larger display
       cv.style.border = '1px solid rgba(255,255,255,0.06)';
       cv.style.background = '#03060a';
       panel.appendChild(cv);
@@ -1329,25 +1353,82 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
       ctx.restore();
     }
 
-    // draw individual camera projections (semi-transparent)
-    const camColors = { C1: 'rgba(255,100,100,0.25)', C2: 'rgba(100,255,120,0.25)', C3: 'rgba(100,160,255,0.25)' };
+    // Geometric construction visualization
+    // Show how the three camera views combine into stereoscopic reconstruction
+    
+    // Draw camera position diagram at top
+    const camPosY = 30;
+    const camSpacing = 80;
+    const camStartX = cv.width/2 - camSpacing;
+    ctx.save();
+    ctx.font = 'bold 11px sans-serif';
+    const camLabels = ['C1', 'C2', 'C3'];
+    const camPosColors = ['rgba(255,100,100,1.0)', 'rgba(100,255,120,1.0)', 'rgba(100,160,255,1.0)'];
+    for(let i = 0; i < 3; i++){
+      const x = camStartX + i * camSpacing;
+      // Camera icon (triangle representing telescope)
+      ctx.fillStyle = camPosColors[i];
+      ctx.beginPath();
+      ctx.moveTo(x, camPosY - 8);
+      ctx.lineTo(x - 6, camPosY + 4);
+      ctx.lineTo(x + 6, camPosY + 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillText(camLabels[i], x - 8, camPosY + 18);
+    }
+    // Title
+    ctx.fillStyle = '#cfe8ff';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.fillText('Geometria telescopi', 10, 20);
+    ctx.restore();
+    
+    // Draw connecting lines from camera ellipses to reconstructed center
+    const centerX = rec.xc*scale + offsetX, centerY = rec.yc*scale + offsetY;
+    ctx.save();
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1;
     for(const it of rec.items){
-      // safe stroke color (fix syntax error from inline replace)
-      const fillCol = camColors[it.cam] || 'rgba(200,200,200,0.18)';
-      const strokeCol = (camColors[it.cam] || '#888').replace(/,0\.25\)/,',0.9)');
-      drawEllipse(ctx, it, { fill: fillCol, stroke: strokeCol, lineWidth: 1.2 });
-      // small center dot
-      ctx.fillStyle = (camColors[it.cam] || '#fff').replace(/,0\.25\)/,',1.0)');
       const cx = it.xc*scale + offsetX, cy = it.yc*scale + offsetY;
-      ctx.beginPath(); ctx.arc(cx, cy, 2.2, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#9fb8d6';
-      ctx.font = '11px sans-serif';
-      ctx.fillText(it.cam, cx + 6, cy + 4);
+      ctx.strokeStyle = 'rgba(180,200,220,0.3)';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(centerX, centerY);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+    
+    // Draw individual camera projections (semi-transparent with distinct colors)
+    const camColors = { 
+      C1: { fill: 'rgba(255,100,100,0.25)', stroke: 'rgba(255,100,100,0.85)', label: 'rgba(255,120,120,1.0)' }, 
+      C2: { fill: 'rgba(100,255,120,0.25)', stroke: 'rgba(100,255,120,0.85)', label: 'rgba(120,255,140,1.0)' }, 
+      C3: { fill: 'rgba(100,160,255,0.25)', stroke: 'rgba(100,160,255,0.85)', label: 'rgba(120,180,255,1.0)' } 
+    };
+    
+    for(let i = 0; i < rec.items.length; i++){
+      const it = rec.items[i];
+      const colors = camColors[it.cam] || { fill: 'rgba(200,200,200,0.18)', stroke: '#888', label: '#fff' };
+      drawEllipse(ctx, it, { fill: colors.fill, stroke: colors.stroke, lineWidth: 1.5 });
+      
+      // Camera center marker
+      const cx = it.xc*scale + offsetX, cy = it.yc*scale + offsetY;
+      ctx.fillStyle = colors.label;
+      ctx.beginPath(); 
+      ctx.arc(cx, cy, 3, 0, Math.PI*2); 
+      ctx.fill();
+      
+      // Camera label with background and weight indicator
+      const weight = rec.weights[i];
+      const weightPct = Math.round(weight * 100 / rec.weights.reduce((a,b)=>a+b, 0));
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      ctx.fillRect(cx + 8, cy - 10, 52, 16);
+      ctx.fillStyle = colors.label;
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`${it.cam} ${weightPct}%`, cx + 10, cy + 2);
     }
 
     // draw reconstructed ellipse (prominent)
-    // gradient stroke
-    const centerX = rec.xc*scale + offsetX, centerY = rec.yc*scale + offsetY;
+    // gradient stroke - reuse centerX/centerY already calculated above
     const a_px = Math.max(4, (rec.length*0.5) * scale), b_px = Math.max(3, (rec.width*0.5) * scale);
     const ang = rec.angle || 0;
     ctx.save();
@@ -1371,9 +1452,47 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
     ctx.fillRect(-2.2, -2.2, 4.4, 4.4);
     ctx.restore();
 
-    // legend
+    // Add visual indicators of the geometric construction process
+    // Draw arrows showing contribution from each camera to reconstruction
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5;
+    for(let i = 0; i < rec.items.length; i++){
+      const it = rec.items[i];
+      const cx = it.xc*scale + offsetX, cy = it.yc*scale + offsetY;
+      const weight = rec.weights[i];
+      
+      // Draw arrow from camera position to reconstruction center
+      // Arrow length represents weight/contribution
+      const dx = centerX - cx, dy = centerY - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist > 5){
+        const arrowLen = Math.min(dist * 0.7, dist - 8);
+        const endX = cx + (dx/dist) * arrowLen;
+        const endY = cy + (dy/dist) * arrowLen;
+        
+        // Arrow line
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        
+        // Arrow head
+        const angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - 8*Math.cos(angle-0.3), endY - 8*Math.sin(angle-0.3));
+        ctx.lineTo(endX - 8*Math.cos(angle+0.3), endY - 8*Math.sin(angle+0.3));
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // legend with geometric process explanation
     ctx.fillStyle = '#9fb8d6'; ctx.font = '12px sans-serif';
-    ctx.fillText('Proiezioni C1/C2/C3 (trasparente) — ricostruzione (verde→giallo)', 10, cv.height - 10);
+    ctx.fillText('Processo geometrico: proiezioni telecamere C1(rosso)/C2(verde)/C3(blu) → ricostruzione stereoscopica (giallo)', 10, cv.height - 10);
   }
 
   // attempt to wrap existing runner so reconstruction is drawn automatically
