@@ -252,7 +252,8 @@ function computeHillasRobust(img, W, H, opts){
 
 // --- updateAllHillasAndDraw: calcola per tutte le camere e assegna window.lastHillas
 function updateAllHillasAndDraw(opts){
-  window.lastHillas = window.lastHillas || {};
+  // Start with fresh object for each update to avoid stale data accumulation
+  window.lastHillas = {};
   if(typeof CAMERAS === 'undefined') { console.warn('CAMERAS non definito'); return; }
 
   // use opts.downsampleFactor to speed up Hillas on high-res images
@@ -317,6 +318,14 @@ function updateAllHillasAndDraw(opts){
       mapped.camId = cam.id;
       mapped._downsample = { targetW, targetH, scaleX, scaleY };
       window.lastHillas[cam.id] = mapped;
+      
+      // Debug logging to track coordinates
+      if((window.__runCount || 0) >= 18){
+        console.log(`Run ${window.__runCount} - Hillas for ${cam.id}:`, 
+                    `xc=${mapped.xc.toFixed(1)}, yc=${mapped.yc.toFixed(1)}, ` +
+                    `len=${mapped.length.toFixed(1)}, wid=${mapped.width.toFixed(1)}, ` +
+                    `W=${mapped.W.toFixed(2)}, pixels=${mapped.pixelsUsed}`);
+      }
 
     }catch(e){
       console.error('updateAllHillas error', cam.id, e);
@@ -332,10 +341,26 @@ function trackHillas(currMap, maxDist){
   const currArr = [];
   for(const camId in currMap){ const h = currMap[camId]; if(!h) continue; currArr.push(h); }
   for(const h of currArr){
-    const x = h.xc_global, y = h.yc_global;
+    // Use xc/yc coordinates (not xc_global which doesn't exist)
+    // Each camera has its own coordinate system
+    const x = h.xc || 0, y = h.yc || 0;
     let bestId = null, bestD = Infinity;
-    for(const id in prev){ if(usedPrev.has(id)) continue; const p = prev[id]; const dx = p.x - x, dy = p.y - y; const d2 = dx*dx + dy*dy; if(d2 < bestD){ bestD = d2; bestId = id; } }
-    if(bestId !== null && Math.sqrt(bestD) <= (maxDist||40)){ newObjects[bestId] = Object.assign({}, h, { id: bestId, x: x, y: y }); usedPrev.add(bestId); } else { const nid = String(tracker.nextId++); newObjects[nid] = Object.assign({}, h, { id: nid, x: x, y: y }); }
+    for(const id in prev){ 
+      if(usedPrev.has(id)) continue; 
+      const p = prev[id]; 
+      // Only match tracks from the same camera to avoid cross-camera confusion
+      if(p.camId !== h.camId) continue;
+      const dx = p.x - x, dy = p.y - y; 
+      const d2 = dx*dx + dy*dy; 
+      if(d2 < bestD){ bestD = d2; bestId = id; } 
+    }
+    if(bestId !== null && Math.sqrt(bestD) <= (maxDist||40)){ 
+      newObjects[bestId] = Object.assign({}, h, { id: bestId, x: x, y: y }); 
+      usedPrev.add(bestId); 
+    } else { 
+      const nid = String(tracker.nextId++); 
+      newObjects[nid] = Object.assign({}, h, { id: nid, x: x, y: y }); 
+    }
   }
   tracker.objects = newObjects; return newObjects;
 }
@@ -344,7 +369,13 @@ function trackHillas(currMap, maxDist){
 function drawTrackedEllipses(trackedMap){
   // use drawHillasOnViewer with saved srcRects so overlays align exactly with viewer crops
   const viewers = ['viewer1Overlay','viewer2Overlay','viewer3Overlay'];
-  window.__lastViewerSrcRects = window.__lastViewerSrcRects || [];
+  // Ensure we have a fresh srcRects array - DO NOT reuse old one
+  if(!window.__lastViewerSrcRects || window.__lastViewerSrcRects.length === 0){
+    window.__lastViewerSrcRects = [];
+    for(let i=0; i<3; i++){
+      window.__lastViewerSrcRects.push({ x:0, y:0, w: CAM_W || 320, h: CAM_H || 240 });
+    }
+  }
   for(let i=0;i<viewers.length;i++){
     const id = viewers[i];
     const overlay = document.getElementById(id);
@@ -627,6 +658,21 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
     }, null);
     if(best && best.h){
       const h = best.h;
+      
+      // Validate coordinates before drawing to prevent corrupt state from causing misplaced ellipses
+      if(!h.xc || !h.yc || !isFinite(h.xc) || !isFinite(h.yc)){
+        console.warn('Invalid Hillas coordinates detected, skipping draw:', h);
+        ctx.restore();
+        return;
+      }
+      
+      // Additional logging when problems might occur
+      if((window.__runCount || 0) >= 18){
+        console.log(`Drawing ellipse at run ${window.__runCount}:`, 
+                    `xc=${h.xc.toFixed(1)}, yc=${h.yc.toFixed(1)}, ` +
+                    `srcRect: x=${srcRect.x}, y=${srcRect.y}, w=${srcRect.w}, h=${srcRect.h}`);
+      }
+      
       // Reduced sizeScale to draw tighter ellipses around single tracks
       // This prevents the ellipse from visually enclosing nearby secondary tracks
       const sizeScale = Number(window.HILLAS_SIZE_SCALE) || 1.2;
@@ -661,6 +707,26 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
 
   // run sim, render thumbnails and viewer crops; then compute hillas & overlay precisely
   function runSimulationAndRender(energy, primary){
+    // COMPLETE state reset to prevent ANY accumulation
+    // Reset tracker state
+    if(window._hillasTracker){
+      console.log('Resetting tracker. Old objects count:', Object.keys(window._hillasTracker.objects).length, 'nextId:', window._hillasTracker.nextId);
+      window._hillasTracker.objects = {};
+      // Also periodically reset nextId to prevent unbounded growth
+      if(window._hillasTracker.nextId > 1000){
+        console.log('Resetting tracker nextId from', window._hillasTracker.nextId);
+        window._hillasTracker.nextId = 1;
+      }
+    }
+    
+    // Clear old viewer src rects immediately
+    window.__lastViewerSrcRects = [];
+    
+    // Clear any stale Hillas data
+    window.lastHillas = null;
+    
+    console.log('runSimulationAndRender called - run count:', (window.__runCount = (window.__runCount || 0) + 1));
+    
     const sim = simulateStereoImages(energy, primary);
     window.lastSimResult = sim;
     window.lastImages = sim.images;
@@ -705,6 +771,12 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
       const sx = Math.max(0, Math.min(CAM_W - cw, Math.round(cx - cw/2)));
       const sy = Math.max(0, Math.min(CAM_H - ch, Math.round(cy - ch/2)));
       const srcRect = { x: sx, y: sy, w: cw, h: ch };
+      
+      // Debug logging for viewer crop calculation
+      if((window.__runCount || 0) >= 18){
+        console.log(`Viewer ${i} crop for ${camId}: center=(${cx.toFixed(1)},${cy.toFixed(1)}), srcRect=(${sx},${sy},${cw},${ch})`);
+      }
+      
       window.__lastViewerSrcRects.push(srcRect);
       if(viewerBase) renderToCanvas(img, viewerBase, srcRect);
       const allHillas = [];
@@ -1095,6 +1167,14 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
 (function ensureGlobalRunner(){
   if(typeof window.runSimulationAndRender === 'function') return;
   window.runSimulationAndRender = function(energy, primary){
+    // COMPLETE state reset to prevent corruption across runs
+    if(window._hillasTracker){
+      window._hillasTracker.objects = {};
+      if(window._hillasTracker.nextId > 1000) window._hillasTracker.nextId = 1;
+    }
+    window.__lastViewerSrcRects = [];
+    window.lastHillas = null;
+    
     energy = Number(energy) || 500;
     primary = primary || 'gamma';
     const sim = (typeof simulateStereoImages === 'function') ? simulateStereoImages(energy, primary) : (window.lastImages ? { images: window.lastImages, meta: window.lastSimMeta || {} } : null);
@@ -1501,6 +1581,14 @@ console.log('Hillas module injected: computeHillasForImage, computeHillasRobust,
     if(window.__stereo_wrapped) return;
     const orig = window.runSimulationAndRender;
     window.runSimulationAndRender = function(energy, primary){
+      // COMPLETE state reset at the outermost wrapper level
+      if(window._hillasTracker){
+        window._hillasTracker.objects = {};
+        if(window._hillasTracker.nextId > 1000) window._hillasTracker.nextId = 1;
+      }
+      window.__lastViewerSrcRects = [];
+      window.lastHillas = null;
+      
       const res = orig(energy, primary);
       try{ renderStereoReconstruction(); }catch(e){ console.warn('stereo render error', e); }
       return res;
