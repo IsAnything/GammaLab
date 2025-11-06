@@ -155,20 +155,25 @@ nav {
 
 .cameras-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr; /* 1 colonna invece di 3 */
+  gap: 24px;
   margin-bottom: 24px;
+  max-width: 1200px; /* Larghezza ottimale per singola colonna */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .camera-container {
   position: relative;
+  min-width: 0; /* Previene overflow */
 }
 
 .camera-label {
   color: var(--accent-cyan);
   font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 0.95em;
+  margin-bottom: 12px;
+  font-size: 1.1em;
+  text-align: center;
 }
 
 .camera-canvas {
@@ -176,9 +181,10 @@ nav {
   height: auto;
   aspect-ratio: 3/2;
   background: #000;
-  border: 2px solid var(--border-color);
+  border: 3px solid var(--border-color);
   border-radius: 8px;
   cursor: crosshair;
+  display: block;
 }
 
 .viewer-canvas {
@@ -197,6 +203,7 @@ nav {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  background: transparent !important; /* CRITICO: overlay deve essere trasparente */
 }
 
 /* Ricostruzione stereoscopica */
@@ -510,3 +517,70 @@ table tr:hover {
 .hidden {
   display: none;
 }
+
+/* ==================== QUIZ LAYOUT ENHANCEMENT ==================== */
+
+/* Aumenta larghezza container per il quiz */
+#quizScreen .container {
+  max-width: 1800px;
+  padding: 30px;
+}
+
+/* Canvas più grandi e leggibili */
+#quizScreen .camera-canvas {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#quizScreen .camera-label {
+  font-size: 1.2em;
+  padding: 8px;
+  background: rgba(14, 165, 233, 0.1);
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+/* ==================== STEREO RECONSTRUCTION PANEL ==================== */
+
+.stereo-panel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 32px auto;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px var(--shadow);
+  max-width: 1200px;
+}
+
+.stereo-panel h3 {
+  color: var(--accent-cyan);
+  font-size: 1.6em;
+  margin-bottom: 16px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+#stereo-canvas {
+  display: block;
+  margin: 0 auto;
+  background: #020617;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6),
+              inset 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Info badge per stereo */
+.stereo-info {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
+  border-left: 4px solid var(--accent-blue);
+  font-size: 0.95em;
+  color: var(--text-secondary);
+}
+
+.stereo-info strong {
+  color: var(--accent-cyan);
+}
+

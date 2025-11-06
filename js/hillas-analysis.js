@@ -5,7 +5,7 @@
  */
 
 // === COSTANTI ===
-const PIXEL_TO_DEGREE = 0.01; // 1 pixel = 0.01 gradi
+// PIXEL_TO_DEGREE definito in core-simulation.js (0.01)
 const MIN_PHOTONS = 50; // Minimo fotoni per analisi valida
 const CLEANING_THRESHOLD = 0.3; // Soglia intensità per cleaning
 
@@ -440,13 +440,4 @@ function applyStandardCuts(params) {
     if (!cuts.details.elongationCut) cuts.passed = false;
 
     return cuts;
-}
-
-// === EXPORT ===
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        HillasAnalyzer,
-        compareHillasAcrossCameras,
-        applyStandardCuts
-    };
 }

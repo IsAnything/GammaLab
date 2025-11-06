@@ -205,18 +205,18 @@
             <div class="cameras-grid">
                 <div class="camera-container">
                     <div class="camera-label">📷 Camera 1 (Nord)</div>
-                    <canvas id="cam1" class="camera-canvas" width="1500" height="1000"></canvas>
-                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam1" class="camera-canvas" width="900" height="600"></canvas>
+                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
                 </div>
                 <div class="camera-container">
-                    <div class="camera-label">📷 Camera 2 (Est)</div>
-                    <canvas id="cam2" class="camera-canvas" width="1500" height="1000"></canvas>
-                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    <div class="camera-label">📷 Camera 2</div>
+                    <canvas id="cam2" class="camera-canvas" width="900" height="600"></canvas>
+                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
                 </div>
                 <div class="camera-container">
-                    <div class="camera-label">📷 Camera 3 (Sud)</div>
-                    <canvas id="cam3" class="camera-canvas" width="1500" height="1000"></canvas>
-                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    <div class="camera-label">📷 Camera 3</div>
+                    <canvas id="cam3" class="camera-canvas" width="900" height="600"></canvas>
+                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
                 </div>
             </div>
 
@@ -354,10 +354,12 @@
         <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
     </footer>
 
-    <script src="../js/core-simulation.js"></script>
-    <script src="../js/source-profiles.js"></script>
-    <script src="../js/hillas-analysis.js"></script>
-    <script src="../js/visualization.js"></script>
+    <script src="../js/core-simulation.js?v=7"></script>
+    <script src="../js/source-profiles.js?v=7"></script>
+    <script src="../js/hillas-analysis.js?v=7"></script>
+    <script src="../js/visualization.js?v=7"></script>
+    <script src="../js/stereo-reconstruction.js?v=7"></script>
+    <script src="../js/navigation.js?v=7"></script>
     <script>
         // === SIMULATORE CRAB NEBULA ===
         let engine, renderers, hillasAnalyzer, colorPalette;
@@ -376,6 +378,13 @@
                 new CanvasRenderer('cam3', 'cam3-overlay')
             ];
 
+            // Assegna nuova palette a tutti i renderers
+            renderers.forEach(renderer => {
+                renderer.colorPalette = colorPalette;
+            });
+
+            console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
+
             // Event listeners
             document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
@@ -392,32 +401,48 @@
             const crabProfile = getSourceProfile('crab');
             const events = [];
             const hillasParams = [];
+            const hillasMap = {};
 
             // Genera per 3 camere
             for (let i = 0; i < 3; i++) {
                 const cameraId = i + 1;
+                const camKey = `cam${cameraId}`;
                 
                 // Genera evento
                 const event = engine.generateEvent(crabProfile, cameraId);
                 events.push(event);
 
-                // Renderizza
-                renderers[i].renderEvent(event, i === 0); // Legenda solo su cam1
+                // Rendering con palette già configurata
+                renderers[i].renderEvent(event, i === 0);
+                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
 
                 // Calcola Hillas
                 const hillas = hillasAnalyzer.analyze(event);
                 if (hillas && hillas.valid) {
                     hillasParams.push(hillas);
+                    hillasMap[camKey] = hillas;
                     renderers[i].renderHillasOverlay(hillas);
                 }
 
                 console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
             }
 
-            // Ricostruzione stereoscopica
-            if (events.length === 3) {
-                const stereoResult = combineStereoscopicEvents(events);
-                renderStereoReconstruction(stereoResult);
+            // Ricostruzione stereoscopica avanzata
+            const stereoCanvas = document.getElementById('stereo');
+            if (stereoCanvas && hillasParams.length >= 2) {
+                if (typeof window.renderStereoReconstruction === 'function') {
+                    // Usa nuova stereo reconstruction
+                    console.log('🔺 Rendering ricostruzione stereoscopica avanzata');
+                    window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                        showGeometry: true,
+                        showCameraPositions: true,
+                        showArrows: true
+                    });
+                } else {
+                    // Fallback a stereo semplice locale
+                    const stereoResult = combineStereoscopicEvents(events);
+                    renderStereoReconstructionSimple(stereoResult);
+                }
             }
 
             // Mostra parametri Hillas
@@ -431,9 +456,9 @@
         }
 
         /**
-         * Renderizza ricostruzione stereoscopica
+         * Renderizza ricostruzione stereoscopica semplice (fallback)
          */
-        function renderStereoReconstruction(stereoResult) {
+        function renderStereoReconstructionSimple(stereoResult) {
             const canvas = document.getElementById('stereo');
             if (!canvas) return;
 

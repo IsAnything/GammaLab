@@ -367,20 +367,3 @@ function scoreAlpha(observedAlpha, profileAlpha) {
     if (diff < width * 3) return 0.4;
     return 0.1;
 }
-
-// === EXPORT ===
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        SOURCE_PROFILES,
-        CRAB_NEBULA_PROFILE,
-        PEVATRON_PROFILE,
-        BLAZAR_PROFILE,
-        GRB_PROFILE,
-        GALACTIC_CENTER_PROFILE,
-        HADRON_BACKGROUND_PROFILE,
-        getSourceProfile,
-        getRandomSourceProfile,
-        getAllProfiles,
-        identifySource
-    };
-}

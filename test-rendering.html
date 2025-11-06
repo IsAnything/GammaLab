@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rendering - GammaLab</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000814;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        canvas {
+            border: 2px solid #0ea5e9;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+        }
+        .info {
+            text-align: center;
+            margin: 20px;
+            font-size: 18px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color: #0ea5e9;">🔬 Test Rendering Fotoni - GammaLab v3.0</h1>
+    
+    <div class="info">
+        <p>Test di rendering con i nuovi parametri:</p>
+        <ul style="list-style: none; padding: 0;">
+            <li>🔷 Raggio base: 5-15px (era 2-6px)</li>
+            <li>🌟 Alone glow: 5× raggio (25-75px)</li>
+            <li>✨ Alpha: 0.5-1.0 (era 0.3-0.6)</li>
+            <li>🎨 Colore: Cyan brillante rgb(20, 119, 200)</li>
+        </ul>
+    </div>
+
+    <button onclick="drawTestPattern()">🎨 Disegna Pattern di Test</button>
+    <canvas id="testCanvas" width="900" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawTestPattern() {
+            // Pulisci canvas
+            ctx.fillStyle = '#000814';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            console.log('🎨 Disegno pattern di test...');
+
+            // Disegna griglia di fotoni con intensità crescente
+            const rows = 4;
+            const cols = 6;
+            const marginX = 100;
+            const marginY = 80;
+            const spacingX = (canvas.width - 2 * marginX) / (cols - 1);
+            const spacingY = (canvas.height - 2 * marginY) / (rows - 1);
+
+            let count = 0;
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const x = marginX + col * spacingX;
+                    const y = marginY + row * spacingY;
+                    
+                    // Intensità crescente
+                    const intensity = (row * cols + col) / (rows * cols);
+                    
+                    // Calcola parametri come nel codice reale
+                    const radius = 5.0 + intensity * 10.0; // 5-15px
+                    const alpha = Math.min(1, intensity * 1.2 + 0.5); // 0.5-1.0
+                    const color = 'rgb(20, 119, 200)'; // Cyan brillante
+
+                    // Disegna fotone
+                    drawPhoton(x, y, radius, alpha, color, intensity);
+                    count++;
+                }
+            }
+
+            console.log(`✅ Disegnati ${count} fotoni di test`);
+            console.log(`📏 Raggio: 5.0-15.0px, Alpha: 0.5-1.0, Alone: 5× raggio`);
+
+            // Aggiungi etichette
+            ctx.fillStyle = '#0ea5e9';
+            ctx.font = '14px Arial';
+            ctx.fillText('Intensità bassa →', 20, 40);
+            ctx.fillText('← Intensità alta', canvas.width - 140, 40);
+            ctx.fillText('Raggio: 5px', marginX - 40, marginY);
+            ctx.fillText('Raggio: 15px', marginX - 40, canvas.height - marginY + 20);
+        }
+
+        function drawPhoton(x, y, radius, alpha, color, intensity) {
+            // Alone esterno (5× raggio)
+            const glowRadius = radius * 5.0;
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+            
+            gradient.addColorStop(0, `rgba(20, 119, 200, ${alpha})`);
+            gradient.addColorStop(0.2, `rgba(20, 119, 200, ${alpha * 0.8})`);
+            gradient.addColorStop(0.5, `rgba(20, 119, 200, ${alpha * 0.4})`);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, glowRadius, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Core brillante (1.5× raggio)
+            ctx.fillStyle = `rgba(20, 119, 200, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(x, y, radius * 1.5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Centro bianco (0.5× raggio)
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+            ctx.beginPath();
+            ctx.arc(x, y, radius * 0.5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Debug text
+            if (intensity < 0.15 || intensity > 0.85) {
+                ctx.fillStyle = '#0ea5e9';
+                ctx.font = '10px Arial';
+                ctx.fillText(`${radius.toFixed(1)}px`, x - 15, y + glowRadius + 15);
+                ctx.fillText(`α=${alpha.toFixed(2)}`, x - 15, y + glowRadius + 27);
+            }
+        }
+
+        // Disegna automaticamente all'avvio
+        drawTestPattern();
+    </script>
+</body>
+</html>

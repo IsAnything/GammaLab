@@ -51,6 +51,13 @@ function setupSourceSimulator(sourceType, options = {}) {
             new CanvasRenderer('cam3', 'cam3-overlay')
         ];
 
+        // Assegna nuova palette a tutti i renderers
+        renderers.forEach(renderer => {
+            renderer.colorPalette = colorPalette;
+        });
+
+        console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
+
         // Event listeners
         const generateBtn = document.getElementById(generateBtnId);
         const clearBtn = document.getElementById(clearBtnId);
@@ -75,29 +82,61 @@ function setupSourceSimulator(sourceType, options = {}) {
         const profile = getSourceProfile(sourceType);
         const events = [];
         const hillasParams = [];
+        const hillasMap = {};
+        
+        // Dimensioni canvas per le pagine sorgenti (ridotte per migliore visualizzazione)
+        const canvasSize = { width: 900, height: 600 };
 
         // Genera per 3 camere
         for (let i = 0; i < 3; i++) {
             const cameraId = i + 1;
+            const camKey = `cam${cameraId}`;
             
-            const event = engine.generateEvent(profile, cameraId);
+            const event = engine.generateEvent(profile, cameraId, canvasSize);
             events.push(event);
 
-            renderers[i].renderEvent(event, i === 0 && showLegend);
+            // Rendering con palette già configurata
+            const canvas = document.getElementById(`cam${cameraId}`);
+            if (canvas && renderers[i]) {
+                renderers[i].renderEvent(event, i === 0 && showLegend);
+                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+            }
 
             const hillas = hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
                 hillasParams.push(hillas);
+                hillasMap[camKey] = hillas;
                 renderers[i].renderHillasOverlay(hillas);
             }
 
             console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
         }
 
-        // Ricostruzione stereoscopica
-        if (showStereo && events.length === 3) {
-            const stereoResult = combineStereoscopicEvents(events);
-            renderStereo(stereoResult);
+        // Ricostruzione stereoscopica avanzata
+        if (showStereo && hillasParams.length >= 2) {
+            // Cerca canvas stereo esistente
+            let stereoCanvas = document.getElementById('stereo');
+            
+            // Se non esiste, prova a crearlo dinamicamente
+            if (!stereoCanvas && typeof createStereoCanvas === 'function') {
+                stereoCanvas = createStereoCanvas('stereo-container');
+            }
+            
+            if (stereoCanvas && typeof renderStereoReconstruction === 'function') {
+                console.log('🔺 Rendering ricostruzione stereoscopica');
+                renderStereoReconstruction(stereoCanvas, hillasMap, {
+                    showGeometry: true,
+                    showCameraPositions: true,
+                    showArrows: true
+                });
+            } else if (stereoCanvas) {
+                // Fallback a vecchia stereo
+                console.log('🔺 Fallback a stereo semplice');
+                const stereoResult = combineStereoscopicEvents(events);
+                renderStereo(stereoResult);
+            } else {
+                console.warn('⚠️ Canvas stereo non trovato');
+            }
         }
 
         // Mostra parametri
@@ -277,12 +316,4 @@ function setupSourceSimulator(sourceType, options = {}) {
         
         console.log('🧹 Canvas puliti');
     }
-}
-
-// === EXPORT ===
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        updateActiveNavItem,
-        setupSourceSimulator
-    };
 }

@@ -146,7 +146,6 @@ class QuizEngine {
      */
     generateQuestion() {
         this.currentQuestion++;
-        console.log(`📝 Domanda ${this.currentQuestion}/${QUIZ_CONFIG.totalQuestions}`);
         
         // Update UI
         document.getElementById('questionNumber').textContent = 
@@ -168,14 +167,16 @@ class QuizEngine {
         
         // Seleziona sorgente random
         this.currentProfile = getRandomSourceProfile(true); // Include hadron
-        console.log(`  Sorgente: ${this.currentProfile.displayName}`);
         
         // Genera eventi per 3 camere
         const events = [];
         this.currentHillasParams = [];
         
+        // Dimensioni canvas del quiz (ottimizzate per layout verticale)
+        const quizCanvasSize = { width: 900, height: 600 };
+        
         for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateEvent(this.currentProfile, i + 1);
+            const event = this.engine.generateEvent(this.currentProfile, i + 1, quizCanvasSize);
             events.push(event);
             
             // Renderizza
@@ -358,15 +359,18 @@ class QuizEngine {
             hintsUsed: this.currentHintLevel
         });
         
-        // Highlight buttons
+        // Highlight buttons - mostra solo il bottone cliccato (rosso se sbagliato, verde se giusto)
         const selectedBtn = document.querySelector(`.quiz-option[data-answer="${answer}"]`);
-        const correctBtn = document.querySelector(`.quiz-option[data-answer="${this.currentProfile.type}"]`);
         
-        if (correct) {
-            selectedBtn.classList.add('correct');
+        if (!selectedBtn) {
+            console.error('❌ Bottone selezionato non trovato:', answer);
         } else {
-            selectedBtn.classList.add('incorrect');
-            correctBtn.classList.add('correct');
+            if (correct) {
+                selectedBtn.classList.add('correct');
+            } else {
+                selectedBtn.classList.add('incorrect');
+                // NON evidenziamo il bottone corretto per non rivelare la risposta
+            }
         }
         
         // Update UI
@@ -567,18 +571,23 @@ class QuizEngine {
         const lastAnswer = this.answerHistory[this.answerHistory.length - 1];
         
         return `
-            <p style="font-size: 16px; margin-bottom: 16px;">
-                La risposta corretta era: <strong>${profile.displayName}</strong>
+            <p style="font-size: 16px; margin-bottom: 16px; color: #ff4444;">
+                <strong>Risposta errata!</strong>
             </p>
-            <p style="font-size: 14px; color: #ff4444;">
-                Hai risposto: ${this.getSourceDisplayName(lastAnswer.userAnswer)}
+            <p style="font-size: 14px; color: var(--text-secondary);">
+                Hai risposto: <strong>${this.getSourceDisplayName(lastAnswer.userAnswer)}</strong>
             </p>
-            <p style="margin-top: 16px; font-size: 13px;">
-                <strong>Perché ${profile.displayName}?</strong><br>
-                ${this.getEducationalNote(profile.type)}
+            <p style="margin-top: 16px; font-size: 13px; color: #ffaa00;">
+                💡 <strong>Suggerimenti:</strong>
             </p>
-            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);">
-                💡 Suggerimento: Rivedi la pagina di confronto per capire meglio le differenze!
+            <ul style="margin-left: 20px; font-size: 13px; color: var(--text-secondary);">
+                <li>Analizza attentamente i parametri di Hillas (Length, Width, Size, Alpha)</li>
+                <li>Confronta le tracce tra le 3 camere per valutare la coerenza</li>
+                <li>Usa gli <strong>Hint</strong> se hai bisogno di aiuto!</li>
+                <li>Rivedi la pagina di <a href="comparison.html" target="_blank" style="color: #0ea5e9;">confronto sorgenti</a></li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); font-style: italic;">
+                La risposta corretta verrà rivelata alla fine del quiz.
             </p>
         `;
     }
@@ -590,14 +599,22 @@ class QuizEngine {
         const profile = this.currentProfile;
         
         return `
-            <p style="font-size: 16px; margin-bottom: 16px;">
-                La risposta corretta era: <strong>${profile.displayName}</strong>
+            <p style="font-size: 16px; margin-bottom: 16px; color: #ff8800;">
+                <strong>Tempo scaduto!</strong>
             </p>
-            <p style="font-size: 13px;">
-                ${this.getEducationalNote(profile.type)}
+            <p style="font-size: 14px; color: var(--text-secondary);">
+                Non hai fornito una risposta entro 60 secondi.
             </p>
-            <p style="margin-top: 12px; font-size: 12px; color: #ffaa00;">
-                ⚡ Prossima volta cerca di analizzare più velocemente i parametri chiave!
+            <p style="margin-top: 16px; font-size: 13px; color: #ffaa00;">
+                💡 <strong>Per la prossima domanda:</strong>
+            </p>
+            <ul style="margin-left: 20px; font-size: 13px; color: var(--text-secondary);">
+                <li>Usa gli <strong>Hint</strong> se non sei sicuro</li>
+                <li>Concentrati sui parametri chiave: Alpha, Size, Length/Width</li>
+                <li>Guarda la coerenza tra le 3 camere</li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); font-style: italic;">
+                La risposta corretta verrà rivelata alla fine del quiz.
             </p>
         `;
     }
@@ -869,8 +886,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✅ Quiz Engine pronto!');
 });
-
-// === EXPORT ===
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { QuizEngine, QUIZ_CONFIG };
-}

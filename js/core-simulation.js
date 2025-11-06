@@ -36,9 +36,20 @@ class SimulationEngine {
      * Genera un evento completo per una sorgente specifica
      * @param {Object} sourceProfile - Profilo sorgente da source-profiles.js
      * @param {Number} cameraId - ID camera (1-3)
+     * @param {Object} canvasSize - Dimensioni canvas {width, height} (opzionale, default 1500x1000)
      * @returns {Object} Evento generato con tracce e parametri
      */
-    generateEvent(sourceProfile, cameraId = 1) {
+    generateEvent(sourceProfile, cameraId = 1, canvasSize = null) {
+        // Log per debug
+        if (!sourceProfile || !sourceProfile.type) {
+            console.error('❌ sourceProfile non valido:', sourceProfile);
+            return null;
+        }
+        
+        // Usa dimensioni canvas passate o default
+        const canvasW = canvasSize?.width || CANVAS_WIDTH;
+        const canvasH = canvasSize?.height || CANVAS_HEIGHT;
+        
         // Estrai parametri dal profilo
         const baseParams = this._sampleFromProfile(sourceProfile);
         
@@ -49,8 +60,8 @@ class SimulationEngine {
         // Genera energia del fotone primario
         const energy = this._sampleEnergy(sourceProfile.energyRange);
         
-        // Genera tracce Cherenkov
-        const tracks = this._generateTracks(params, energy);
+        // Genera tracce Cherenkov con dimensioni canvas
+        const tracks = this._generateTracks(params, energy, canvasW, canvasH);
         
         // Crea l'evento
         const event = {
@@ -70,6 +81,26 @@ class SimulationEngine {
      * Campiona parametri dal profilo sorgente
      */
     _sampleFromProfile(profile) {
+        // Validazione profilo
+        if (!profile.length || !profile.width || !profile.size) {
+            console.error('❌ Profilo incompleto:', {
+                type: profile.type,
+                name: profile.displayName,
+                length: profile.length,
+                width: profile.width,
+                size: profile.size
+            });
+            // Valori di fallback
+            return {
+                length: 0.2,
+                width: 0.1,
+                size: 1000,
+                alpha: 0,
+                elongation: 0.3,
+                asymmetry: { mean: 0.1, std: 0.05 }
+            };
+        }
+        
         return {
             length: this._randomInRange(profile.length.min, profile.length.max),
             width: this._randomInRange(profile.width.min, profile.width.max),
@@ -125,15 +156,25 @@ class SimulationEngine {
     /**
      * Genera le tracce Cherenkov sul piano camera
      */
-    _generateTracks(params, energy) {
+    _generateTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+        // Validazione parametri
+        if (!params || typeof params.length !== 'number' || typeof params.width !== 'number' ||
+            !isFinite(params.length) || !isFinite(params.width) ||
+            !isFinite(params.size)) {
+            console.error('❌ Parametri non validi in _generateTracks:', params);
+            return [];
+        }
+        
         const tracks = [];
         
-        // Numero di fotoni proporzionale a Size
-        const numPhotons = Math.floor(params.size * 0.8 + Math.random() * params.size * 0.4);
+        // Numero di fotoni proporzionale a Size (ridotto per rendering con glow grandi)
+        const numPhotons = Math.floor(params.size * 0.5 + Math.random() * params.size * 0.3);
         
-        // Centro della traccia (random nel FOV centrale)
-        const centerX = CANVAS_WIDTH / 2 + (Math.random() - 0.5) * 300;
-        const centerY = CANVAS_HEIGHT / 2 + (Math.random() - 0.5) * 200;
+        // Centro della traccia - ridotta dispersione per evitare uscite dallo schermo
+        const dispersionX = canvasWidth * 0.15;  // 15% della larghezza (era 20%)
+        const dispersionY = canvasHeight * 0.15; // 15% dell'altezza (era 20%)
+        const centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
+        const centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
         
         // Angolo di orientazione (random)
         const theta = Math.random() * 2 * Math.PI;
@@ -141,11 +182,34 @@ class SimulationEngine {
         const sinTheta = Math.sin(theta);
         
         // Converti Length e Width da gradi a pixel
-        const lengthPx = params.length * DEGREE_TO_PIXEL;
-        const widthPx = params.width * DEGREE_TO_PIXEL;
+        // Scala in base alle dimensioni effettive del canvas
+        const degreeToPixel = canvasWidth / FOV_WIDTH; // Ricalcola per canvas corrente
+        const lengthPx = params.length * degreeToPixel;
+        const widthPx = params.width * degreeToPixel;
+        
+        // Validazione conversione
+        if (!isFinite(lengthPx) || !isFinite(widthPx) || lengthPx <= 0 || widthPx <= 0) {
+            console.error('❌ Conversione pixel non valida:', {
+                length: params.length,
+                width: params.width,
+                degreeToPixel,
+                lengthPx,
+                widthPx
+            });
+            return [];
+        }
         
         // Parametri per asimmetria
         const asymFactor = this._randomFromDistribution(params.asymmetry);
+        
+        // Validazione asimmetria
+        if (!isFinite(asymFactor)) {
+            console.error('❌ asymFactor non valido:', {
+                asymmetry: params.asymmetry,
+                asymFactor
+            });
+            return [];
+        }
         
         // Genera fotoni
         for (let i = 0; i < numPhotons; i++) {
@@ -159,9 +223,21 @@ class SimulationEngine {
             const gx = r * Math.cos(angle);
             const gy = r * Math.sin(angle);
             
-            // Scala con Length/Width
-            let dx = gx * lengthPx * 0.4;
-            let dy = gy * widthPx * 0.4;
+            // Validazione gx/gy
+            if (!isFinite(gx) || !isFinite(gy)) {
+                if (i === 0) console.error('❌ gx/gy non validi:', { r, angle, gx, gy });
+                continue; // Salta questo fotone
+            }
+            
+            // Scala con Length/Width (aumentata dispersione per raggi grandi)
+            let dx = gx * lengthPx * 0.7;  // Era 0.4, ora 0.7 per maggiore dispersione
+            let dy = gy * widthPx * 0.7;   // Era 0.4, ora 0.7 per maggiore dispersione
+            
+            // Validazione dx/dy
+            if (!isFinite(dx) || !isFinite(dy)) {
+                if (i === 0) console.error('❌ dx/dy non validi:', { gx, gy, lengthPx, widthPx, dx, dy });
+                continue; // Salta questo fotone
+            }
             
             // Applica asimmetria (shift lungo asse maggiore)
             if (dx > 0) {
@@ -170,12 +246,27 @@ class SimulationEngine {
                 dx *= (1 - asymFactor * 0.5);
             }
             
+            // Validazione dopo asimmetria
+            if (!isFinite(dx) || !isFinite(dy)) {
+                if (i === 0) console.error('❌ dx/dy dopo asimmetria non validi:', { dx, dy, asymFactor });
+                continue; // Salta questo fotone
+            }
+            
             // Ruota secondo theta
             const rotX = dx * cosTheta - dy * sinTheta;
             const rotY = dx * sinTheta + dy * cosTheta;
             
             const x = centerX + rotX;
             const y = centerY + rotY;
+            
+            // Validazione coordinate finali
+            if (!isFinite(x) || !isFinite(y)) {
+                if (i === 0) console.error('❌ Coordinate finali non valide:', {
+                    centerX, centerY, rotX, rotY, x, y,
+                    cosTheta, sinTheta, theta
+                });
+                continue; // Salta questo fotone
+            }
             
             // Energia del fotone (distribuzione realistica)
             const photonEnergy = this._samplePhotonEnergy(energy);
@@ -213,12 +304,26 @@ class SimulationEngine {
      * Converte energia in intensità (photoelectrons)
      */
     _energyToIntensity(energy) {
+        // Validazione input
+        if (typeof energy !== 'number' || !isFinite(energy) || energy <= 0) {
+            console.warn('⚠️ Energy non valida in _energyToIntensity:', energy);
+            return 0.2; // Valore di default
+        }
+        
         // Efficienza quantica del PMT + fattore di scala
         const qe = 0.25; // 25% efficienza media
         const logE = Math.log10(energy / 100); // Normalizza a 100 GeV
         const base = 1 + logE * 0.5;
         
-        return Math.max(0.1, base * qe * (0.8 + Math.random() * 0.4));
+        const result = Math.max(0.1, base * qe * (0.8 + Math.random() * 0.4));
+        
+        // Validazione output
+        if (!isFinite(result)) {
+            console.warn('⚠️ Intensity non finita:', result, 'da energy:', energy);
+            return 0.2;
+        }
+        
+        return result;
     }
 
     /**
@@ -410,9 +515,4 @@ function calculateCoherence(events) {
     ) / 3;
     
     return Math.max(0, 1 - relVar);
-}
-
-// === EXPORT ===
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { SimulationEngine, combineStereoscopicEvents, calculateCoherence };
 }
