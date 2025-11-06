@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduzione ai Telescopi Cherenkov - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">Introduzione ai Telescopi Cherenkov Atmosferici</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html" class="active">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Cos'è un IACT -->
+        <section class="card">
+            <h2>Cos'è un Telescopio Cherenkov Atmosferico (IACT)?</h2>
+            <p>
+                I <strong>Telescopi Cherenkov Atmosferici (IACT - Imaging Atmospheric Cherenkov Telescope)</strong> 
+                sono strumenti progettati per rilevare raggi gamma di <strong>altissima energia</strong> 
+                (>50 GeV) provenienti dallo spazio profondo.
+            </p>
+            <p>
+                A differenza dei telescopi ottici tradizionali che osservano la luce visibile, gli IACT 
+                sfruttano l'<strong>atmosfera terrestre</strong> come parte integrante del rilevatore. 
+                Quando un raggio gamma ad alta energia entra nell'atmosfera, innesca una cascata di 
+                particelle secondarie che producono un caratteristico <strong>lampo di luce Cherenkov</strong>.
+            </p>
+
+            <h3>⚡ L'Effetto Cherenkov</h3>
+            <p>
+                La luce Cherenkov è un fenomeno fisico che si verifica quando una particella carica 
+                viaggia attraverso un mezzo (come l'atmosfera) a una velocità <strong>superiore alla 
+                velocità della luce in quel mezzo</strong>.
+            </p>
+            <p>
+                Anche se nulla può superare la velocità della luce nel vuoto (c ≈ 300.000 km/s), 
+                la luce si propaga più lentamente nei mezzi materiali. Ad esempio, nell'atmosfera 
+                terrestre la velocità della luce è circa c/n, dove n~1.0003 è l'indice di rifrazione.
+            </p>
+            <p>
+                Quando una particella carica si muove più velocemente di questa velocità "ridotta", 
+                emette un <strong>cono di luce blu-violetta</strong> - la luce Cherenkov. È lo stesso 
+                effetto che produce il caratteristico bagliore blu nelle piscine dei reattori nucleari.
+            </p>
+        </section>
+
+        <!-- Come Funziona -->
+        <section class="card">
+            <h2>Come Funziona la Rilevazione</h2>
+            
+            <h3>1️⃣ Arrivo del Raggio Gamma</h3>
+            <p>
+                Un fotone gamma ad alta energia (10 GeV - 100 TeV) proveniente da una sorgente cosmica 
+                entra nell'atmosfera terrestre a un'altitudine di circa <strong>20-30 km</strong>.
+            </p>
+
+            <h3>2️⃣ Produzione dello Sciame</h3>
+            <p>
+                Il fotone gamma interagisce con i nuclei atmosferici attraverso due processi principali:
+            </p>
+            <ul>
+                <li><strong>Produzione di coppie (γ → e⁺ + e⁻)</strong>: Il fotone si converte in una coppia elettrone-positrone</li>
+                <li><strong>Bremsstrahlung (e± → e± + γ)</strong>: Gli elettroni/positroni emettono nuovi fotoni gamma</li>
+            </ul>
+            <p>
+                Questi processi si ripetono a cascata, creando uno <strong>sciame elettromagnetico</strong> 
+                che può contenere milioni di particelle. Lo sciame ha una struttura caratteristica:
+            </p>
+            <ul>
+                <li><strong>Asse principale</strong>: Diretto lungo la traiettoria del fotone primario</li>
+                <li><strong>Sviluppo laterale</strong>: Le particelle si disperdono lateralmente (~100-150 metri)</li>
+                <li><strong>Massimo</strong>: Lo sciame raggiunge il massimo numero di particelle a ~10 km di quota</li>
+            </ul>
+
+            <h3>3️⃣ Emissione Cherenkov</h3>
+            <p>
+                Le particelle cariche dello sciame (e± principalmente) viaggiano a velocità ultrarelativistiche 
+                e producono <strong>luce Cherenkov</strong>:
+            </p>
+            <ul>
+                <li><strong>Colore</strong>: Blu-violetta (lunghezze d'onda 300-400 nm)</li>
+                <li><strong>Durata</strong>: Brevissima (~pochi nanosecondi)</li>
+                <li><strong>Geometria</strong>: Cono con apertura ~1° attorno all'asse dello sciame</li>
+                <li><strong>Intensità</strong>: Proporzionale all'energia del fotone primario</li>
+            </ul>
+            <p>
+                La luce Cherenkov illumina un'area al suolo di circa <strong>250 metri di diametro</strong>, 
+                detta "pool Cherenkov".
+            </p>
+
+            <h3>4️⃣ Rilevazione con gli IACT</h3>
+            <p>
+                I telescopi Cherenkov, posizionati a terra, catturano questa luce con:
+            </p>
+            <ul>
+                <li><strong>Specchi parabolici</strong>: Diametri tipici 12-28 metri per massimizzare l'area di raccolta</li>
+                <li><strong>Camere PMT</strong>: Sensori fotomoltiplicatori (Photo-Multiplier Tubes) disposti nel piano focale</li>
+                <li><strong>Elettronica veloce</strong>: Trigger e acquisizione dati in nanosecondi</li>
+            </ul>
+
+            <h3>5️⃣ Formazione dell'Immagine</h3>
+            <p>
+                La camera cattura un'<strong>immagine della traccia</strong> lasciata dallo sciame. 
+                Caratteristiche tipiche:
+            </p>
+            <ul>
+                <li><strong>Forma ellittica</strong>: Proiezione prospettica dello sciame cilindrico</li>
+                <li><strong>Orientamento</strong>: L'asse maggiore punta verso la sorgente</li>
+                <li><strong>Luminosità</strong>: Maggiore al centro, decresce verso i bordi</li>
+                <li><strong>Dimensione</strong>: Funzione dell'energia (eventi più energetici → tracce più lunghe)</li>
+            </ul>
+        </section>
+
+        <!-- Tecnica Stereoscopica -->
+        <section class="card">
+            <h2>🔺 Tecnica Stereoscopica</h2>
+            <p>
+                Per migliorare la <strong>precisione</strong> e <strong>ridurre il background</strong>, 
+                gli osservatori IACT utilizzano <strong>array di telescopi multipli</strong>.
+            </p>
+
+            <h3>Vantaggi della Stereoscopia</h3>
+            <ul>
+                <li><strong>Ricostruzione 3D</strong>: Ogni telescopio vede lo sciame da un'angolazione diversa, permettendo di triangolare la direzione di arrivo con precisione ~0.1°</li>
+                <li><strong>Determinazione dell'energia</strong>: Combinando le informazioni da più telescopi si stima meglio l'energia del fotone primario</li>
+                <li><strong>Reiezione del background</strong>: Gli eventi adronici (protoni, nuclei) producono tracce meno coerenti tra i telescopi</li>
+                <li><strong>Efficienza</strong>: Area efficace aumentata (~10⁵ m² per array di 3-4 telescopi)</li>
+            </ul>
+
+            <h3>Configurazioni Tipiche</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Osservatorio</th>
+                        <th>N. Telescopi</th>
+                        <th>Diametro Specchi</th>
+                        <th>Separazione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>H.E.S.S.</td>
+                        <td>5 (4×12m + 1×28m)</td>
+                        <td>12-28 m</td>
+                        <td>120 m</td>
+                    </tr>
+                    <tr>
+                        <td>MAGIC</td>
+                        <td>2</td>
+                        <td>17 m</td>
+                        <td>85 m</td>
+                    </tr>
+                    <tr>
+                        <td>VERITAS</td>
+                        <td>4</td>
+                        <td>12 m</td>
+                        <td>~100 m</td>
+                    </tr>
+                    <tr>
+                        <td>CTA (futuro)</td>
+                        <td>~100</td>
+                        <td>4-23 m</td>
+                        <td>50-300 m</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Processo di Ricostruzione</h3>
+            <p>
+                Quando un evento viene rilevato da almeno 2 telescopi:
+            </p>
+            <ol>
+                <li>Ogni telescopio registra un'immagine della traccia</li>
+                <li>Si estraggono i <strong>parametri di Hillas</strong> (Length, Width, Size, Alpha)</li>
+                <li>Gli assi maggiori delle ellissi si intersecano in un punto nel cielo</li>
+                <li>Questo punto corrisponde alla <strong>direzione di arrivo del fotone gamma</strong></li>
+                <li>La coerenza tra i parametri conferma che si tratta di un vero evento gamma</li>
+            </ol>
+        </section>
+
+        <!-- Parametri di Hillas -->
+        <section class="card">
+            <h2>📏 Parametri di Hillas</h2>
+            <p>
+                L'analisi delle immagini Cherenkov si basa sui <strong>parametri di Hillas</strong>, 
+                introdotti da Michael Hillas negli anni '80. Questi parametri descrivono la forma 
+                e l'intensità della traccia come un'ellisse equivalente.
+            </p>
+
+            <h3>Parametri Principali</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Simbolo</th>
+                        <th>Descrizione Fisica</th>
+                        <th>Range Tipico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>L</td>
+                        <td>Lunghezza maggiore dell'ellisse (sviluppo longitudinale dello sciame)</td>
+                        <td>0.1° - 0.5°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>W</td>
+                        <td>Larghezza minore dell'ellisse (dispersione trasversale)</td>
+                        <td>0.05° - 0.2°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>S</td>
+                        <td>Carica totale integrata (∝ energia del primario)</td>
+                        <td>50 - 10000 p.e.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>α</td>
+                        <td>Angolo tra l'asse maggiore e la direzione della sorgente</td>
+                        <td>0° - 90°</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Rapporto Length/Width</h3>
+            <p>
+                Il rapporto <strong>L/W</strong> è un indicatore importante:
+            </p>
+            <ul>
+                <li><strong>Eventi gamma</strong>: L/W ~ 2-4 (ellissi allungate e regolari)</li>
+                <li><strong>Eventi adronici</strong>: L/W più variabile, forme meno regolari</li>
+                <li><strong>Rumore</strong>: L/W → 1 (tracce quasi circolari)</li>
+            </ul>
+
+            <h3>Size e Energia</h3>
+            <p>
+                Il parametro Size è correlato all'<strong>energia del fotone primario</strong>:
+            </p>
+            <ul>
+                <li>Size ~ 100 p.e. → E ~ 100 GeV</li>
+                <li>Size ~ 1000 p.e. → E ~ 1 TeV</li>
+                <li>Size ~ 5000 p.e. → E ~ 10 TeV</li>
+            </ul>
+            <p>
+                La relazione esatta dipende dalla distanza d'impatto dello sciame rispetto al telescopio 
+                e dall'angolo zenitale di osservazione.
+            </p>
+
+            <h3>Alpha e Riconoscimento della Sorgente</h3>
+            <p>
+                Il parametro <strong>Alpha</strong> è cruciale per distinguere eventi dalla sorgente 
+                dal background:
+            </p>
+            <ul>
+                <li><strong>Sorgente puntiforme (es. Crab Nebula, Blazar)</strong>: α → 0° (asse maggiore punta verso la sorgente)</li>
+                <li><strong>Sorgente estesa (es. Resto di Supernova)</strong>: α distribuito (~5°-15°)</li>
+                <li><strong>Background adronico</strong>: α distribuito uniformemente (0°-90°)</li>
+            </ul>
+            <p>
+                Nella pratica, si applica un <strong>taglio α < 10°-15°</strong> per selezionare 
+                gli eventi provenienti dalla sorgente nota.
+            </p>
+        </section>
+
+        <!-- Sfide e Limitazioni -->
+        <section class="card">
+            <h2>⚠️ Sfide e Limitazioni</h2>
+            
+            <h3>Background Cosmico</h3>
+            <p>
+                I <strong>raggi cosmici carichi</strong> (protoni principalmente, ~1000 volte più abbondanti 
+                dei raggi gamma) producono sciami simili. La discriminazione gamma/adrone si basa su:
+            </p>
+            <ul>
+                <li>Forma più regolare delle tracce gamma</li>
+                <li>Maggiore coerenza stereoscopica</li>
+                <li>Parametri di Hillas più compatti</li>
+            </ul>
+            <p>
+                Anche con tecniche avanzate, la <strong>contaminazione adronica residua</strong> 
+                è ~1-5% per energie >1 TeV.
+            </p>
+
+            <h3>Duty Cycle Limitato</h3>
+            <p>
+                Gli IACT possono operare solo di notte con cielo sereno:
+            </p>
+            <ul>
+                <li><strong>Duty cycle</strong>: ~10-15% (~1000-1500 ore/anno)</li>
+                <li><strong>Luna</strong>: Durante le fasi luminose il background di luce diffusa è troppo alto</li>
+                <li><strong>Meteo</strong>: Nuvole, pioggia, alta umidità impediscono le osservazioni</li>
+            </ul>
+
+            <h3>Soglia Energetica</h3>
+            <p>
+                La sensibilità degli IACT è limitata a energie <strong>E > 50-100 GeV</strong>:
+            </p>
+            <ul>
+                <li>Sotto questa soglia, gli sciami non producono abbastanza luce Cherenkov</li>
+                <li>Per energie inferiori (10 MeV - 100 GeV) si usano telescopi spaziali come <strong>Fermi-LAT</strong></li>
+            </ul>
+
+            <h3>Campo di Vista</h3>
+            <p>
+                Il FoV (Field of View) tipico è <strong>~5° di diametro</strong>, piccolo rispetto al cielo intero. 
+                Questo rende gli IACT ideali per:
+            </p>
+            <ul>
+                <li>✅ Osservazioni mirate di sorgenti note</li>
+                <li>✅ Follow-up di allerte multi-messenger (GW, neutrini)</li>
+                <li>❌ Survey di grandi aree del cielo</li>
+            </ul>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card">
+            <h2>🚀 Prossimi Passi</h2>
+            <p>
+                Ora che hai compreso i principi base degli IACT, è il momento di esplorare come 
+                <strong>diverse sorgenti astronomiche</strong> producono tracce Cherenkov caratteristiche!
+            </p>
+            <p>
+                Ogni sorgente ha una "firma" distintiva nei parametri di Hillas:
+            </p>
+            <ul>
+                <li><strong>Crab Nebula</strong>: Sorgente stabile e compatta, ideale come riferimento</li>
+                <li><strong>PeVatron</strong>: Eventi estremamente energetici con Size elevati</li>
+                <li><strong>Blazar</strong>: Variabilità rapida, emissione puntiforme</li>
+                <li><strong>GRB</strong>: Burst improvvisi e brevissimi</li>
+                <li><strong>Centro Galattico</strong>: Emissione diffusa con parametri dispersi</li>
+            </ul>
+            <p>
+                Visita le pagine dedicate per vedere simulazioni interattive e capire come 
+                identificare ciascuna sorgente!
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="crab-nebula.html" class="btn btn-primary">🦀 Esplora la Crab Nebula</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Tabella Comparativa</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p>
+            <strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici
+        </p>
+    </footer>
+</body>
+</html>

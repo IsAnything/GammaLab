@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resti di Supernova (PeVatron) - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">💥 Resti di Supernova - PeVatron: Acceleratori Cosmici Estremi</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html" class="active">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Introduzione -->
+        <section class="card">
+            <h2>💥 Resti di Supernova: PeVatron</h2>
+            <p>
+                I <strong>resti di supernova (SNR - Supernova Remnants)</strong> sono tra le sorgenti 
+                di raggi gamma più energetiche della nostra galassia. Quando una stella massiccia 
+                esplode come supernova, l'<strong>onda d'urto</strong> si propaga nel mezzo interstellare 
+                a velocità di migliaia di km/s, creando condizioni ideali per l'<strong>accelerazione 
+                di particelle</strong>.
+            </p>
+            <p>
+                Alcuni SNR sono classificati come <strong>PeVatron</strong> - sorgenti capaci di 
+                accelerare particelle fino a energie di <strong>1 PeV (10¹⁵ eV)</strong>, ovvero 
+                un milione di miliardi di elettronvolt. Questa energia corrisponde a circa 
+                <strong>1000 TeV</strong>, mille volte superiore alle energie tipiche della Crab Nebula!
+            </p>
+        </section>
+
+        <!-- Fisica dei PeVatron -->
+        <section class="card">
+            <h2>⚡ Fisica dell'Accelerazione Estrema</h2>
+            
+            <h3>🌪️ Accelerazione da Shock</h3>
+            <p>
+                Il meccanismo principale è l'<strong>accelerazione di Fermi del primo ordine</strong> 
+                (o "diffusive shock acceleration"):
+            </p>
+            <ul>
+                <li><strong>Onda d'urto</strong>: Velocità tipiche v_shock ~ 3000-5000 km/s</li>
+                <li><strong>Attraversamenti multipli</strong>: Le particelle cariche rimbalzano avanti e indietro attraverso lo shock</li>
+                <li><strong>Guadagno energetico</strong>: Ad ogni attraversamento, ΔE/E ~ v_shock/c ~ 1%</li>
+                <li><strong>Accelerazione efficiente</strong>: Dopo ~100 cicli → energie PeV per protoni e nuclei</li>
+            </ul>
+
+            <h3>🧲 Amplificazione Magnetica</h3>
+            <p>
+                Per raggiungere energie PeV, è necessario un <strong>campo magnetico intenso</strong> 
+                (B ~ 100-500 μG, molto superiore al tipico ~3 μG del mezzo interstellare). 
+                L'amplificazione avviene tramite:
+            </p>
+            <ul>
+                <li><strong>Instabilità di streaming</strong>: I raggi cosmici accelerati generano onde nel plasma</li>
+                <li><strong>Turbolenza</strong>: Aumenta l'efficienza del confinamento magnetico</li>
+                <li><strong>Feedback positivo</strong>: Più particelle → più turbolenza → più accelerazione</li>
+            </ul>
+
+            <h3>🎯 Emissione Gamma: Leptonico vs Adronico</h3>
+            <p>
+                I raggi gamma possono essere prodotti attraverso due canali:
+            </p>
+            
+            <h4>📘 Leptonico (elettroni)</h4>
+            <ul>
+                <li><strong>Inverse Compton</strong>: Elettroni ultra-relativistici scatterano fotoni CMB/IR/ottico → raggi gamma</li>
+                <li><strong>Bremsstrahlung</strong>: Elettroni frenano nel campo dei nuclei atomici</li>
+                <li><strong>Caratteristiche</strong>: Spettro più "morbido", cutoff a energie più basse (~10-30 TeV)</li>
+            </ul>
+
+            <h4>📕 Adronico (protoni/nuclei)</h4>
+            <ul>
+                <li><strong>Interazione p-p</strong>: Protoni accelerati collidono con protoni del mezzo → produzione di pioni (π⁰)</li>
+                <li><strong>Decadimento π⁰ → γγ</strong>: I pioni neutri decadono rapidamente in coppie di raggi gamma</li>
+                <li><strong>Caratteristiche</strong>: Spettro più "duro", estensione fino a multi-TeV e PeV</li>
+                <li><strong>Firma distintiva</strong>: "Bump" a E ~ 70 MeV (massa del pione / 2)</li>
+            </ul>
+
+            <p>
+                <strong>Rilevare emissione adronica fino a PeV è la prova che gli SNR sono PeVatron!</strong>
+            </p>
+        </section>
+
+        <!-- Esempi Osservativi -->
+        <section class="card">
+            <h2>🔭 PeVatron Confermati e Candidati</h2>
+            
+            <h3>🌟 Esempi Celebri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sorgente</th>
+                        <th>Tipo</th>
+                        <th>E_max</th>
+                        <th>Distanza</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>RX J1713.7-3946</strong></td>
+                        <td>SNR giovane</td>
+                        <td>>100 TeV</td>
+                        <td>~1 kpc</td>
+                        <td>Primo PeVatron candidato, shell-type</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cassiopeia A</strong></td>
+                        <td>SNR giovane</td>
+                        <td>~10 TeV</td>
+                        <td>3.4 kpc</td>
+                        <td>Resto di SN storica (1680 ca.)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tycho SNR</strong></td>
+                        <td>SNR giovane</td>
+                        <td>~10 TeV</td>
+                        <td>3 kpc</td>
+                        <td>SN osservata nel 1572</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HESS J1825-137</strong></td>
+                        <td>PWN estesa</td>
+                        <td>>50 TeV</td>
+                        <td>4 kpc</td>
+                        <td>Associata a PSR B1823-13</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LHAASO J2226+6057</strong></td>
+                        <td>PWN/SNR?</td>
+                        <td>~1 PeV ⚡</td>
+                        <td>?</td>
+                        <td>Rilevazione LHAASO a energie PeV!</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📊 Caratteristiche Comuni</h3>
+            <ul>
+                <li><strong>Età</strong>: Tipicamente SNR giovani (< 10.000 anni)</li>
+                <li><strong>Morfologia</strong>: Spesso "shell-type" (emissione a guscio, non centrale)</li>
+                <li><strong>Estensione</strong>: Sorgenti estese (diametri ~10-60 arcmin)</li>
+                <li><strong>Spettro duro</strong>: Indice spettrale Γ ~ 2.0-2.3 (più "piatto" della Crab Γ~2.6)</li>
+                <li><strong>Luminosità</strong>: L_γ ~ 10³³-10³⁴ erg/s (0.1-1% dell'energia cinetica dell'esplosione)</li>
+            </ul>
+        </section>
+
+        <!-- Parametri IACT -->
+        <section class="card">
+            <h2>📸 Firma Cherenkov dei PeVatron</h2>
+            <p>
+                Gli eventi gamma da PeVatron mostrano caratteristiche <strong>estreme</strong> 
+                rispetto a sorgenti standard come la Crab:
+            </p>
+
+            <h3>Parametri di Hillas Tipici</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>Interpretazione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.30° - 0.50°</td>
+                        <td>~0.40°</td>
+                        <td>⚡ Tracce molto più lunghe (alta energia)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>0.10° - 0.20°</td>
+                        <td>~0.15°</td>
+                        <td>Sciami più ampi (sviluppo laterale maggiore)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>2000 - 5000 p.e.</td>
+                        <td>~2500 p.e. 🔥</td>
+                        <td>Segnali molto intensi (E >> TeV), spesso saturazione</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>0° - 20°</td>
+                        <td>~10° (disperso)</td>
+                        <td>Sorgenti estese → α non punta sempre al centro</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L/W Ratio</strong></td>
+                        <td>2.0 - 3.5</td>
+                        <td>~2.7</td>
+                        <td>Rapporto simile a Crab, ma valori assoluti maggiori</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Caratteristiche Distintive</h3>
+            <ul>
+                <li><strong>Size estremi</strong>: Il segnale chiave! Size regolarmente >2000 p.e., con picchi >5000 p.e. (vs ~1000 per Crab)</li>
+                <li><strong>Saturazione</strong>: A energie multi-TeV, i PMT possono saturare → segnale "tagliato"</li>
+                <li><strong>Tracce lunghe</strong>: Length ~40 pixel (0.40°), ben oltre i ~25 px della Crab</li>
+                <li><strong>Alpha disperso</strong>: Per SNR shell-type, α varia 5-20° (emissione dal bordo, non dal centro)</li>
+                <li><strong>Coerenza stereoscopica buona</strong>: Varianza inter-camera ~10-15% (leggermente superiore a Crab)</li>
+                <li><strong>Spettro duro</strong>: Maggiore frazione di eventi ad alta Size rispetto a spettri "morbidi"</li>
+            </ul>
+
+            <h3>📐 Conversione Pixel (1° = 100 px)</h3>
+            <ul>
+                <li>Length ~ 0.40° → <strong>40 pixel</strong></li>
+                <li>Width ~ 0.15° → <strong>15 pixel</strong></li>
+                <li>Distribuzione Size: picco a ~2500 p.e., coda fino a 5000+ p.e.</li>
+            </ul>
+        </section>
+
+        <!-- Simulatore -->
+        <section class="card simulator-section">
+            <h2>🎮 Simulatore IACT - PeVatron</h2>
+            <p>
+                Questa simulazione mostra eventi gamma da un <strong>resto di supernova PeVatron</strong>. 
+                Nota le <strong>tracce molto più lunghe e luminose</strong> rispetto alla Crab, 
+                e la maggiore <strong>dispersione angolare</strong> dovuta all'estensione spaziale della sorgente.
+            </p>
+            <p style="color: var(--text-secondary); font-size: 0.95em;">
+                💡 <strong>Osserva</strong>: I parametri Size saranno sistematicamente >2000 p.e., 
+                spesso saturando i sensori. Questo è il marchio distintivo degli eventi PeV!
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <button id="generateBtn" class="btn btn-primary">⚡ Genera Evento PeVatron</button>
+                <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
+            </div>
+
+            <!-- 3 Camere -->
+            <div class="cameras-grid">
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 1 (Nord)</div>
+                    <canvas id="cam1" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 2 (Est)</div>
+                    <canvas id="cam2" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 3 (Sud)</div>
+                    <canvas id="cam3" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+            </div>
+
+            <!-- Pannello Parametri di Hillas -->
+            <div class="hillas-panel">
+                <h3>📊 Parametri di Hillas Misurati</h3>
+                <div id="hillasDisplay">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Genera un evento per visualizzare i parametri di Hillas
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ricostruzione Stereoscopica -->
+            <div class="stereo-container">
+                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Per sorgenti estese, gli assi possono convergere in regioni diverse del cielo
+                </p>
+                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
+            </div>
+        </section>
+
+        <!-- Importanza Scientifica -->
+        <section class="card">
+            <h2>🎓 Perché i PeVatron Sono Importanti?</h2>
+            
+            <h3>🌌 Origine dei Raggi Cosmici</h3>
+            <p>
+                Una delle domande fondamentali dell'astrofisica è: <strong>dove vengono accelerati 
+                i raggi cosmici galattici?</strong> I PeVatron sono candidati primari:
+            </p>
+            <ul>
+                <li><strong>Problema del "ginocchio"</strong>: Lo spettro dei raggi cosmici mostra una rottura a ~3 PeV (il "knee"). I PeVatron potrebbero essere responsabili della componente fino a questa energia</li>
+                <li><strong>Bilancio energetico</strong>: Servono ~10⁴¹ erg/s per mantenere i raggi cosmici galattici. I PeVatron SNR possono fornire questa potenza</li>
+                <li><strong>Composizione</strong>: L'emissione adronica (decadimento π⁰) dimostra che vengono accelerati protoni e nuclei, non solo elettroni</li>
+            </ul>
+
+            <h3>⚛️ Fisica delle Particelle Estrema</h3>
+            <p>
+                I PeVatron sono laboratori naturali per studiare:
+            </p>
+            <ul>
+                <li><strong>Accelerazione</strong>: Meccanismi che portano particelle da energie termiche (~eV) a PeV in pochi anni</li>
+                <li><strong>Propagazione</strong>: Come si diffondono i raggi cosmici nella galassia</li>
+                <li><strong>Interazioni nucleari</strong>: Sezioni d'urto p-p a energie inaccessibili agli acceleratori terrestri</li>
+            </ul>
+
+            <h3>🔮 Prossimi Sviluppi</h3>
+            <p>
+                La ricerca sui PeVatron è in piena espansione grazie a nuovi strumenti:
+            </p>
+            <ul>
+                <li><strong>CTA (Cherenkov Telescope Array)</strong>: 100+ telescopi, sensibilità 10× superiore a H.E.S.S./VERITAS</li>
+                <li><strong>LHAASO</strong>: Osservatorio cinese già operativo, ha scoperto oltre 10 sorgenti >100 TeV</li>
+                <li><strong>SWGO (Southern Wide-field Gamma-ray Observatory)</strong>: Progetto per emisfero sud, copertura continua del cielo</li>
+                <li><strong>Fermi-LAT + IACT</strong>: Copertura multi-banda da MeV a PeV per distinguere emissione leptonica da adronica</li>
+            </ul>
+        </section>
+
+        <!-- Confronto -->
+        <section class="card">
+            <h2>⚖️ Confronto: PeVatron vs Crab</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caratteristica</th>
+                        <th>Crab Nebula</th>
+                        <th>PeVatron SNR</th>
+                        <th>Rapporto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Energy Max</strong></td>
+                        <td>~100 TeV</td>
+                        <td>~1 PeV (1000 TeV)</td>
+                        <td>×10</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>~0.25°</td>
+                        <td>~0.40°</td>
+                        <td>×1.6</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size medio</strong></td>
+                        <td>~1000 p.e.</td>
+                        <td>~2500 p.e.</td>
+                        <td>×2.5</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estensione</strong></td>
+                        <td>~4' (puntiforme)</td>
+                        <td>10-60' (estesa)</td>
+                        <td>×5-15</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Variabilità</strong></td>
+                        <td><5% (stabile)</td>
+                        <td><20% (moderata)</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card">
+            <h2>🚀 Esplora Altre Sorgenti</h2>
+            <p>
+                Hai visto gli acceleratori galattici più potenti. Ora scopri sorgenti extragalattiche 
+                ancora più violente:
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="blazars.html" class="btn btn-primary">🌀 Blazar (AGN)</a>
+                <a href="grb.html" class="btn btn-primary">⚡ GRB (Gamma-Ray Burst)</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Tabella Comparativa</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/core-simulation.js"></script>
+    <script src="../js/source-profiles.js"></script>
+    <script src="../js/hillas-analysis.js"></script>
+    <script src="../js/visualization.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script>
+        // Setup simulatore PeVatron usando modulo navigation
+        setupSourceSimulator('pevatron');
+    </script>
+</body>
+</html>

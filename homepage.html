@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaLab - Astronomia dei Raggi Gamma</title>
+    <link rel="stylesheet" href="css/main-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">Esplora l'Universo ai Raggi Gamma - Telescopi Cherenkov e Astronomia di Alta Energia</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="homepage.html" class="active">🏠 Home</a></li>
+                    <li><a href="pages/intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="pages/crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="pages/supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="pages/blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="pages/grb.html">⚡ GRB</a></li>
+                    <li><a href="pages/galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="pages/comparison.html">📊 Confronto</a></li>
+                    <li><a href="pages/hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="pages/quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Introduzione -->
+        <section class="card">
+            <h2>Benvenuto in GammaLab</h2>
+            <p>
+                Questo sito ti permetterà di esplorare il mondo dell'<strong>astronomia ai raggi gamma</strong>, 
+                una delle frontiere più affascinanti della fisica moderna. Attraverso simulazioni interattive 
+                dei <strong>telescopi Cherenkov atmosferici (IACT)</strong>, potrai osservare come vengono 
+                rilevati i raggi gamma provenienti da diverse sorgenti cosmiche.
+            </p>
+            <p>
+                I raggi gamma sono la forma più energetica di radiazione elettromagnetica, con energie che 
+                superano i <strong>100 GeV</strong> (cento miliardi di elettronvolt). Quando questi fotoni 
+                ad alta energia entrano nell'atmosfera terrestre, generano <strong>sciami di particelle</strong> 
+                che producono <strong>luce Cherenkov</strong> - un caratteristico bagliore blu che i nostri 
+                telescopi possono rilevare.
+            </p>
+        </section>
+
+        <!-- Come funziona -->
+        <section class="card">
+            <h2>Come Funziona GammaLab</h2>
+            
+            <h3>🔍 Esplora le Sorgenti</h3>
+            <p>
+                Visita le pagine dedicate alle cinque principali classi di sorgenti di raggi gamma:
+            </p>
+            <ul>
+                <li><strong>Crab Nebula</strong> - La "candela standard" dell'astronomia gamma, resto di supernova pulsante</li>
+                <li><strong>Resti di Supernova (PeVatron)</strong> - Acceleratori cosmici che producono raggi gamma fino al PeV</li>
+                <li><strong>Blazar (AGN)</strong> - Nuclei galattici attivi con getti relativistici puntati verso la Terra</li>
+                <li><strong>GRB (Gamma-Ray Burst)</strong> - Esplosioni cosmiche tra le più energetiche dell'Universo</li>
+                <li><strong>Centro Galattico</strong> - Il cuore turbolento della nostra galassia</li>
+            </ul>
+
+            <h3>🧪 Simulazioni Interattive</h3>
+            <p>
+                Ogni pagina include un <strong>simulatore IACT in tempo reale</strong> che mostra:
+            </p>
+            <ul>
+                <li><strong>3 camere Cherenkov</strong> con disposizione stereoscopica</li>
+                <li><strong>Immagini delle tracce</strong> lasciate dai raggi gamma nell'atmosfera</li>
+                <li><strong>Parametri di Hillas</strong> (Length, Width, Size, Alpha) per ogni camera</li>
+                <li><strong>Ricostruzione stereoscopica</strong> della direzione di arrivo</li>
+                <li><strong>Palette energetica realistica</strong> (Blu → Ciano → Verde → Giallo → Arancione → Rosso → Bianco)</li>
+            </ul>
+
+            <h3>🎯 Metti alla Prova le Tue Conoscenze</h3>
+            <p>
+                Vai alla sezione <strong>Quiz</strong> per testare la tua capacità di identificare le sorgenti 
+                basandoti sui parametri osservabili. Avrai 60 secondi per analizzare le immagini Cherenkov 
+                e indovinare la sorgente corretta!
+            </p>
+        </section>
+
+        <!-- Parametri di Hillas -->
+        <section class="card">
+            <h2>Parametri di Hillas: La Firma delle Sorgenti</h2>
+            <p>
+                Le tracce Cherenkov vengono analizzate tramite i <strong>parametri di Hillas</strong>, 
+                che caratterizzano la forma e l'intensità delle immagini. Questi parametri variano 
+                in modo distintivo a seconda della sorgente:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Descrizione</th>
+                        <th>Unità</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>Lunghezza maggiore dell'ellisse che descrive la traccia</td>
+                        <td>gradi (°)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>Larghezza minore dell'ellisse (perpendic olare alla Length)</td>
+                        <td>gradi (°)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>Carica totale raccolta (intensità luminosa integrata)</td>
+                        <td>fotoelettroni</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>Angolo tra l'asse maggiore e la direzione della sorgente stimata</td>
+                        <td>gradi (°)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <strong>Esempio pratico:</strong> Una traccia della <strong>Crab Nebula</strong> mostrerà 
+                tipicamente Length ~0.25°, Width ~0.08°, Size ~1000 p.e., e Alpha ~0° (sorgente puntiforme). 
+                Al contrario, un <strong>resto di supernova PeVatron</strong> avrà Length maggiori (~0.35°), 
+                Width più ampi (~0.15°), Size più elevati (>2000 p.e.), e Alpha variabili per l'estensione spaziale.
+            </p>
+        </section>
+
+        <!-- Background Adronico -->
+        <section class="card">
+            <h2>🧩 Il Problema del Background Adronico</h2>
+            <p>
+                Non tutte le tracce rilevate sono dovute a raggi gamma! I <strong>raggi cosmici</strong> 
+                (protoni, nuclei atomici) sono ~1000 volte più abbondanti e producono sciami molto simili.
+            </p>
+            <p>
+                Distinguere i veri eventi gamma dal background adronico è una delle sfide principali 
+                dell'astronomia Cherenkov. Nella sezione dedicata imparerai a riconoscere le differenze:
+            </p>
+            <ul>
+                <li><strong>Tracce adroniche</strong>: più irregolari, meno compatte, parametri più dispersi</li>
+                <li><strong>Tracce gamma</strong>: ellissi più regolari, parametri più coerenti tra le camere</li>
+            </ul>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="card text-center">
+            <h2>Inizia l'Esplorazione!</h2>
+            <p style="font-size: 1.2em; margin-bottom: 24px;">
+                Scegli da dove vuoi cominciare il tuo viaggio nell'universo gamma:
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a href="pages/intro-cherenkov.html" class="btn btn-primary">📚 Introduzione ai Telescopi Cherenkov</a>
+                <a href="pages/crab-nebula.html" class="btn btn-primary">🦀 Simula la Crab Nebula</a>
+                <a href="pages/quiz.html" class="btn btn-success">🎮 Vai al Quiz!</a>
+            </div>
+        </section>
+
+        <!-- Footer informativo -->
+        <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+            <p>
+                <strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici<br>
+                Basato sui principi della fisica degli sciami estesi e dell'analisi dei parametri di Hillas
+            </p>
+            <p style="margin-top: 12px; font-size: 0.9em;">
+                ⚠️ Nota: Le simulazioni sono rappresentazioni semplificate per scopi didattici.<br>
+                I valori reali possono variare in base alla configurazione strumentale e alle condizioni osservative.
+            </p>
+        </footer>
+    </main>
+</body>
+</html>

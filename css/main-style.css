@@ -1,0 +1,512 @@
+/* ==================== GAMMALAB - TEMA SCURO ASTRONOMICO ==================== */
+
+/* Reset e Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Colori tema astronomico */
+  --bg-space: #0a0e1a;
+  --bg-card: #111827;
+  --bg-elevated: #1e293b;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #06b6d4;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --shadow: rgba(0, 0, 0, 0.5);
+  
+  /* Palette energetica per simulazioni */
+  --energy-low: #0066ff;
+  --energy-medium: #00ffff;
+  --energy-high: #00ff00;
+  --energy-very-high: #ffff00;
+  --energy-intense: #ff8800;
+  --energy-extreme: #ff0000;
+  --energy-saturated: #ffffff;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-space);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Container principale */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ==================== HEADER E NAVIGAZIONE ==================== */
+
+header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 2px solid var(--accent-blue);
+  padding: 20px 0;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.site-title {
+  font-size: 2.5em;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.site-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1em;
+  margin-bottom: 20px;
+}
+
+/* Menu navigazione */
+nav {
+  margin-top: 20px;
+}
+
+.nav-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+}
+
+.nav-menu li a {
+  display: block;
+  padding: 12px 24px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-menu li a:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.nav-menu li a.active {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+/* ==================== CARDS E SEZIONI ==================== */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.card h2 {
+  color: var(--accent-cyan);
+  margin-bottom: 16px;
+  font-size: 1.8em;
+}
+
+.card h3 {
+  color: var(--accent-blue);
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-size: 1.4em;
+}
+
+.card p {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.card ul {
+  color: var(--text-secondary);
+  margin-left: 24px;
+  margin-bottom: 12px;
+}
+
+/* ==================== SIMULATORE LAYOUT ==================== */
+
+.simulator-section {
+  margin-top: 32px;
+}
+
+.cameras-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.camera-container {
+  position: relative;
+}
+
+.camera-label {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.camera-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3/2;
+  background: #000;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: crosshair;
+}
+
+.viewer-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+  background: #000;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Ricostruzione stereoscopica */
+.stereo-container {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.stereo-canvas {
+  max-width: 960px;
+  width: 100%;
+  height: auto;
+  background: #000;
+  border: 2px solid var(--accent-purple);
+  border-radius: 8px;
+  margin: 0 auto;
+  display: block;
+}
+
+/* ==================== PANNELLO PARAMETRI HILLAS ==================== */
+
+.hillas-panel {
+  background: var(--bg-elevated);
+  border: 2px solid var(--accent-blue);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.hillas-panel h3 {
+  color: var(--accent-cyan);
+  margin-bottom: 16px;
+}
+
+.hillas-parameters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.param-item {
+  background: var(--bg-card);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.param-label {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.param-value {
+  color: var(--accent-cyan);
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.param-unit {
+  color: var(--text-secondary);
+  font-size: 0.85em;
+  margin-left: 4px;
+}
+
+/* Tooltip */
+.tooltip-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-blue);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 16px;
+  font-size: 12px;
+  cursor: help;
+  position: relative;
+}
+
+.tooltip-icon:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* ==================== BUTTONS ==================== */
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+/* ==================== TABELLE ==================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+table th {
+  background: var(--bg-elevated);
+  color: var(--accent-cyan);
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+}
+
+table td {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+table tr:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* ==================== QUIZ SPECIFICO ==================== */
+
+.quiz-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+}
+
+.timer {
+  font-size: 2em;
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.timer.warning {
+  color: var(--energy-intense);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.score {
+  font-size: 1.5em;
+  color: var(--accent-purple);
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.quiz-option {
+  padding: 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-weight: 600;
+}
+
+.quiz-option:hover {
+  border-color: var(--accent-blue);
+  transform: scale(1.05);
+}
+
+.quiz-option.selected {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.quiz-option.correct {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.quiz-option.incorrect {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.feedback-panel {
+  background: var(--bg-elevated);
+  border: 2px solid var(--accent-purple);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.hint-panel {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid var(--accent-purple);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1024px) {
+  .cameras-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hillas-parameters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cameras-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav-menu {
+    flex-direction: column;
+  }
+  
+  .site-title {
+    font-size: 2em;
+  }
+  
+  .hillas-parameters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.hidden {
+  display: none;
+}

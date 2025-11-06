@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Sorgenti Gamma - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">🎮 Quiz - Identifica le Sorgenti Gamma</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html" class="active">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container quiz-container">
+        <!-- Schermata Iniziale -->
+        <section id="startScreen" class="card">
+            <h2>🎮 Quiz: Identifica le Sorgenti Gamma</h2>
+            <p>
+                Metti alla prova la tua conoscenza dell'astronomia gamma! 
+                Ti verranno presentati eventi Cherenkov simulati, e dovrai <strong>identificare 
+                la sorgente</strong> basandoti sui parametri di Hillas.
+            </p>
+
+            <h3>📋 Come Funziona</h3>
+            <ul>
+                <li>🎯 <strong>Obiettivo</strong>: Identifica correttamente la sorgente tra 6 opzioni</li>
+                <li>⏱️ <strong>Tempo</strong>: Hai 60 secondi per ogni domanda</li>
+                <li>💡 <strong>Hints</strong>: Puoi richiedere fino a 3 indizi progressivi (riducono il punteggio)</li>
+                <li>📊 <strong>Scoring</strong>:
+                    <ul>
+                        <li>Risposta corretta senza hint: +100 punti</li>
+                        <li>Con 1 hint: +70 punti</li>
+                        <li>Con 2 hint: +40 punti</li>
+                        <li>Con 3 hint: +20 punti</li>
+                        <li>Risposta sbagliata: 0 punti</li>
+                    </ul>
+                </li>
+                <li>🏆 <strong>Bonus</strong>: Streak di risposte consecutive corrette → bonus moltiplicatore!</li>
+            </ul>
+
+            <h3>🎯 Sorgenti da Identificare</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 24px 0;">
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>🦀 Crab Nebula</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">L~25px, W~8px, α~0°</p>
+                </div>
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>💥 PeVatron</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">L~40px, Size>>2000, α~10°</p>
+                </div>
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>🌀 Blazar</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">L~15px, W~5px, α~0°</p>
+                </div>
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>⚡ GRB</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">L~15px, L/W~1.9, α~0°</p>
+                </div>
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>⭐ Centro Galattico</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">L~30px, Size~1800, α~8°</p>
+                </div>
+                <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h4>⚛️ Background Adronico</h4>
+                    <p style="font-size: 0.9em; color: var(--text-secondary);">W~22px, L/W~1.6, α uniforme</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 32px;">
+                <button id="startQuizBtn" class="btn btn-success" style="font-size: 1.2em; padding: 16px 32px;">
+                    🚀 Inizia Quiz
+                </button>
+            </div>
+
+            <p style="margin-top: 24px; text-align: center; color: var(--text-secondary);">
+                💡 <strong>Consiglio</strong>: Ripassa la <a href="comparison.html" style="color: var(--accent-blue);">tabella comparativa</a> 
+                prima di iniziare!
+            </p>
+        </section>
+
+        <!-- Schermata Quiz (nascosta inizialmente) -->
+        <section id="quizScreen" class="hidden">
+            <!-- Header Quiz -->
+            <div class="quiz-header">
+                <div>
+                    <span style="color: var(--text-secondary);">Domanda</span>
+                    <strong id="questionNumber" style="font-size: 1.3em; margin-left: 8px;">1/10</strong>
+                </div>
+                <div class="timer" id="timer">60</div>
+                <div class="score">
+                    <span style="color: var(--text-secondary);">Punteggio:</span>
+                    <strong id="scoreDisplay" style="font-size: 1.3em; margin-left: 8px;">0</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-secondary);">Streak:</span>
+                    <strong id="streakDisplay" style="font-size: 1.3em; margin-left: 8px; color: var(--accent-cyan);">0</strong>
+                </div>
+            </div>
+
+            <!-- Simulatore -->
+            <div class="card simulator-section">
+                <h3>📷 Osservazione IACT</h3>
+                <p id="quizInstruction" style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Analizza le immagini Cherenkov e i parametri di Hillas per identificare la sorgente.
+                </p>
+
+                <!-- 3 Camere -->
+                <div class="cameras-grid">
+                    <div class="camera-container">
+                        <div class="camera-label">📷 Camera 1</div>
+                        <canvas id="quizCam1" class="camera-canvas" width="1500" height="1000"></canvas>
+                        <canvas id="quizCam1-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    </div>
+                    <div class="camera-container">
+                        <div class="camera-label">📷 Camera 2</div>
+                        <canvas id="quizCam2" class="camera-canvas" width="1500" height="1000"></canvas>
+                        <canvas id="quizCam2-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    </div>
+                    <div class="camera-container">
+                        <div class="camera-label">📷 Camera 3</div>
+                        <canvas id="quizCam3" class="camera-canvas" width="1500" height="1000"></canvas>
+                        <canvas id="quizCam3-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pannello Parametri -->
+                <div class="hillas-panel">
+                    <h3>📊 Parametri di Hillas Misurati</h3>
+                    <div id="quizHillasDisplay" class="hillas-parameters">
+                        <!-- I parametri saranno inseriti dinamicamente dal JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opzioni Risposta -->
+            <div class="card">
+                <h3>🎯 Quale sorgente hai osservato?</h3>
+                <div class="quiz-options" id="answerOptions">
+                    <button class="quiz-option" data-answer="crab">🦀 Crab Nebula</button>
+                    <button class="quiz-option" data-answer="pevatron">💥 Resto di Supernova (PeVatron)</button>
+                    <button class="quiz-option" data-answer="blazar">🌀 Blazar (AGN)</button>
+                    <button class="quiz-option" data-answer="grb">⚡ GRB (Gamma-Ray Burst)</button>
+                    <button class="quiz-option" data-answer="gc">⭐ Centro Galattico</button>
+                    <button class="quiz-option" data-answer="hadron">⚛️ Background Adronico</button>
+                </div>
+
+                <!-- Pulsanti Hints -->
+                <div style="text-align: center; margin-top: 24px;">
+                    <button id="hint1Btn" class="btn btn-secondary" style="margin: 0 8px;">💡 Hint 1 (-30 punti)</button>
+                    <button id="hint2Btn" class="btn btn-secondary" style="margin: 0 8px;" disabled>💡 Hint 2 (-30 punti)</button>
+                    <button id="hint3Btn" class="btn btn-secondary" style="margin: 0 8px;" disabled>💡 Hint 3 (-20 punti)</button>
+                </div>
+
+                <!-- Pannello Hint -->
+                <div id="hintPanel" class="hint-panel hidden">
+                    <h4 style="color: var(--accent-purple);">💡 Indizio</h4>
+                    <p id="hintText"></p>
+                </div>
+
+                <!-- Feedback Risposta -->
+                <div id="feedbackPanel" class="feedback-panel hidden">
+                    <h3 id="feedbackTitle"></h3>
+                    <p id="feedbackText"></p>
+                    <div style="text-align: center; margin-top: 16px;">
+                        <button id="nextQuestionBtn" class="btn btn-primary">➡️ Prossima Domanda</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schermata Risultati (nascosta inizialmente) -->
+        <section id="resultsScreen" class="hidden">
+            <div class="card text-center">
+                <h2>🏆 Quiz Completato!</h2>
+                
+                <div style="font-size: 3em; margin: 24px 0;">
+                    <span id="finalScore" style="color: var(--accent-cyan); font-weight: 700;">0</span>
+                    <span style="color: var(--text-secondary); font-size: 0.5em;">/1000</span>
+                </div>
+
+                <div id="performanceRating" style="margin: 24px 0;">
+                    <!-- Rating inserito dinamicamente -->
+                </div>
+
+                <!-- Statistiche Dettagliate -->
+                <div class="card" style="background: var(--bg-elevated); margin: 32px auto; max-width: 600px;">
+                    <h3>📊 Statistiche</h3>
+                    <table style="width: 100%; text-align: left;">
+                        <tr>
+                            <td><strong>Risposte Corrette:</strong></td>
+                            <td id="correctAnswers" style="text-align: right; color: var(--accent-cyan);">0/10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Accuratezza:</strong></td>
+                            <td id="accuracy" style="text-align: right;">0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Streak Massimo:</strong></td>
+                            <td id="maxStreak" style="text-align: right;">0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hints Utilizzati:</strong></td>
+                            <td id="hintsUsed" style="text-align: right;">0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tempo Medio:</strong></td>
+                            <td id="avgTime" style="text-align: right;">0s</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Performance per Sorgente -->
+                <div class="card" style="background: var(--bg-elevated); margin: 32px auto; max-width: 800px;">
+                    <h3>🎯 Performance per Sorgente</h3>
+                    <div id="sourceBreakdown">
+                        <!-- Breakdown inserito dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Pulsanti Azione -->
+                <div style="margin-top: 32px;">
+                    <button id="retryQuizBtn" class="btn btn-primary" style="margin: 0 8px;">🔄 Riprova</button>
+                    <button id="reviewBtn" class="btn btn-secondary" style="margin: 0 8px;">📚 Ripassa</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/core-simulation.js"></script>
+    <script src="../js/source-profiles.js"></script>
+    <script src="../js/visualization.js"></script>
+    <script src="../js/quiz-engine.js"></script>
+    <script>
+        // Placeholder per inizializzazione quiz (implementazione completa in Settimana 5-6)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Quiz page loaded - Engine in development');
+
+            // Pulsante Start Quiz
+            document.getElementById('startQuizBtn').addEventListener('click', () => {
+                alert('🚧 Quiz Engine in fase di sviluppo\n\nSarà completamente implementato nella Settimana 5-6 del timeline con:\n\n✅ Generazione casuale sorgenti\n✅ Timer 60 secondi\n✅ Sistema hints progressivi\n✅ Scoring e streak bonus\n✅ Feedback educativo dettagliato\n✅ Statistiche finali\n\nPer ora puoi esplorare le pagine educative e simulatori delle singole sorgenti!');
+            });
+
+            // Pulsante Retry (nascosto per ora)
+            const retryBtn = document.getElementById('retryQuizBtn');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => {
+                    location.reload();
+                });
+            }
+
+            // Pulsante Review
+            const reviewBtn = document.getElementById('reviewBtn');
+            if (reviewBtn) {
+                reviewBtn.addEventListener('click', () => {
+                    window.location.href = 'comparison.html';
+                });
+            }
+        });
+
+        // Funzioni placeholder (saranno implementate in quiz-engine.js)
+        function initQuiz() {
+            console.log('Init quiz...');
+            // TODO: Implementare in Settimana 5-6
+        }
+
+        function startTimer() {
+            console.log('Start timer...');
+            // TODO: Timer countdown 60s
+        }
+
+        function generateQuestion() {
+            console.log('Generate question...');
+            // TODO: Seleziona sorgente casuale, genera evento, mostra parametri
+        }
+
+        function checkAnswer(selected) {
+            console.log('Check answer:', selected);
+            // TODO: Verifica risposta, aggiorna score, mostra feedback
+        }
+
+        function showHint(level) {
+            console.log('Show hint level:', level);
+            // TODO: Mostra hint progressivo basato sulla sorgente corrente
+        }
+
+        function calculateFinalScore() {
+            console.log('Calculate final score...');
+            // TODO: Somma punti, applica bonus streak, mostra statistiche
+        }
+    </script>
+</body>
+</html>

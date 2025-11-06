@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Adronico - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">⚛️ Background Adronico - Il Rumore Cosmico</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html" class="active">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Introduzione -->
+        <section class="card">
+            <h2>⚛️ Il Problema del Background Adronico</h2>
+            <p>
+                Uno dei maggiori ostacoli nell'astronomia gamma con telescopi Cherenkov è distinguere 
+                i <strong>veri eventi gamma</strong> dal <strong>background adronico</strong> - gli 
+                sciami atmosferici prodotti dai <strong>raggi cosmici carichi</strong> (protoni, nuclei 
+                atomici) che bombardano continuamente l'atmosfera terrestre.
+            </p>
+            <p>
+                Il problema è critico perché:
+            </p>
+            <ul>
+                <li>📊 <strong>Abbondanza</strong>: I raggi cosmici sono ~<strong>1000 volte più frequenti</strong> dei raggi gamma</li>
+                <li>🎭 <strong>Mimicry</strong>: Gli sciami adronici producono luce Cherenkov simile agli sciami gamma</li>
+                <li>⚠️ <strong>Contaminazione</strong>: Anche con tecniche avanzate, rimane ~1-5% di contaminazione adronica</li>
+            </ul>
+            <p>
+                Senza metodi efficaci di <strong>reiezione del background</strong>, i telescopi IACT 
+                sarebbero sommersi da falsi positivi, rendendo impossibile rilevare le deboli sorgenti gamma!
+            </p>
+        </section>
+
+        <!-- Origine Fisica -->
+        <section class="card">
+            <h2>🌌 Origine del Background Adronico</h2>
+            
+            <h3>☄️ Raggi Cosmici Galattici</h3>
+            <p>
+                I <strong>raggi cosmici (CR)</strong> sono particelle cariche accelerate in sorgenti 
+                astrofisiche (SNR, pulsar, AGN) che pervadono la galassia:
+            </p>
+            <ul>
+                <li><strong>Composizione</strong>: ~90% protoni, ~9% nuclei He, ~1% nuclei pesanti</li>
+                <li><strong>Spettro energetico</strong>: Power-law E⁻²·⁷ da GeV a oltre 10²⁰ eV</li>
+                <li><strong>Flusso</strong>: ~1 particella/cm²/s a E~1 GeV, ~1/m²/anno a E>10¹⁵ eV</li>
+                <li><strong>Isotropia</strong>: Praticamente isotropi (diffusi da campi magnetici galattici)</li>
+            </ul>
+
+            <h3>💥 Sciami Adronici nell'Atmosfera</h3>
+            <p>
+                Quando un raggio cosmico entra nell'atmosfera, innesca uno <strong>sciame adronico</strong>:
+            </p>
+            <ul>
+                <li><strong>Collisione iniziale</strong>: Protone + nucleo atmosferico → produzione di pioni, kaoni, barioni</li>
+                <li><strong>Cascata adronica</strong>: π±, K±, p, n si propagano e interagiscono ulteriormente</li>
+                <li><strong>Decadimenti</strong>: π⁰ → γγ (fotoni che generano cascate EM), π± → μ± + ν</li>
+                <li><strong>Componente muonica</strong>: I muoni penetrano profondamente (~km nell'atmosfera)</li>
+                <li><strong>Componente EM</strong>: Dai decadimenti π⁰ e da Bremsstrahlung</li>
+            </ul>
+
+            <h3>⚡ Produzione di Luce Cherenkov</h3>
+            <p>
+                Lo sciame adronico produce luce Cherenkov attraverso:
+            </p>
+            <ul>
+                <li><strong>Elettroni/positroni</strong>: Dalla componente EM (π⁰ → γ → e⁺e⁻)</li>
+                <li><strong>Muoni</strong>: Particelle cariche ultra-relativistiche (β~1)</li>
+                <li><strong>Protoni/nuclei secondari</strong>: Contributo minore (più lenti)</li>
+            </ul>
+            <p>
+                Il risultato è che <strong>gli sciami adronici sembrano molto simili agli sciami gamma</strong> 
+                nella camera IACT - entrambi producono immagini ellittiche con luce blu Cherenkov!
+            </p>
+        </section>
+
+        <!-- Differenze Gamma vs Adroni -->
+        <section class="card">
+            <h2>🔍 Distinguere Eventi Gamma da Adronici</h2>
+            <p>
+                Nonostante le similitudini, ci sono <strong>differenze sottili ma cruciali</strong> 
+                tra sciami gamma ed adronici che permettono la discriminazione:
+            </p>
+
+            <h3>📊 Confronto Morfologico</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Proprietà</th>
+                        <th>Eventi Gamma (γ)</th>
+                        <th>Eventi Adronici (p/He)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Forma traccia</strong></td>
+                        <td>Ellisse regolare, smooth</td>
+                        <td>Irregolare, con grumi (clumpiness)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Singolarità</strong></td>
+                        <td>Un solo "core" centrale</td>
+                        <td>Spesso multipli sub-sciami</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>Stretto (~0.05-0.15°)</td>
+                        <td>Più largo (~0.10-0.30°)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Length/Width</strong></td>
+                        <td>Alto (2.5-4.0)</td>
+                        <td>Più basso (1.5-3.0)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compattezza</strong></td>
+                        <td>Alta (luminosità concentrata)</td>
+                        <td>Bassa (luce dispersa)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Asimmetria</strong></td>
+                        <td>Bassa</td>
+                        <td>Alta (forma asimmetrica)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coerenza stereo</strong></td>
+                        <td>Eccellente (parametri simili tra camere)</td>
+                        <td>Moderata (parametri più dispersi)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Presenza muoni</strong></td>
+                        <td>Nessuna / trascurabile</td>
+                        <td>Significativa (anelli Cherenkov muonici)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Parametri Discriminanti Chiave</h3>
+            <ul>
+                <li><strong>Width</strong>: Gli eventi adronici hanno Width sistematicamente maggiori (~1.5× rispetto a gamma)</li>
+                <li><strong>Asimmetria</strong>: Misurata come deviazione dalla forma ellittica perfetta</li>
+                <li><strong>Numero sub-immagini</strong>: Conteggio pixel clusters separati</li>
+                <li><strong>Tempo arrivo</strong>: Gli adroni hanno spread temporale maggiore (componente muonica ritardata)</li>
+                <li><strong>Core location</strong>: Distanza impatto al suolo ricostruita</li>
+            </ul>
+        </section>
+
+        <!-- Metodi di Reiezione -->
+        <section class="card">
+            <h2>🛡️ Metodi di Reiezione del Background</h2>
+            
+            <h3>1️⃣ Tagli sui Parametri di Hillas (Standard Cuts)</h3>
+            <p>
+                Il metodo classico usa <strong>tagli geometrici</strong> sui parametri di Hillas:
+            </p>
+            <ul>
+                <li><strong>Width cut</strong>: Rigetta eventi con Width > 0.15-0.20° (dipende da energia)</li>
+                <li><strong>Length cut</strong>: Seleziona 0.10° < Length < 0.50°</li>
+                <li><strong>Size cut</strong>: Soglia minima ~50-100 p.e. (elimina rumore NSB)</li>
+                <li><strong>L/W cut</strong>: Richiede L/W > 1.5-2.0</li>
+            </ul>
+            <p>
+                <strong>Efficienza</strong>: Conserva ~60-80% degli eventi gamma, riget ta ~95-98% degli adroni.
+            </p>
+
+            <h3>2️⃣ Alpha Plot e Segnale ON/OFF</h3>
+            <p>
+                Sfrutta la concentrazione degli eventi gamma a piccoli Alpha:
+            </p>
+            <ul>
+                <li><strong>Regione ON</strong>: α < 10-15° (contiene segnale + background)</li>
+                <li><strong>Regione OFF</strong>: 30° < α < 90° (solo background, niente segnale)</li>
+                <li><strong>Sottrazione</strong>: N_signal = N_ON - N_OFF (normalizzato per area)</li>
+            </ul>
+            <p>
+                Questo metodo permette di <strong>stimare il background direttamente dai dati</strong>.
+            </p>
+
+            <h3>3️⃣ Stereoscopia e Triangolazione</h3>
+            <p>
+                L'uso di <strong>telescopi multipli</strong> migliora drasticamente la reiezione:
+            </p>
+            <ul>
+                <li><strong>Coerenza geometrica</strong>: Gli assi delle ellissi devono intersecarsi in un punto</li>
+                <li><strong>Coerenza parametri</strong>: Length, Width, Size devono essere consistenti tra camere</li>
+                <li><strong>Core location</strong>: Ricostruzione 3D della posizione impatto sciame</li>
+            </ul>
+            <p>
+                Con ≥3 telescopi, la <strong>reiezione adronica migliora di un fattore ~10×</strong>.
+            </p>
+
+            <h3>4️⃣ Machine Learning (Random Forest, NN)</h3>
+            <p>
+                Metodi moderni usano <strong>algoritmi di apprendimento automatico</strong>:
+            </p>
+            <ul>
+                <li><strong>Random Forest</strong>: Alberi decisionali su ~10-20 parametri Hillas + stereo</li>
+                <li><strong>Deep Neural Networks</strong>: Analisi diretta delle immagini pixel (CNN)</li>
+                <li><strong>Boosted Decision Trees</strong>: Gradient boosting (XGBoost, LightGBM)</li>
+            </ul>
+            <p>
+                <strong>Performance</strong>: Conserva ~80-90% degli eventi gamma, riget ta >99% degli adroni!
+            </p>
+
+            <h3>5️⃣ Rilevazione Muoni</h3>
+            <p>
+                Alcuni IACT hanno <strong>rilevatori dedicati di muoni</strong>:
+            </p>
+            <ul>
+                <li>I muoni producono anelli Cherenkov distinti (profondità atmosferica maggiore)</li>
+                <li>La presenza di muoni → evento quasi certamente adronico → veto</li>
+                <li>Efficienza: rimozione diretta del ~30-50% degli eventi adronici residui</li>
+            </ul>
+        </section>
+
+        <!-- Performance Reale -->
+        <section class="card">
+            <h2>📈 Performance nella Pratica</h2>
+            
+            <h3>Catena di Analisi Tipica (H.E.S.S., MAGIC, VERITAS)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Eventi Gamma Residui</th>
+                        <th>Eventi Adronici Residui</th>
+                        <th>Rapporto γ/hadron</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Raw data</strong></td>
+                        <td>100% (baseline)</td>
+                        <td>100% (~1000× più frequenti)</td>
+                        <td>~1:1000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+ Trigger hardware</strong></td>
+                        <td>~95%</td>
+                        <td>~80%</td>
+                        <td>~1:800</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+ Cleaning/calibrazione</strong></td>
+                        <td>~90%</td>
+                        <td>~60%</td>
+                        <td>~1:650</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+ Hillas cuts</strong></td>
+                        <td>~70%</td>
+                        <td>~5%</td>
+                        <td>~1:70</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+ Stereoscopia</strong></td>
+                        <td>~65%</td>
+                        <td>~2%</td>
+                        <td>~1:30</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+ ML/Alpha cuts</strong></td>
+                        <td>~60%</td>
+                        <td>~0.5-1%</td>
+                        <td>~1:8 - 1:16</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📊 Quality Factor</h3>
+            <p>
+                Si definisce il <strong>Quality Factor</strong> come:
+            </p>
+            <p style="text-align: center; font-size: 1.3em; color: var(--accent-cyan);">
+                Q = ε_γ / √(ε_hadron)
+            </p>
+            <p>
+                dove ε_γ è l'efficienza gamma, ε_hadron è la frazione di contaminazione adronica.
+            </p>
+            <ul>
+                <li><strong>Q ~ 10-20</strong>: Tagli standard (solo Hillas)</li>
+                <li><strong>Q ~ 30-50</strong>: Con stereoscopia (2-3 telescopi)</li>
+                <li><strong>Q ~ 50-100</strong>: Con machine learning avanzato</li>
+            </ul>
+
+            <h3>⚖️ Trade-off Efficienza vs Purezza</h3>
+            <p>
+                C'è sempre un <strong>compromesso</strong>:
+            </p>
+            <ul>
+                <li><strong>Tagli stretti</strong> (pochi eventi gamma persi) → Alta contaminazione adronica</li>
+                <li><strong>Tagli larghi</strong> (bassa contaminazione) → Perdita di molti eventi gamma veri</li>
+            </ul>
+            <p>
+                La scelta dipende dall'obiettivo scientifico:
+            </p>
+            <ul>
+                <li><strong>Rilevazione sorgenti deboli</strong>: Priorità su S/N → tagli stretti</li>
+                <li><strong>Studi spettrali</strong>: Priorità su efficienza → tagli più larghi</li>
+            </ul>
+        </section>
+
+        <!-- Parametri Tipici Background -->
+        <section class="card">
+            <h2>📸 Caratteristiche Cherenkov del Background Adronico</h2>
+            
+            <h3>Parametri di Hillas Tipici (Eventi Adronici)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>vs Eventi Gamma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.25° - 0.45°</td>
+                        <td>~0.35°</td>
+                        <td>Simile o maggiore</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>0.15° - 0.30°</td>
+                        <td>~0.22°</td>
+                        <td>Significativamente maggiore ⚠️</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>500 - 3000 p.e.</td>
+                        <td>~1200 p.e.</td>
+                        <td>Sovrapposizione ampia</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha</strong></td>
+                        <td>0° - 90°</td>
+                        <td>~45° (uniforme)</td>
+                        <td>Distribuito, non picco a 0° 🔑</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L/W Ratio</strong></td>
+                        <td>1.2 - 2.5</td>
+                        <td>~1.6</td>
+                        <td>Più basso (meno allungato)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Asimmetria</strong></td>
+                        <td>0.3 - 0.8</td>
+                        <td>~0.5</td>
+                        <td>Molto maggiore (irregolare)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Varianza inter-camera</strong></td>
+                        <td>20-40%</td>
+                        <td>~30%</td>
+                        <td>3-6× maggiore che per gamma</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Firme Distintive del Background</h3>
+            <ul>
+                <li><strong>Width ampi</strong>: Il segnale chiave! Width ~0.22° vs ~0.08-0.15° per gamma</li>
+                <li><strong>Alpha distribuito uniformemente</strong>: Nessun picco verso 0° (eventi isotropi)</li>
+                <li><strong>Forme irregolari</strong>: Tracce "grumose" con multipli massimi locali</li>
+                <li><strong>L/W basso</strong>: Ellissi meno allungate (~1.6 vs 2.5-3.5 per gamma)</li>
+                <li><strong>Incoerenza stereoscopica</strong>: Parametri molto diversi tra camere diverse</li>
+                <li><strong>Presenza componente muonica</strong>: Anelli di luce aggiuntivi</li>
+            </ul>
+
+            <h3>📐 Conversione Pixel (1° = 100 px)</h3>
+            <ul>
+                <li>Length ~ 0.35° → <strong>35 pixel</strong> (sovrapposizione con PeVatron!)</li>
+                <li>Width ~ 0.22° → <strong>22 pixel</strong> (molto maggiore di qualsiasi sorgente gamma)</li>
+                <li>Rapporto L/W ~ 1.6 (il più basso tra tutte le categorie)</li>
+            </ul>
+        </section>
+
+        <!-- Simulatore -->
+        <section class="card simulator-section">
+            <h2>🎮 Simulatore IACT - Background Adronico</h2>
+            <p>
+                Questa simulazione mostra eventi adronici tipici (protoni, nuclei He). 
+                Nota le <strong>tracce irregolari e larghe</strong>, con <strong>Alpha distribuito 
+                uniformemente</strong> e <strong>scarsa coerenza stereoscopica</strong>.
+            </p>
+            <p style="color: var(--text-secondary); font-size: 0.95em;">
+                💡 <strong>Impara a riconoscere</strong>: Il Width ampio (~22 px) è il segnale più 
+                affidabile. Nessuna sorgente gamma ha Width così grandi!
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <button id="generateBtn" class="btn btn-primary">⚛️ Genera Evento Adronico</button>
+                <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
+            </div>
+
+            <!-- 3 Camere -->
+            <div class="cameras-grid">
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 1 (Nord)</div>
+                    <canvas id="cam1" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 2 (Est)</div>
+                    <canvas id="cam2" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 3 (Sud)</div>
+                    <canvas id="cam3" class="camera-canvas" width="1500" height="1000"></canvas>
+                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="1500" height="1000"></canvas>
+                </div>
+            </div>
+
+            <!-- Pannello Parametri di Hillas -->
+            <div class="hillas-panel">
+                <h3>📊 Parametri di Hillas Misurati</h3>
+                <div id="hillasDisplay">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Genera un evento per visualizzare i parametri di Hillas
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ricostruzione Stereoscopica -->
+            <div class="stereo-container">
+                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Gli assi NON convergono in un punto preciso - segno di evento adronico
+                </p>
+                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
+            </div>
+        </section>
+
+        <!-- Importanza -->
+        <section class="card">
+            <h2>🎓 Perché è Così Importante?</h2>
+            
+            <h3>🔬 Senza Reiezione Adronica...</h3>
+            <p>
+                Se non potessimo discriminare eventi gamma da adroni, l'astronomia Cherenkov 
+                sarebbe <strong>impossibile</strong>:
+            </p>
+            <ul>
+                <li>Con rapporto γ/hadron ~ 1:1000, anche una sorgente brillante come Crab sarebbe invisibile</li>
+                <li>La significatività statistica (S/√B) sarebbe troppo bassa per rilevazioni robuste</li>
+                <li>Le mappe del cielo sarebbero dominate da fluttuazioni casuali del background</li>
+            </ul>
+
+            <h3>✅ Con Reiezione Adronica Efficace...</h3>
+            <p>
+                Grazie a tecniche sofisticate, oggi possiamo:
+            </p>
+            <ul>
+                <li>Rilevare sorgenti con flusso <strong><1% Crab</strong> in ~50 ore</li>
+                <li>Raggiungere sensibilità <strong>~10⁻¹³ erg/cm²/s</strong> (50 ore, 5σ)</li>
+                <li>Costruire <strong>mappe pulite</strong> del cielo gamma con S/N >> 5σ</li>
+                <li>Studiare <strong>spettri precisi</strong> fino a 10+ TeV</li>
+            </ul>
+
+            <h3>🔮 Sviluppi Futuri (CTA)</h3>
+            <p>
+                Il <strong>Cherenkov Telescope Array (CTA)</strong> porterà la reiezione adronica 
+                a un nuovo livello:
+            </p>
+            <ul>
+                <li><strong>~100 telescopi</strong>: Stereoscopia estrema con ≥10 telescopi per evento</li>
+                <li><strong>Deep Learning</strong>: Analisi CNN delle immagini raw pixel</li>
+                <li><strong>Sensibilità</strong>: 10× migliore di H.E.S.S./MAGIC → rilevazione di sorgenti ancora più deboli</li>
+                <li><strong>Duty cycle</strong>: Operazioni anche con Luna (algoritmi avanzati per NSB)</li>
+            </ul>
+        </section>
+
+        <!-- Confronto Finale -->
+        <section class="card">
+            <h2>⚖️ Background Adronico vs Sorgenti Gamma</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>⚛️ Background Adronico</th>
+                        <th>Sorgenti Gamma (range)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Width (px)</strong></td>
+                        <td>~22 (molto largo) 🔴</td>
+                        <td>5-15 (sottile/medio)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L/W</strong></td>
+                        <td>~1.6 (basso) 🔴</td>
+                        <td>1.9-3.1 (alto)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha</strong></td>
+                        <td>Uniforme 0-90° 🔴</td>
+                        <td>Concentrato 0-15°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Irregolarità</strong></td>
+                        <td>Alta (grumosa) 🔴</td>
+                        <td>Bassa (smooth)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coerenza stereo</strong></td>
+                        <td>~70% (bassa) 🔴</td>
+                        <td>85-95% (alta)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card">
+            <h2>🚀 Sei Pronto per il Quiz!</h2>
+            <p>
+                Ora conosci tutte le 5 sorgenti gamma E il background adronico. 
+                È il momento di <strong>testare le tue capacità di identificazione</strong>!
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="comparison.html" class="btn btn-secondary">📊 Ripassa il Confronto</a>
+                <a href="quiz.html" class="btn btn-success">🎮 Inizia il Quiz Ora!</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/core-simulation.js"></script>
+    <script src="../js/source-profiles.js"></script>
+    <script src="../js/hillas-analysis.js"></script>
+    <script src="../js/visualization.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script>
+        setupSourceSimulator('hadron');
+    </script>
+</body>
+</html>
