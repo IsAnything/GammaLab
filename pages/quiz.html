@@ -251,65 +251,9 @@
     <!-- Scripts -->
     <script src="../js/core-simulation.js"></script>
     <script src="../js/source-profiles.js"></script>
+    <script src="../js/hillas-analysis.js"></script>
     <script src="../js/visualization.js"></script>
     <script src="../js/quiz-engine.js"></script>
-    <script>
-        // Placeholder per inizializzazione quiz (implementazione completa in Settimana 5-6)
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Quiz page loaded - Engine in development');
-
-            // Pulsante Start Quiz
-            document.getElementById('startQuizBtn').addEventListener('click', () => {
-                alert('🚧 Quiz Engine in fase di sviluppo\n\nSarà completamente implementato nella Settimana 5-6 del timeline con:\n\n✅ Generazione casuale sorgenti\n✅ Timer 60 secondi\n✅ Sistema hints progressivi\n✅ Scoring e streak bonus\n✅ Feedback educativo dettagliato\n✅ Statistiche finali\n\nPer ora puoi esplorare le pagine educative e simulatori delle singole sorgenti!');
-            });
-
-            // Pulsante Retry (nascosto per ora)
-            const retryBtn = document.getElementById('retryQuizBtn');
-            if (retryBtn) {
-                retryBtn.addEventListener('click', () => {
-                    location.reload();
-                });
-            }
-
-            // Pulsante Review
-            const reviewBtn = document.getElementById('reviewBtn');
-            if (reviewBtn) {
-                reviewBtn.addEventListener('click', () => {
-                    window.location.href = 'comparison.html';
-                });
-            }
-        });
-
-        // Funzioni placeholder (saranno implementate in quiz-engine.js)
-        function initQuiz() {
-            console.log('Init quiz...');
-            // TODO: Implementare in Settimana 5-6
-        }
-
-        function startTimer() {
-            console.log('Start timer...');
-            // TODO: Timer countdown 60s
-        }
-
-        function generateQuestion() {
-            console.log('Generate question...');
-            // TODO: Seleziona sorgente casuale, genera evento, mostra parametri
-        }
-
-        function checkAnswer(selected) {
-            console.log('Check answer:', selected);
-            // TODO: Verifica risposta, aggiorna score, mostra feedback
-        }
-
-        function showHint(level) {
-            console.log('Show hint level:', level);
-            // TODO: Mostra hint progressivo basato sulla sorgente corrente
-        }
-
-        function calculateFinalScore() {
-            console.log('Calculate final score...');
-            // TODO: Somma punti, applica bonus streak, mostra statistiche
-        }
-    </script>
+    <!-- Quiz Engine si inizializza automaticamente -->
 </body>
 </html>
