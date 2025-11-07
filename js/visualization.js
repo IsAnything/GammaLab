@@ -230,6 +230,10 @@ class CanvasRenderer {
         const cosT = Math.cos(thetaRad);
         const sinT = Math.sin(thetaRad);
 
+        // Protezioni minime per semiassi
+        if (!isFinite(a) || a <= 1) a = 1;
+        if (!isFinite(b) || b <= 1) b = 1;
+
         let maxNormalized = 0.0001;
         tracks.forEach(t => {
             const dx = t.x - cx;
@@ -237,13 +241,26 @@ class CanvasRenderer {
             // Proietta nella referenza dell'ellisse (rotate -theta)
             const long = dx * cosT + dy * sinT;
             const lat = -dx * sinT + dy * cosT;
-            const norm = Math.sqrt(Math.pow(long / a, 2) + Math.pow(lat / b, 2));
+
+            // Considera solo il raggio core del fotone (non il glow)
+            let buffer = 0;
+            try {
+                buffer = Math.abs(this.intensityToRadius(t.intensity) * 1.5); // solo core, non glow
+            } catch (e) {
+                buffer = 0;
+            }
+
+            const longAbs = Math.abs(long) + buffer;
+            const latAbs = Math.abs(lat) + buffer;
+
+            const norm = Math.sqrt(Math.pow(longAbs / a, 2) + Math.pow(latAbs / b, 2));
             if (norm > maxNormalized) maxNormalized = norm;
         });
 
         // Se esiste qualche fotone fuori dall'ellisse (norm>1), ingrandire mantenendo proporzione
         if (maxNormalized > 1) {
-            const scale = maxNormalized * 1.06; // piccolo margine
+            const scale = maxNormalized * 1.02; // margine minimo
+            console.log(`🔧 adjustHillas: found outliers (maxNorm=${maxNormalized.toFixed(2)}), scaling ellipse by ${scale.toFixed(2)}`);
             a *= scale;
             b *= scale;
             hillas.lengthPx = a;
@@ -260,6 +277,66 @@ class CanvasRenderer {
         }
 
         return hillas;
+    }
+
+    /**
+     * Disegna un riempimento diffuso (soft glow) all'interno dell'ellisse Hillas
+     * Questo viene disegnato sul canvas principale usando 'destination-over' in modo
+     * da risultare sotto i fotoni già renderizzati ma sopra lo sfondo.
+     * @param {Object} hillas - parametri Hillas (cogX, cogY, lengthPx, widthPx, theta)
+     * @param {Array} tracks - array di fotoni (opzionale) per determinare colore medio
+     */
+    fillEllipseBackground(hillas, tracks = []) {
+        if (!hillas || !this.ctx) return;
+
+        const cx = hillas.cogX;
+        const cy = hillas.cogY;
+        const a = hillas.lengthPx || 1;
+        const b = hillas.widthPx || 1;
+        const theta = (hillas.theta || 0) * Math.PI / 180;
+
+        // Calcola colore medio dei fotoni (se disponibili)
+        let avgColor = [20, 119, 200]; // fallback cyan
+        if (tracks && tracks.length) {
+            let r = 0, g = 0, bcol = 0, n = 0;
+            tracks.forEach(t => {
+                try {
+                    const c = this.colorPalette.getColorRGB(t.energy);
+                    r += c[0]; g += c[1]; bcol += c[2]; n++;
+                } catch (e) {}
+            });
+            if (n > 0) {
+                avgColor = [Math.round(r / n), Math.round(g / n), Math.round(bcol / n)];
+            }
+        }
+
+        // Disegna il riempimento dietro i fotoni
+        this.ctx.save();
+    // Disegnamo il fill sopra lo sfondo (ma prima dei fotoni), normale compositing
+    this.ctx.globalCompositeOperation = 'source-over';
+
+        // Crea gradiente radiale più visibile per riempire l'ellisse
+        const gradRadius = Math.max(a, b) * 1.8;
+        const grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, gradRadius);
+        // Aumentiamo significativamente l'alpha per rendere il riempimento ben visibile
+        const rgbaCenter = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.55)`;
+        const rgbaMid = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.28)`;
+        const rgbaEdge = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.08)`;
+        grad.addColorStop(0, rgbaCenter);
+        grad.addColorStop(0.35, rgbaMid);
+        grad.addColorStop(0.7, rgbaEdge);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');        // Trasforma contesto per ruotare l'ellisse
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(theta);
+
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+
+    // Ripristina trasformazioni e compositing
+    this.ctx.restore();
+    this.ctx.globalCompositeOperation = 'source-over';
     }
 
     /**
@@ -288,6 +365,9 @@ class CanvasRenderer {
             this.renderPhoton(track);
         });
 
+        // Se disponibile, possiamo applicare un leggero riempimento diffuso sotto i fotoni
+        // chiamando fillEllipseBackground separatamente da navigation.js quando abbiamo i parametri Hillas.
+
         // Griglia (opzionale)
         if (event.showGrid) {
             this.drawGrid();
@@ -315,14 +395,28 @@ class CanvasRenderer {
             return;
         }
 
-    // Colore di base dalla palette (RGB array per varianza)
-    const baseRGB = this.colorPalette.getColorRGB(track.energy);
-    // Aggiungi una leggera variazione cromatica basata sull'intensity e posizione
-    const intensityFactor = Math.max(0, Math.min(1, track.intensity));
-    const jitter = (Math.sin((track.x + track.y) * 0.13) + Math.random() * 0.5 - 0.25) * (1 - intensityFactor) * 18;
-    const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 30)));
-    const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.6 + intensityFactor * 20)));
-    const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.4 + intensityFactor * 10)));
+    // Usa intensity per scegliere colore dalla palette (visualizzazione energia più chiara)
+    // Normalizza intensity a [0,1]
+    const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+    
+    // Mappa intensity→colore usando la palette (ritorna [r,g,b])
+    // Aggiungiamo anche variazione basata sull'energia per maggiore differenziazione
+    let baseRGB;
+    try {
+        // Combina intensity (0-1) con energia normalizzata per più varietà
+        const energyNorm = Math.log10(track.energy / this.colorPalette.minEnergy) / 
+                          Math.log10(this.colorPalette.maxEnergy / this.colorPalette.minEnergy);
+        const colorT = (intensityFactor * 0.7 + energyNorm * 0.3); // 70% intensity, 30% energia
+        baseRGB = this.colorPalette.mapNormalized(colorT);
+    } catch (e) {
+        baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
+    }
+
+    // Aggiungi jitter posizionale per evitare colori identici
+    const jitter = (Math.sin((track.x + track.y) * 0.12) + (Math.random() - 0.5) * 0.8) * 12;
+    const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 35)));
+    const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.7 + intensityFactor * 25)));
+    const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.5 + intensityFactor * 15)));
 
     const color = `rgb(${r}, ${g}, ${b})`;
     const radius = this.intensityToRadius(track.intensity);

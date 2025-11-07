@@ -179,13 +179,31 @@ class QuizEngine {
             const event = this.engine.generateEvent(this.currentProfile, i + 1, quizCanvasSize);
             events.push(event);
             
-            // Renderizza
-            this.renderers[i].renderEvent(event, i === 0);
-            
             // Calcola Hillas
             const hillas = this.hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
+                // Aggiusta ellisse per contenere tutti i fotoni
+                try {
+                    this.renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
+                } catch (e) {
+                    console.warn('⚠️ adjustHillasToContainTracks failed:', e);
+                }
+                
+                // Riempi ellisse prima di disegnare i fotoni
+                try {
+                    this.renderers[i].fillEllipseBackground(hillas, event.tracks);
+                } catch (e) {
+                    console.warn('⚠️ fillEllipseBackground failed:', e);
+                }
+                
                 this.currentHillasParams.push(hillas);
+            }
+            
+            // Renderizza fotoni sopra il riempimento
+            this.renderers[i].renderEvent(event, i === 0);
+            
+            // Overlay ellisse sopra tutto
+            if (hillas && hillas.valid) {
                 this.renderers[i].renderHillasOverlay(hillas);
             }
         }

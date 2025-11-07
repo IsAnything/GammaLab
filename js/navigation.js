@@ -95,13 +95,10 @@ function setupSourceSimulator(sourceType, options = {}) {
             const event = engine.generateEvent(profile, cameraId, canvasSize);
             events.push(event);
 
-            // Rendering con palette già configurata
             const canvas = document.getElementById(`cam${cameraId}`);
-            if (canvas && renderers[i]) {
-                renderers[i].renderEvent(event, i === 0 && showLegend);
-                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
-            }
 
+            // Calcola Hillas PRIMA del rendering in modo da poter disegnare il
+            // riempimento dell'ellisse sotto i fotoni e poi i fotoni sopra.
             const hillas = hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
                 // Espandi l'ellisse per includere tutti i fotoni renderizzati
@@ -113,7 +110,28 @@ function setupSourceSimulator(sourceType, options = {}) {
 
                 hillasParams.push(hillas);
                 hillasMap[camKey] = hillas;
-                renderers[i].renderHillasOverlay(hillas);
+
+                // Disegna il riempimento diffuso DENTRO l'ellisse sul canvas principale
+                try {
+                    renderers[i].fillEllipseBackground(hillas, event.tracks);
+                } catch (e) {
+                    console.warn('Errore durante fillEllipseBackground', e);
+                }
+            }
+
+            // Rendering con palette già configurata (fotoni sopra il riempimento)
+            if (canvas && renderers[i]) {
+                renderers[i].renderEvent(event, i === 0 && showLegend);
+                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+            }
+
+            // Ora disegniamo l'overlay Hillas sopra i fotoni
+            if (hillas && hillas.valid) {
+                try {
+                    renderers[i].renderHillasOverlay(hillas);
+                } catch (e) {
+                    console.warn('Errore durante renderHillasOverlay', e);
+                }
             }
 
             console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);

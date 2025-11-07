@@ -170,8 +170,8 @@ class SimulationEngine {
     // Numero di fotoni proporzionale a Size
     // Aumentiamo il numero di fotoni per una resa più ricca,
     // ma limitiamo per evitare freeze/performance hit
-    const requestedPhotons = Math.floor(params.size * 1.0 + Math.random() * params.size * 0.6);
-    const MAX_PHOTONS = 3000;
+    const requestedPhotons = Math.floor(params.size * 1.2 + Math.random() * params.size * 0.8);
+    const MAX_PHOTONS = 4000;
     const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
         
         // Centro della traccia - ridotta dispersione per evitare uscite dallo schermo
