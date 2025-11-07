@@ -215,6 +215,54 @@ class CanvasRenderer {
     }
 
     /**
+     * Aggiusta i parametri Hillas in modo che l'ellisse contenga tutti i fotoni
+     * accetta hillas (oggetto risultato) e lista di tracks (event.tracks)
+     */
+    adjustHillasToContainTracks(hillas, tracks) {
+        if (!hillas || !tracks || !tracks.length) return hillas;
+
+        // Usa lengthPx/widthPx come semiassi
+        let a = hillas.lengthPx || 1;
+        let b = hillas.widthPx || 1;
+        const cx = hillas.cogX;
+        const cy = hillas.cogY;
+        const thetaRad = (hillas.theta || 0) * Math.PI / 180;
+        const cosT = Math.cos(thetaRad);
+        const sinT = Math.sin(thetaRad);
+
+        let maxNormalized = 0.0001;
+        tracks.forEach(t => {
+            const dx = t.x - cx;
+            const dy = t.y - cy;
+            // Proietta nella referenza dell'ellisse (rotate -theta)
+            const long = dx * cosT + dy * sinT;
+            const lat = -dx * sinT + dy * cosT;
+            const norm = Math.sqrt(Math.pow(long / a, 2) + Math.pow(lat / b, 2));
+            if (norm > maxNormalized) maxNormalized = norm;
+        });
+
+        // Se esiste qualche fotone fuori dall'ellisse (norm>1), ingrandire mantenendo proporzione
+        if (maxNormalized > 1) {
+            const scale = maxNormalized * 1.06; // piccolo margine
+            a *= scale;
+            b *= scale;
+            hillas.lengthPx = a;
+            hillas.widthPx = b;
+            // Aggiorna anche le versioni in gradi (se presenti e PIXEL_TO_DEGREE definito)
+            try {
+                if (typeof PIXEL_TO_DEGREE !== 'undefined') {
+                    hillas.length = a * PIXEL_TO_DEGREE;
+                    hillas.width = b * PIXEL_TO_DEGREE;
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        return hillas;
+    }
+
+    /**
      * Pulisce entrambi i canvas
      */
     clear() {
@@ -267,9 +315,18 @@ class CanvasRenderer {
             return;
         }
 
-        const color = this.colorPalette.getColor(track.energy);
-        const radius = this.intensityToRadius(track.intensity);
-        const alpha = Math.min(1, track.intensity * 1.2 + 0.5); // Alpha molto più alto!
+    // Colore di base dalla palette (RGB array per varianza)
+    const baseRGB = this.colorPalette.getColorRGB(track.energy);
+    // Aggiungi una leggera variazione cromatica basata sull'intensity e posizione
+    const intensityFactor = Math.max(0, Math.min(1, track.intensity));
+    const jitter = (Math.sin((track.x + track.y) * 0.13) + Math.random() * 0.5 - 0.25) * (1 - intensityFactor) * 18;
+    const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 30)));
+    const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.6 + intensityFactor * 20)));
+    const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.4 + intensityFactor * 10)));
+
+    const color = `rgb(${r}, ${g}, ${b})`;
+    const radius = this.intensityToRadius(track.intensity);
+    const alpha = Math.min(1, track.intensity * 1.2 + 0.5); // Alpha molto più alto!
 
         // Debug: mostra valori di rendering ogni 50 fotoni
         if (Math.random() < 0.02) {
@@ -298,16 +355,16 @@ class CanvasRenderer {
         this.ctx.fill();
 
         // Core brillante (più grande e visibile)
-        this.ctx.fillStyle = this.colorPalette.getColorWithAlpha(track.energy, alpha);
+    this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         this.ctx.beginPath();
         this.ctx.arc(track.x, track.y, radius * 1.5, 0, 2 * Math.PI);
         this.ctx.fill();
 
-        // Punto centrale ultra-brillante (sempre presente)
-        this.ctx.fillStyle = 'rgba(255, 255, 255, ' + (alpha * 0.95) + ')';
-        this.ctx.beginPath();
-        this.ctx.arc(track.x, track.y, radius * 0.5, 0, 2 * Math.PI);
-        this.ctx.fill();
+    // Punto centrale ultra-brillante (sempre presente)
+    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+    this.ctx.beginPath();
+    this.ctx.arc(track.x, track.y, radius * 0.5, 0, 2 * Math.PI);
+    this.ctx.fill();
     }
 
     /**

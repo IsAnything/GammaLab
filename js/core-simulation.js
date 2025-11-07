@@ -167,8 +167,12 @@ class SimulationEngine {
         
         const tracks = [];
         
-        // Numero di fotoni proporzionale a Size (ridotto per rendering con glow grandi)
-        const numPhotons = Math.floor(params.size * 0.5 + Math.random() * params.size * 0.3);
+    // Numero di fotoni proporzionale a Size
+    // Aumentiamo il numero di fotoni per una resa più ricca,
+    // ma limitiamo per evitare freeze/performance hit
+    const requestedPhotons = Math.floor(params.size * 1.0 + Math.random() * params.size * 0.6);
+    const MAX_PHOTONS = 3000;
+    const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
         
         // Centro della traccia - ridotta dispersione per evitare uscite dallo schermo
         const dispersionX = canvasWidth * 0.15;  // 15% della larghezza (era 20%)

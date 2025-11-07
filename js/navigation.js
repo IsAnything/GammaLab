@@ -104,6 +104,13 @@ function setupSourceSimulator(sourceType, options = {}) {
 
             const hillas = hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
+                // Espandi l'ellisse per includere tutti i fotoni renderizzati
+                try {
+                    renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
+                } catch (e) {
+                    console.warn('Errore durante l\'adjustHillasToContainTracks', e);
+                }
+
                 hillasParams.push(hillas);
                 hillasMap[camKey] = hillas;
                 renderers[i].renderHillasOverlay(hillas);
