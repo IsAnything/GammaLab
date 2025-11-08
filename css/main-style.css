@@ -493,6 +493,102 @@ table tr:hover {
   margin: 16px 0;
 }
 
+/* ==================== TABS SYSTEM ==================== */
+
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tab-link {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab-link:hover {
+  color: var(--accent-cyan);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.tab-link.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+
+.tab-content-container {
+  min-height: 400px;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== ACCORDION SYSTEM ==================== */
+
+.accordion-card {
+  margin-bottom: 16px;
+}
+
+.accordion-card summary {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.accordion-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-card summary:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.accordion-card summary h2 {
+  color: var(--accent-cyan);
+  margin: 0;
+  display: inline;
+}
+
+.accordion-card summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 12px;
+  transition: transform 0.3s ease;
+  color: var(--accent-blue);
+}
+
+.accordion-card[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.accordion-content {
+  padding: 20px 16px;
+  animation: fadeIn 0.3s ease;
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 1024px) {

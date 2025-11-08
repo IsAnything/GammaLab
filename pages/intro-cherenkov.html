@@ -30,8 +30,19 @@
     </header>
 
     <main class="container">
+        <div class="intro-note" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--accent-blue); padding: 16px; margin-bottom: 24px; border-radius: 8px;">
+            <p style="margin: 0; color: var(--text-primary);">
+                💡 <strong>Nota</strong>: Clicca su ogni sezione per espanderla e leggere i dettagli. 
+                Tutte le sezioni partono chiuse per facilitare la navigazione.
+            </p>
+        </div>
+
         <!-- Cos'è un IACT -->
-        <section class="card">
+        <details class="card accordion-card">
+            <summary class="accordion-header">
+                <h2 style="display: inline; margin: 0;">1. Cos'è un Telescopio Cherenkov Atmosferico (IACT)?</h2>
+            </summary>
+            <div class="accordion-content">
             <h2>Cos'è un Telescopio Cherenkov Atmosferico (IACT)?</h2>
             <p>
                 I <strong>Telescopi Cherenkov Atmosferici (IACT - Imaging Atmospheric Cherenkov Telescope)</strong> 
@@ -61,10 +72,15 @@
                 emette un <strong>cono di luce blu-violetta</strong> - la luce Cherenkov. È lo stesso 
                 effetto che produce il caratteristico bagliore blu nelle piscine dei reattori nucleari.
             </p>
-        </section>
+            </div>
+        </details>
 
         <!-- Come Funziona -->
-        <section class="card">
+        <details class="card accordion-card">
+            <summary class="accordion-header">
+                <h2 style="display: inline; margin: 0;">2. Come Funziona la Rilevazione</h2>
+            </summary>
+            <div class="accordion-content">
             <h2>Come Funziona la Rilevazione</h2>
             
             <h3>1️⃣ Arrivo del Raggio Gamma</h3>
@@ -361,6 +377,39 @@
             </div>
         </section>
     </main>
+
+    <script>
+        // Convert all remaining sections to accordion
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('main > section.card:not(.accordion-card)');
+            let counter = 3; // Start from 3 (first 2 already converted)
+            
+            sections.forEach(section => {
+                const h2 = section.querySelector('h2');
+                if (h2) {
+                    const title = h2.textContent;
+                    const content = section.innerHTML.replace(h2.outerHTML, '');
+                    
+                    const details = document.createElement('details');
+                    details.className = 'card accordion-card';
+                    
+                    const summary = document.createElement('summary');
+                    summary.className = 'accordion-header';
+                    summary.innerHTML = `<h2 style="display: inline; margin: 0;">${counter}. ${title}</h2>`;
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'accordion-content';
+                    contentDiv.innerHTML = content;
+                    
+                    details.appendChild(summary);
+                    details.appendChild(contentDiv);
+                    
+                    section.parentNode.replaceChild(details, section);
+                    counter++;
+                }
+            });
+        });
+    </script>
 
     <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
         <p>
