@@ -29,8 +29,9 @@
         .telescope-camera canvas {
             width: 100%;
             height: auto;
-            border-radius: 50%;
+            border-radius: 0; /* Rimosso border-radius circolare */
             box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
         }
         
         .telescope-label-bottom {
@@ -240,7 +241,8 @@
                 const cameraId = i + 1;
                 const camKey = `cam${cameraId}`;
                 
-                const event = engine.generateEvent(crabProfile, cameraId);
+                // Specifica dimensioni canvas corrette: 600×600px
+                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 });
                 events.push(event);
 
                 renderers[i].renderEvent(event, i === 0);

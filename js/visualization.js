@@ -352,9 +352,86 @@ class CanvasRenderer {
         this.ctx.fillStyle = this.lightStyle ? '#e0e0e0' : '#000814';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
+        // Disegna griglia esagonale (honeycomb) solo per light style
+        if (this.lightStyle) {
+            this.drawHexagonalGrid();
+        }
+        
         if (this.overlayCtx) {
             this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
         }
+    }
+
+    /**
+     * Disegna griglia esagonale (PMT pixels)
+     */
+    drawHexagonalGrid() {
+        const hexRadius = 8; // Raggio pixel PMT
+        const hexHeight = hexRadius * Math.sqrt(3);
+        const hexWidth = hexRadius * 2;
+        const vertDist = hexHeight;
+        const horizDist = hexWidth * 0.75;
+
+        this.ctx.strokeStyle = '#d0d0d0'; // Grigio chiaro per le linee
+        this.ctx.lineWidth = 0.5;
+
+        // Disegna esagoni in pattern honeycomb
+        for (let row = 0; row < Math.ceil(this.canvas.height / vertDist) + 2; row++) {
+            for (let col = 0; col < Math.ceil(this.canvas.width / horizDist) + 2; col++) {
+                const x = col * horizDist;
+                const y = row * vertDist + (col % 2 === 1 ? vertDist / 2 : 0);
+                
+                this.drawHexagon(x, y, hexRadius);
+            }
+        }
+        
+        // Disegna bordo esagonale della camera
+        this.drawCameraBorder();
+    }
+
+    /**
+     * Disegna bordo esagonale della camera
+     */
+    drawCameraBorder() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) / 2 - 5;
+        
+        this.ctx.strokeStyle = '#999999'; // Grigio medio
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 2; // Ruotato per avere flat-top
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                this.ctx.lineTo(x, y);
+            }
+        }
+        this.ctx.closePath();
+        this.ctx.stroke();
+    }
+
+    /**
+     * Disegna singolo esagono
+     */
+    drawHexagon(cx, cy, radius) {
+        this.ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 6;
+            const x = cx + radius * Math.cos(angle);
+            const y = cy + radius * Math.sin(angle);
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                this.ctx.lineTo(x, y);
+            }
+        }
+        this.ctx.closePath();
+        this.ctx.stroke();
     }
 
     /**
@@ -370,6 +447,11 @@ class CanvasRenderer {
         sortedTracks.forEach(track => {
             this.renderPhoton(track);
         });
+
+        // Aggiungi rumore di background (solo light style)
+        if (this.lightStyle) {
+            this.renderBackgroundNoise();
+        }
 
         // Se disponibile, possiamo applicare un leggero riempimento diffuso sotto i fotoni
         // chiamando fillEllipseBackground separatamente da navigation.js quando abbiamo i parametri Hillas.
@@ -401,51 +483,40 @@ class CanvasRenderer {
             return;
         }
 
-    // Usa intensity per scegliere colore dalla palette (visualizzazione energia più chiara)
-    // Normalizza intensity a [0,1]
-    const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
-    
-    // Mappa intensity→colore usando la palette (ritorna [r,g,b])
-    // Aggiungiamo anche variazione basata sull'energia per maggiore differenziazione
-    let baseRGB;
-    try {
-        // Combina intensity (0-1) con energia normalizzata per più varietà
-        const energyNorm = Math.log10(track.energy / this.colorPalette.minEnergy) / 
-                          Math.log10(this.colorPalette.maxEnergy / this.colorPalette.minEnergy);
-        const colorT = (intensityFactor * 0.7 + energyNorm * 0.3); // 70% intensity, 30% energia
-        baseRGB = this.colorPalette.mapNormalized(colorT);
-    } catch (e) {
-        baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
-    }
-
-    // Aggiungi jitter posizionale per evitare colori identici
-    const jitter = (Math.sin((track.x + track.y) * 0.12) + (Math.random() - 0.5) * 0.8) * 12;
-    
-    // Light style: boost saturation by 40% for more vivid colors
-    const saturationBoost = this.lightStyle ? 1.4 : 1.0;
-    let r = Math.min(255, Math.max(0, Math.round(baseRGB[0] * saturationBoost + jitter + intensityFactor * 35)));
-    let g = Math.min(255, Math.max(0, Math.round(baseRGB[1] * saturationBoost + jitter * 0.7 + intensityFactor * 25)));
-    let b = Math.min(255, Math.max(0, Math.round(baseRGB[2] * saturationBoost - jitter * 0.5 + intensityFactor * 15)));
-
-    const color = `rgb(${r}, ${g}, ${b})`;
-    const radius = this.intensityToRadius(track.intensity);
-    const alpha = Math.min(1, track.intensity * 1.2 + 0.5); // Alpha molto più alto!
-
-        // Debug: mostra valori di rendering ogni 50 fotoni
-        if (Math.random() < 0.02) {
-            console.log(`🔷 Fotone: E=${(track.energy/1000).toFixed(1)}TeV, radius=${radius.toFixed(1)}px, alpha=${alpha.toFixed(2)}, color=${color}`);
-        }
-
-        // Validazione radius
-        if (!isFinite(radius) || radius <= 0) {
-            console.warn('⚠️ Radius non valido:', radius, 'per track:', track);
+        // Light style: rendering con pixel esagonali
+        if (this.lightStyle) {
+            this.renderPhotonHexagonal(track);
             return;
         }
 
-        // Glow esterno molto ampio (effetto drammatico)
+        // Dark style: rendering tradizionale con glow
+        const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+        
+        let baseRGB;
+        try {
+            const energyNorm = Math.log10(track.energy / this.colorPalette.minEnergy) / 
+                              Math.log10(this.colorPalette.maxEnergy / this.colorPalette.minEnergy);
+            const colorT = (intensityFactor * 0.7 + energyNorm * 0.3);
+            baseRGB = this.colorPalette.mapNormalized(colorT);
+        } catch (e) {
+            baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
+        }
+
+        const jitter = (Math.sin((track.x + track.y) * 0.12) + (Math.random() - 0.5) * 0.8) * 12;
+        const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 35)));
+        const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.7 + intensityFactor * 25)));
+        const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.5 + intensityFactor * 15)));
+
+        const color = `rgb(${r}, ${g}, ${b})`;
+        const radius = this.intensityToRadius(track.intensity);
+        const alpha = Math.min(1, track.intensity * 1.2 + 0.5);
+
+        if (!isFinite(radius) || radius <= 0) return;
+
+        // Glow esterno
         const gradient = this.ctx.createRadialGradient(
             track.x, track.y, 0,
-            track.x, track.y, radius * 5.0  // Alone MOLTO ampio (5× il raggio)
+            track.x, track.y, radius * 5.0
         );
         gradient.addColorStop(0, this.colorPalette.getColorWithAlpha(track.energy, alpha));
         gradient.addColorStop(0.2, this.colorPalette.getColorWithAlpha(track.energy, alpha * 0.8));
@@ -457,17 +528,214 @@ class CanvasRenderer {
         this.ctx.arc(track.x, track.y, radius * 5.0, 0, 2 * Math.PI);
         this.ctx.fill();
 
-        // Core brillante (più grande e visibile)
-    this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        // Core brillante
+        this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         this.ctx.beginPath();
         this.ctx.arc(track.x, track.y, radius * 1.5, 0, 2 * Math.PI);
         this.ctx.fill();
 
-    // Punto centrale ultra-brillante (sempre presente)
-    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
-    this.ctx.beginPath();
-    this.ctx.arc(track.x, track.y, radius * 0.5, 0, 2 * Math.PI);
-    this.ctx.fill();
+        // Punto centrale ultra-brillante
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+        this.ctx.beginPath();
+        this.ctx.arc(track.x, track.y, radius * 0.5, 0, 2 * Math.PI);
+        this.ctx.fill();
+    }
+
+    /**
+     * Renderizza circoletti grigi di background (rumore/eventi cosmici)
+     */
+    renderBackgroundNoise() {
+        if (!this.lightStyle) return;
+        
+        const canvasW = this.canvas.width;
+        const canvasH = this.canvas.height;
+        const numNoise = Math.floor(15 + Math.random() * 15); // 15-30 pixel di rumore
+        const pixelRadius = 4;
+        
+        for (let i = 0; i < numNoise; i++) {
+            const x = pixelRadius + Math.random() * (canvasW - 2 * pixelRadius);
+            const y = pixelRadius + Math.random() * (canvasH - 2 * pixelRadius);
+            const alpha = 0.15 + Math.random() * 0.25; // Opacità bassa 0.15-0.4
+            
+            // Circoletto grigio
+            this.ctx.fillStyle = `rgba(120, 120, 120, ${alpha})`;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, pixelRadius, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Bordo scuro
+            this.ctx.strokeStyle = `rgba(80, 80, 80, ${alpha * 0.6})`;
+            this.ctx.lineWidth = 1;
+            this.ctx.stroke();
+        }
+    }
+
+    /**
+     * Renderizza fotone con pixel esagonali (stile light)
+     */
+    renderPhotonHexagonal(track) {
+        const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+        
+        const pixelRadius = 4; // Ridotto da 5 per circoletti più piccoli
+        const spreadRadiusLong = this.intensityToRadius(track.intensity) * 14; // Ridotto da 20
+        const spreadRadiusShort = this.intensityToRadius(track.intensity) * 1.8; // Ridotto da 2.5 (più sottile)
+        
+        // Meno pixel totali, maggiore rarefazione
+        const densityVariation = 0.3 + Math.random() * 0.7; // Fattore 0.3-1.0
+        const numPixels = Math.max(5, Math.floor(intensityFactor * 22 * densityVariation)); // Ridotto: 5-22 pixel (era 6-30)
+        const minDistance = pixelRadius * 3; // Distanza minima tra pixel
+
+        const pixels = [];
+        const canvasW = this.canvas.width;
+        const canvasH = this.canvas.height;
+        const margin = pixelRadius * 2;
+        
+        // Angolo casuale per orientamento della traccia ellittica
+        const trackAngle = Math.random() * Math.PI * 2;
+        const cosAngle = Math.cos(trackAngle);
+        const sinAngle = Math.sin(trackAngle);
+        
+        // Genera posizioni dei pixel evitando sovrapposizioni (distribuzione ellittica)
+        // Con probabilità decrescente verso l'esterno (forma affusolata)
+        for (let i = 0; i < numPixels; i++) {
+            let attempts = 0;
+            let px, py;
+            let validPosition = false;
+            
+            while (!validPosition && attempts < 30) {
+                // Distribuzione ellittica con bias verso il centro (affusolata)
+                const t = Math.random() * Math.PI * 2;
+                // Uso Math.pow per concentrare i pixel al centro
+                const radiusFactor = Math.pow(Math.random(), 1.8); // Esponente >1 = più concentrato al centro
+                
+                // Coordinate ellittiche locali
+                const localX = Math.cos(t) * spreadRadiusLong * radiusFactor;
+                const localY = Math.sin(t) * spreadRadiusShort * radiusFactor;
+                
+                // Ruota secondo trackAngle
+                const rotX = localX * cosAngle - localY * sinAngle;
+                const rotY = localX * sinAngle + localY * cosAngle;
+                
+                px = track.x + rotX;
+                py = track.y + rotY;
+                
+                // Verifica che sia dentro i bordi del canvas
+                if (px < margin || px > canvasW - margin || py < margin || py > canvasH - margin) {
+                    attempts++;
+                    continue;
+                }
+                
+                // Verifica che non sia troppo vicino ad altri pixel
+                validPosition = true;
+                for (let existing of pixels) {
+                    const dx = px - existing.x;
+                    const dy = py - existing.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < minDistance) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+                attempts++;
+            }
+            
+            if (validPosition) {
+                // Intensità diminuisce con la distanza dal centro
+                const dx = px - track.x;
+                const dy = py - track.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = Math.sqrt(spreadRadiusLong * spreadRadiusLong + spreadRadiusShort * spreadRadiusShort) / 2;
+                const distanceFactor = 1 - (distance / maxDistance);
+                const pixelAlpha = Math.min(0.85, (intensityFactor * 0.4 + 0.4) * Math.pow(distanceFactor, 0.5));
+                
+                // Colore varia con la distanza: pixel centrali = alta energia (giallo/verde), esterni = bassa energia (blu/cyan)
+                const energyNorm = 1 - distanceFactor; // Inverso: centro = 0 (alta E), esterno = 1 (bassa E)
+                const colorRGB = this.colorPalette.mapNormalized(energyNorm);
+                
+                // Boost saturation
+                const saturationBoost = 1.6;
+                const r = Math.min(255, Math.max(0, Math.round(colorRGB[0] * saturationBoost)));
+                const g = Math.min(255, Math.max(0, Math.round(colorRGB[1] * saturationBoost)));
+                const b = Math.min(255, Math.max(0, Math.round(colorRGB[2] * saturationBoost)));
+                
+                pixels.push({ x: px, y: py, alpha: pixelAlpha, r, g, b, isWhite: false });
+            }
+        }
+
+        // Aggiungi più pixel bianchi nella zona centrale per forma affusolata
+        const numWhitePixels = Math.max(2, Math.floor(intensityFactor * 8)); // Ridotto: 2-8 pixel bianchi (era 3-12)
+        for (let i = 0; i < numWhitePixels; i++) {
+            let attempts = 0;
+            let px, py;
+            let validPosition = false;
+            
+            while (!validPosition && attempts < 20) {
+                // Distribuzione ellittica concentrata al centro (30% interno)
+                const t = Math.random() * Math.PI * 2;
+                const radiusFactor = Math.pow(Math.random(), 2) * 0.4; // Molto concentrato al centro
+                
+                const localX = Math.cos(t) * spreadRadiusLong * radiusFactor;
+                const localY = Math.sin(t) * spreadRadiusShort * radiusFactor;
+                
+                const rotX = localX * cosAngle - localY * sinAngle;
+                const rotY = localX * sinAngle + localY * cosAngle;
+                
+                px = track.x + rotX;
+                py = track.y + rotY;
+                
+                if (px < margin || px > canvasW - margin || py < margin || py > canvasH - margin) {
+                    attempts++;
+                    continue;
+                }
+                
+                validPosition = true;
+                for (let existing of pixels) {
+                    const dx = px - existing.x;
+                    const dy = py - existing.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < minDistance) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+                attempts++;
+            }
+            
+            if (validPosition) {
+                const pixelAlpha = 0.75 + Math.random() * 0.25; // 0.75-1.0 (più brillanti)
+                pixels.push({ x: px, y: py, alpha: pixelAlpha, r: 255, g: 255, b: 255, isWhite: true });
+            }
+        }
+
+        // Disegna i pixel separati con colori diversi
+        pixels.forEach(pixel => {
+            // Cerchio pieno colorato o bianco
+            this.ctx.fillStyle = `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.alpha})`;
+            this.ctx.beginPath();
+            this.ctx.arc(pixel.x, pixel.y, pixelRadius, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Bordo scuro per definizione
+            this.ctx.strokeStyle = `rgba(50, 50, 50, ${pixel.alpha * 0.5})`;
+            this.ctx.lineWidth = pixel.isWhite ? 2 : 1.5;
+            this.ctx.stroke();
+        });
+
+        // Pixel centrale più brillante (giallo/bianco - massima energia)
+        const centerColor = this.colorPalette.mapNormalized(0); // Massima energia
+        const saturationBoost = 1.7;
+        const cr = Math.min(255, Math.round(centerColor[0] * saturationBoost + 50));
+        const cg = Math.min(255, Math.round(centerColor[1] * saturationBoost + 50));
+        const cb = Math.min(255, Math.round(centerColor[2] * saturationBoost + 50));
+        
+        this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.1)})`;
+        this.ctx.beginPath();
+        this.ctx.arc(track.x, track.y, pixelRadius * 1.4, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        this.ctx.strokeStyle = `rgba(50, 50, 50, 0.7)`;
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
     }
 
     /**

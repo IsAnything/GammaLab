@@ -167,16 +167,16 @@ class SimulationEngine {
         
         const tracks = [];
         
-    // Numero di fotoni proporzionale a Size
-    // Aumentiamo il numero di fotoni per una resa più ricca,
-    // ma limitiamo per evitare freeze/performance hit
-    const requestedPhotons = Math.floor(params.size * 1.2 + Math.random() * params.size * 0.8);
+    // Numero di fotoni proporzionale a Size con maggiore variabilità
+    // Alcune tracce dense, altre rarefatte
+    const densityFactor = 0.3 + Math.random() * 1.4; // Fattore 0.3-1.7 (variabilità ~5x)
+    const requestedPhotons = Math.floor(params.size * densityFactor);
     const MAX_PHOTONS = 4000;
     const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
         
-        // Centro della traccia - ridotta dispersione per evitare uscite dallo schermo
-        const dispersionX = canvasWidth * 0.15;  // 15% della larghezza (era 20%)
-        const dispersionY = canvasHeight * 0.15; // 15% dell'altezza (era 20%)
+        // Centro della traccia - maggiore dispersione per tracce anche vicino ai bordi
+        const dispersionX = canvasWidth * 0.35;  // 35% della larghezza (era 15%)
+        const dispersionY = canvasHeight * 0.35; // 35% dell'altezza (era 15%)
         const centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
         const centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
         
@@ -233,9 +233,9 @@ class SimulationEngine {
                 continue; // Salta questo fotone
             }
             
-            // Scala con Length/Width (aumentata dispersione per raggi grandi)
-            let dx = gx * lengthPx * 0.7;  // Era 0.4, ora 0.7 per maggiore dispersione
-            let dy = gy * widthPx * 0.7;   // Era 0.4, ora 0.7 per maggiore dispersione
+            // Scala con Length/Width - tracce ESTREMAMENTE allungate (gamma-like)
+            let dx = gx * lengthPx * 2.5;  // Era 1.8, ora 2.5 per ellissi molto pronunciate
+            let dy = gy * widthPx * 0.3;   // Era 0.4, ora 0.3 per mantenere molto strette (rapporto ~8:1)
             
             // Validazione dx/dy
             if (!isFinite(dx) || !isFinite(dy)) {
