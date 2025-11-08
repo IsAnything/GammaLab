@@ -30,21 +30,64 @@
     </header>
 
     <main class="container">
-        <!-- Introduzione -->
+        <!-- Immagine SNR Interattiva -->
         <section class="card">
             <h2>💥 Resti di Supernova: PeVatron</h2>
+            
+            <div style="position: relative; text-align: center; margin: 24px 0;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Cassiopeia_A_-_Hubble_2005.jpg/1280px-Cassiopeia_A_-_Hubble_2005.jpg" 
+                     alt="Cassiopeia A - Supernova Remnant" 
+                     id="snr-image"
+                     style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                
+                <!-- Hotspot Annotations -->
+                <div class="snr-hotspot" style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);">
+                    <div class="hotspot-marker">+</div>
+                    <div class="hotspot-tooltip">
+                        <strong>Centro Compatto</strong><br>
+                        Stella di neutroni residua dall'esplosione (SN 1680)
+                    </div>
+                </div>
+                
+                <div class="snr-hotspot" style="position: absolute; top: 20%; left: 30%;">
+                    <div class="hotspot-marker">◉</div>
+                    <div class="hotspot-tooltip">
+                        <strong>Fronte d'Urto</strong><br>
+                        Onde d'urto a 5000 km/s accelerano particelle fino a PeV
+                    </div>
+                </div>
+                
+                <div class="snr-hotspot" style="position: absolute; top: 70%; left: 70%;">
+                    <div class="hotspot-marker">◉</div>
+                    <div class="hotspot-tooltip">
+                        <strong>Ejecta Caldi</strong><br>
+                        Materiale espulso ricco di elementi pesanti (Fe, Si, S)
+                    </div>
+                </div>
+                
+                <div class="snr-hotspot" style="position: absolute; top: 35%; left: 85%;">
+                    <div class="hotspot-marker">◉</div>
+                    <div class="hotspot-tooltip">
+                        <strong>Filamenti</strong><br>
+                        Regioni di emissione gamma ad alta energia
+                    </div>
+                </div>
+                
+                <p style="margin-top: 16px; font-size: 0.9rem; color: var(--text-secondary);">
+                    📸 <strong>Cassiopeia A</strong> - Immagine composita Hubble/Chandra/Spitzer<br>
+                    Resto di supernova a 11,000 anni luce. Passa il mouse sui marker (+/◉) per esplorare le regioni.
+                </p>
+            </div>
+            
+            <h3>🌟 Acceleratori Cosmici Estremi</h3>
             <p>
-                I <strong>resti di supernova (SNR - Supernova Remnants)</strong> sono tra le sorgenti 
-                di raggi gamma più energetiche della nostra galassia. Quando una stella massiccia 
-                esplode come supernova, l'<strong>onda d'urto</strong> si propaga nel mezzo interstellare 
-                a velocità di migliaia di km/s, creando condizioni ideali per l'<strong>accelerazione 
-                di particelle</strong>.
+                I <strong>resti di supernova (SNR)</strong> sono tra le sorgenti di raggi gamma più energetiche 
+                della galassia. L'<strong>onda d'urto</strong> si propaga a migliaia di km/s, creando condizioni 
+                ideali per l'<strong>accelerazione di particelle</strong>.
             </p>
             <p>
-                Alcuni SNR sono classificati come <strong>PeVatron</strong> - sorgenti capaci di 
-                accelerare particelle fino a energie di <strong>1 PeV (10¹⁵ eV)</strong>, ovvero 
-                un milione di miliardi di elettronvolt. Questa energia corrisponde a circa 
-                <strong>1000 TeV</strong>, mille volte superiore alle energie tipiche della Crab Nebula!
+                I <strong>PeVatron</strong> accelerano particelle fino a <strong>1 PeV (10¹⁵ eV)</strong>, 
+                ovvero <strong>1000 TeV</strong> - mille volte l'energia tipica della Crab Nebula!
             </p>
         </section>
 
@@ -401,6 +444,7 @@
     <script src="../js/visualization.js"></script>
     <script src="../js/stereo-reconstruction.js"></script>
     <script src="../js/navigation.js"></script>
+    <script src="../js/lightbox.js"></script>
     <script>
         // Setup simulatore PeVatron usando modulo navigation
         setupSourceSimulator('pevatron');

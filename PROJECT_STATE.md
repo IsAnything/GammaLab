@@ -1,4 +1,4 @@
-# 📊 GammaLab - Stato Progetto (7 Novembre 2025)
+# 📊 GammaLab - Stato Progetto (20 Gennaio 2025)
 
 ## 🎯 Panoramica Progetto
 
@@ -19,6 +19,18 @@
 - ✅ Riempimento ellissi visibile (gradient con alpha 0.55)
 - ✅ Aumentato numero fotoni (MAX_PHOTONS = 4000)
 - ✅ Ricostruzione stereo con visualizzazione geometrica
+
+### Week 8: Sprint 1 + Sprint 2 (UX Enhancement) ✅
+- ✅ **P1.1** Menu compatto (padding 12px, font 0.9rem, gap 8px)
+- ✅ **P1.2** Hero section homepage (gradient, border, title 2.5rem)
+- ✅ **P1.3** Auto-generate eventi (setTimeout 500ms)
+- ✅ **P1.4** Crab foto reale (Hubble Space Telescope)
+- ✅ **P1.5** Galactic Center foto Sgr A* (Event Horizon Telescope 2022)
+- ✅ **P1.6** Layout Blazars/GRB unificato (già ottimale)
+- ✅ **P2.1** Homepage tabs (3 tab: Come Funziona, Hillas, Quiz)
+- ✅ **P2.4** Intro accordion (6 sezioni collapsable con <details>)
+- ✅ **P2.5** SNR interactive image (4 hotspot su Cassiopeia A)
+- ✅ **P4.2** Lightbox universale (click-to-zoom, gallery, keyboard nav)
 
 ## 📁 Struttura File Chiave
 
@@ -41,11 +53,145 @@ GammaLab/
 │   ├── navigation.js             (setup simulatori universale)
 │   ├── quiz-engine.js            (logica quiz)
 │   ├── stereo-reconstruction.js  (ricostruzione geometrica)
-│   └── source-profiles.js        (profili fisici sorgenti)
+│   ├── source-profiles.js        (profili fisici sorgenti)
+│   └── lightbox.js               (✨ NEW: click-to-zoom universale)
 ├── css/
-│   └── main-style.css            (stili globali + fix overlay)
-├── homepage.html
+│   └── main-style.css            (stili globali + UX Week 8)
+├── homepage.html                 (✨ UPDATED: tabs system + hero)
 ├── index.html
+├── PROJECT_STATE.md
+└── EVOLUTION_PLAN.md             (✨ NEW: roadmap Week 8-10)
+```
+
+---
+
+## 🆕 Week 8 UX Enhancement
+
+### 1. Homepage Tabs System
+
+**File:** `homepage.html` linee 52-145
+
+**Implementazione:**
+- 3 tab collapsable: **Come Funziona** (default), **Parametri Hillas**, **Quiz Interattivo**
+- CSS: `.tab-link` con border-bottom 3px su `.active`
+- JavaScript inline (linee 180-195): toggle classe active su click
+- Animazione fadeIn 0.3s
+
+**CSS:** `main-style.css` linee 470-510
+```css
+.tab-link.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+.tab-content { display: none; animation: fadeIn 0.3s; }
+.tab-content.active { display: block; }
+```
+
+### 2. Hero Section Enhancement
+
+**File:** `homepage.html` linee 32-50
+
+**Modifiche:**
+- Background: `linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%)`
+- Border 2px solid accent-blue
+- Padding aumentato a 48px
+- Title `.hero-title`: **2.5rem** (era 1.8rem)
+
+### 3. Menu Compatto
+
+**CSS:** `main-style.css` linee 48-90
+
+**Ottimizzazioni:**
+- Header padding: **12px** (era 20px)
+- Menu font-size: **0.9rem** (era 1rem)
+- Gap tra link: **8px** (era 16px)
+- Border-bottom header: rimosso
+- **Risparmio verticale:** ~20px
+
+### 4. Auto-generate Eventi
+
+**File:** `navigation.js` linee 70-75
+
+```javascript
+if (options.autoGenerate !== false) {
+  setTimeout(() => {
+    console.log('🎬 Auto-generating initial event...');
+    generateEvent();
+  }, 500);
+}
+```
+
+**Applicato a:** Tutti i simulatori (delay 500ms dopo DOMContentLoaded)
+
+### 5. Immagini Reali Sorgenti
+
+**Crab Nebula** (`crab-nebula.html` linee 34-53):
+- 📸 Hubble Space Telescope (Wikimedia Commons)
+- Caption: "Crab Nebula - NASA/ESA Hubble (SN 1054)"
+- Styling: max-width 100%, border-radius 8px
+
+**Galactic Center** (`galactic-center.html` linee 34-60):
+- 📸 Sgr A* - Event Horizon Telescope (2022)
+- Caption: "4 million solar masses black hole"
+- Testo semplificato a bullet points
+
+### 6. Accordion System (Intro Cherenkov)
+
+**File:** `intro-cherenkov.html`
+
+**Implementazione:**
+- HTML5 `<details>/<summary>` per 6 sezioni
+- Prime 2 sezioni: conversione manuale
+- Restanti 4: **auto-converter script** (linee 380-410)
+  ```javascript
+  document.querySelectorAll('main > section.card:not(.accordion-card)').forEach(section => {
+    const details = document.createElement('details');
+    details.className = 'card accordion-card';
+    // ... converte section → details
+  });
+  ```
+
+**CSS:** `main-style.css` linee 512-560
+- Arrow rotation: `▶` → `▼` quando `[open]`
+- Smooth expand con max-height transition
+- Hover highlight su summary
+
+### 7. Interactive SNR Image
+
+**File:** `supernova-remnants.html` linee 34-95
+
+**Hotspots:**
+1. **Centro** (45%, 50%): Neutron star core
+2. **Top-left** (20%, 30%): Shock front (5000 km/s)
+3. **Bottom-right** (70%, 70%): Hot ejecta (Fe, Si, S)
+4. **Mid-right** (35%, 85%): Gamma-ray filaments
+
+**CSS:** `main-style.css` linee 562-620
+- Pulse animation: box-shadow 0 → 15px (2s infinite)
+- Tooltip hover: opacity 0 → 1 with translateY(-5px)
+- Arrow pointer con `::after` pseudo-element
+
+### 8. Lightbox Universale ⭐
+
+**File:** `js/lightbox.js` (124 linee, nuovo modulo)
+
+**Features:**
+- ✅ Auto-discovery di tutte le immagini `.card img:not(.no-lightbox)`
+- ✅ Click-to-zoom (cursor: zoom-in)
+- ✅ Gallery navigation (prev/next buttons)
+- ✅ Keyboard shortcuts (ESC, arrow keys)
+- ✅ Caption extraction da `img.alt` o `<p>` successivo
+- ✅ Body scroll lock durante modal
+- ✅ Click su overlay per chiudere
+
+**CSS:** `main-style.css` linee 622-730
+- Overlay: `rgba(0,0,0,0.95)` full-screen
+- Animation: `lightboxZoomIn` (scale 0.8→1, opacity 0→1, 0.3s)
+- Controls: close button (48px), prev/next (56px), hover scale 1.1
+
+**Integration:** Script include in 9 pagine HTML
+
+---
 └── PROJECT_STATE.md              (questo documento)
 ```
 
