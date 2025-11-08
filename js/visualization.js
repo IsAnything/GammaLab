@@ -212,6 +212,9 @@ class CanvasRenderer {
         this.overlayCtx = this.overlay ? this.overlay.getContext('2d') : null;
         
         this.colorPalette = new EnergyColorPalette();
+        
+        // NEW: Light style flag (default: false = dark theme)
+        this.lightStyle = false;
     }
 
     /**
@@ -243,9 +246,11 @@ class CanvasRenderer {
             const lat = -dx * sinT + dy * cosT;
 
             // Considera solo il raggio core del fotone (non il glow)
+            // Light style: tighter buffer (1.2×) for compact ellipses
             let buffer = 0;
             try {
-                buffer = Math.abs(this.intensityToRadius(t.intensity) * 1.5); // solo core, non glow
+                const bufferFactor = this.lightStyle ? 1.2 : 1.5;
+                buffer = Math.abs(this.intensityToRadius(t.intensity) * bufferFactor);
             } catch (e) {
                 buffer = 0;
             }
@@ -343,7 +348,8 @@ class CanvasRenderer {
      * Pulisce entrambi i canvas
      */
     clear() {
-        this.ctx.fillStyle = '#000814';
+        // Background: light gray for light style, dark blue for dark style
+        this.ctx.fillStyle = this.lightStyle ? '#e0e0e0' : '#000814';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         if (this.overlayCtx) {
@@ -414,9 +420,12 @@ class CanvasRenderer {
 
     // Aggiungi jitter posizionale per evitare colori identici
     const jitter = (Math.sin((track.x + track.y) * 0.12) + (Math.random() - 0.5) * 0.8) * 12;
-    const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 35)));
-    const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.7 + intensityFactor * 25)));
-    const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.5 + intensityFactor * 15)));
+    
+    // Light style: boost saturation by 40% for more vivid colors
+    const saturationBoost = this.lightStyle ? 1.4 : 1.0;
+    let r = Math.min(255, Math.max(0, Math.round(baseRGB[0] * saturationBoost + jitter + intensityFactor * 35)));
+    let g = Math.min(255, Math.max(0, Math.round(baseRGB[1] * saturationBoost + jitter * 0.7 + intensityFactor * 25)));
+    let b = Math.min(255, Math.max(0, Math.round(baseRGB[2] * saturationBoost - jitter * 0.5 + intensityFactor * 15)));
 
     const color = `rgb(${r}, ${g}, ${b})`;
     const radius = this.intensityToRadius(track.intensity);
@@ -538,19 +547,19 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = hillasParams.theta * Math.PI / 180;
 
-        // Ellisse Hillas
+        // Ellisse Hillas - magenta for light style, green for dark style
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);
 
-        ctx.strokeStyle = '#00ff88';
+        ctx.strokeStyle = this.lightStyle ? '#ff1493' : '#00ff88';  // Deep pink (magenta) for light style
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.ellipse(0, 0, hillasParams.lengthPx, hillasParams.widthPx, 0, 0, 2 * Math.PI);
         ctx.stroke();
 
         // Assi
-        ctx.strokeStyle = '#ffaa00';
+        ctx.strokeStyle = this.lightStyle ? '#ff1493' : '#ffaa00';
         ctx.lineWidth = 1.5;
         // Asse maggiore
         ctx.beginPath();
@@ -566,18 +575,18 @@ class CanvasRenderer {
         ctx.restore();
 
         // Centro di gravità
-        ctx.fillStyle = '#ff0055';
+        ctx.fillStyle = this.lightStyle ? '#ff1493' : '#ff0055';
         ctx.beginPath();
         ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = this.lightStyle ? '#333333' : '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
 
         // Linea Alpha (CoG → Centro camera)
         const cameraCenterX = this.overlay.width / 2;
         const cameraCenterY = this.overlay.height / 2;
-        ctx.strokeStyle = '#4488ff';
+        ctx.strokeStyle = this.lightStyle ? '#0066cc' : '#4488ff';
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 5]);
         ctx.beginPath();
@@ -589,9 +598,9 @@ class CanvasRenderer {
         // Label Alpha
         const midX = (centerX + cameraCenterX) / 2;
         const midY = (centerY + cameraCenterY) / 2;
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
         ctx.font = 'bold 14px "Courier New", monospace';
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#000000';
         ctx.lineWidth = 3;
         ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
         ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);

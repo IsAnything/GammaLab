@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Crab Nebula - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        /* Stile specifico simulatore */
+        .simulator-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .telescopes-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin: 32px 0;
+            flex-wrap: wrap;
+        }
+        
+        .telescope-camera {
+            position: relative;
+            width: 450px;
+        }
+        
+        .telescope-camera canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        
+        .telescope-label-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-weight: bold;
+            font-size: 1.5rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #666;
+            z-index: 10;
+        }
+        
+        .energy-scale-vertical {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 300px;
+            width: 40px;
+        }
+        
+        .scale-bar {
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                rgb(255, 240, 80) 0%,
+                rgb(100, 220, 80) 25%,
+                rgb(20, 160, 150) 50%,
+                rgb(24, 80, 220) 75%,
+                rgb(20, 120, 200) 100%
+            );
+            border: 1px solid #999;
+            border-radius: 4px;
+        }
+        
+        .scale-tick {
+            position: absolute;
+            right: 25px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">🎮 Simulatore IACT - Crab Nebula</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="crab-nebula.html">🦀 Info Crab Nebula</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="simulator-container">
+        <section class="card">
+            <h2>🎮 Simulatore IACT - Crab Nebula</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                Simulazione di un evento gamma dalla Crab Nebula osservato da <strong>3 telescopi Cherenkov</strong> in configurazione stereoscopica.
+                Clicca "Genera Evento" per simulare l'arrivo di un fotone gamma.
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">
+                    🌟 Genera Evento Crab
+                </button>
+                <button id="clearBtn" class="btn btn-secondary" style="font-size: 1.2rem; padding: 16px 32px;">
+                    🗑️ Pulisci
+                </button>
+            </div>
+
+            <!-- 3 Telescopi in Riga -->
+            <div class="telescopes-row">
+                <div class="telescope-camera">
+                    <canvas id="cam1" width="600" height="600"></canvas>
+                    <canvas id="cam1-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                    <div class="telescope-label-bottom">T1</div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">30</div>
+                        <div class="scale-tick" style="top: 25%;">8</div>
+                        <div class="scale-tick" style="top: 50%;">2</div>
+                        <div class="scale-tick" style="top: 75%;">0.5</div>
+                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                    </div>
+                </div>
+
+                <div class="telescope-camera">
+                    <canvas id="cam2" width="600" height="600"></canvas>
+                    <canvas id="cam2-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                    <div class="telescope-label-bottom">T2</div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">30</div>
+                        <div class="scale-tick" style="top: 25%;">8</div>
+                        <div class="scale-tick" style="top: 50%;">2</div>
+                        <div class="scale-tick" style="top: 75%;">0.5</div>
+                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                    </div>
+                </div>
+
+                <div class="telescope-camera">
+                    <canvas id="cam3" width="600" height="600"></canvas>
+                    <canvas id="cam3-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                    <div class="telescope-label-bottom">T3</div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">30</div>
+                        <div class="scale-tick" style="top: 25%;">8</div>
+                        <div class="scale-tick" style="top: 50%;">2</div>
+                        <div class="scale-tick" style="top: 75%;">0.5</div>
+                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parametri Hillas -->
+            <div class="hillas-panel" style="margin-top: 48px;">
+                <h3>📊 Parametri di Hillas Misurati</h3>
+                <div id="hillasDisplay">
+                    <p style="text-align: center; color: var(--text-secondary); padding: 40px;">
+                        Genera un evento per visualizzare i parametri di Hillas
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ricostruzione Stereoscopica -->
+            <div class="stereo-container" style="margin-top: 48px;">
+                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    La triangolazione dagli assi delle 3 ellissi determina la direzione di arrivo del fotone gamma
+                </p>
+                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/core-simulation.js?v=7"></script>
+    <script src="../js/source-profiles.js?v=7"></script>
+    <script src="../js/hillas-analysis.js?v=7"></script>
+    <script src="../js/visualization.js?v=7"></script>
+    <script src="../js/stereo-reconstruction.js?v=7"></script>
+    <script src="../js/lightbox.js"></script>
+    <script>
+        // === SIMULATORE CRAB NEBULA ===
+        let engine, renderers, hillasAnalyzer, colorPalette;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inizializza componenti
+            engine = new SimulationEngine();
+            hillasAnalyzer = new HillasAnalyzer();
+            colorPalette = new EnergyColorPalette();
+            engine.colorPalette = colorPalette;
+
+            // Inizializza renderers per 3 telescopi con nuovo stile
+            renderers = [
+                new CanvasRenderer('cam1', 'cam1-overlay'),
+                new CanvasRenderer('cam2', 'cam2-overlay'),
+                new CanvasRenderer('cam3', 'cam3-overlay')
+            ];
+
+            // Abilita rendering stile chiaro
+            renderers.forEach(renderer => {
+                renderer.colorPalette = colorPalette;
+                renderer.lightStyle = true; // Nuovo flag per stile chiaro
+            });
+
+            console.log('🎨 Simulatore Crab con stile chiaro inizializzato');
+
+            // Event listeners
+            document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
+            document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
+
+            console.log('✅ Simulatore Crab Nebula inizializzato');
+            
+            // Auto-genera primo evento
+            setTimeout(() => {
+                console.log('🎬 Auto-generating initial Crab event...');
+                generateCrabEvent();
+            }, 500);
+        });
+
+        function generateCrabEvent() {
+            console.log('🦀 Generazione evento Crab Nebula...');
+
+            const crabProfile = getSourceProfile('crab');
+            const events = [];
+            const hillasParams = [];
+            const hillasMap = {};
+
+            // Genera per 3 telescopi
+            for (let i = 0; i < 3; i++) {
+                const cameraId = i + 1;
+                const camKey = `cam${cameraId}`;
+                
+                const event = engine.generateEvent(crabProfile, cameraId);
+                events.push(event);
+
+                renderers[i].renderEvent(event, i === 0);
+                console.log(`🎨 Telescopio T${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+
+                const hillas = hillasAnalyzer.analyze(event);
+                if (hillas && hillas.valid) {
+                    hillasParams.push(hillas);
+                    hillasMap[camKey] = hillas;
+                    renderers[i].renderHillasOverlay(hillas);
+                }
+            }
+
+            // Ricostruzione stereoscopica
+            const stereoCanvas = document.getElementById('stereo');
+            if (stereoCanvas && hillasParams.length >= 2) {
+                if (typeof window.renderStereoReconstruction === 'function') {
+                    window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                        showGeometry: true,
+                        showCameraPositions: true,
+                        showArrows: true
+                    });
+                }
+            }
+
+            displayHillasParameters(hillasParams);
+
+            if (hillasParams.length >= 2) {
+                const comparison = compareHillasAcrossCameras(hillasParams);
+                displayCoherence(comparison);
+            }
+        }
+
+        function displayHillasParameters(hillasArray) {
+            const container = document.getElementById('hillasDisplay');
+            if (!container || hillasArray.length === 0) return;
+
+            let html = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">';
+            
+            hillasArray.forEach((hillas, idx) => {
+                html += `
+                    <div style="padding: 16px; background: rgba(0, 40, 80, 0.3); border-radius: 8px; border: 2px solid var(--accent-cyan);">
+                        <h5 style="color: #00d9ff; margin-bottom: 12px; text-align: center;">T${idx + 1}</h5>
+                        <table style="width: 100%; font-family: 'Courier New', monospace; font-size: 13px;">
+                            <tr>
+                                <td style="padding: 4px;"><strong>Length:</strong></td>
+                                <td style="text-align: right;">${hillas.length.toFixed(3)}°</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4px;"><strong>Width:</strong></td>
+                                <td style="text-align: right;">${hillas.width.toFixed(3)}°</td>
+                            </tr>
+                            <tr style="background: rgba(255, 200, 0, 0.1);">
+                                <td style="padding: 4px;"><strong>Size:</strong></td>
+                                <td style="text-align: right;"><span style="color: #ffc800;">${hillas.size.toFixed(0)} p.e.</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 4px;"><strong>Alpha:</strong></td>
+                                <td style="text-align: right;">${hillas.alpha.toFixed(1)}°</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayCoherence(comparison) {
+            const container = document.getElementById('hillasDisplay');
+            if (!container) return;
+
+            const coherenceColor = comparison.coherence > 90 ? '#00ff88' : 
+                                    comparison.coherence > 80 ? '#ffaa00' : '#ff4444';
+
+            container.innerHTML += `
+                <div style="margin-top: 24px; padding: 16px; background: rgba(0, 80, 40, 0.3); border-radius: 8px; border: 2px solid ${coherenceColor};">
+                    <h4 style="color: ${coherenceColor};">📊 Analisi Stereoscopica</h4>
+                    <p><strong>Coerenza Inter-Telescopi:</strong> <span style="color: ${coherenceColor}; font-size: 20px;">${comparison.coherence.toFixed(1)}%</span></p>
+                </div>
+            `;
+        }
+
+        function clearAllCanvases() {
+            renderers.forEach(r => r.clear());
+            
+            const stereoCanvas = document.getElementById('stereo');
+            if (stereoCanvas) {
+                const ctx = stereoCanvas.getContext('2d');
+                ctx.fillStyle = '#000814';
+                ctx.fillRect(0, 0, stereoCanvas.width, stereoCanvas.height);
+            }
+
+            document.getElementById('hillasDisplay').innerHTML = 
+                '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Genera un evento per visualizzare i parametri di Hillas</p>';
+            
+            console.log('🧹 Canvas puliti');
+        }
+    </script>
+</body>
+</html>
