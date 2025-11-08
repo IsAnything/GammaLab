@@ -664,6 +664,88 @@ table tr:hover {
   margin-bottom: 4px;
 }
 
+/* ==================== TELESCOPE GRID 2x2 ==================== */
+
+.telescopes-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 1400px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.telescope-container {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.telescope-label {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(0,0,0,0.7);
+  color: var(--accent-cyan);
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--accent-cyan);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.telescope-container .camera-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: #000;
+  display: block;
+}
+
+/* Barra Scala Colori */
+.color-scale-bar {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.scale-label {
+  text-align: center;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.scale-gradient {
+  height: 30px;
+  background: linear-gradient(to right, 
+    rgb(20, 120, 200) 0%,      /* Cyan - 50 GeV */
+    rgb(24, 80, 220) 25%,      /* Blue - 500 GeV */
+    rgb(20, 160, 150) 50%,     /* Teal - 2 TeV */
+    rgb(100, 220, 80) 75%,     /* Green - 8 TeV */
+    rgb(255, 240, 80) 100%     /* Yellow - 30 TeV */
+  );
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.scale-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 /* ==================== LIGHTBOX ==================== */
 
 .gl-lightbox {
@@ -793,6 +875,11 @@ table tr:hover {
     grid-template-columns: repeat(2, 1fr);
   }
   
+  .telescopes-grid-2x2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
   .hillas-parameters {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -800,6 +887,10 @@ table tr:hover {
 
 @media (max-width: 768px) {
   .cameras-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .telescopes-grid-2x2 {
     grid-template-columns: 1fr;
   }
   
