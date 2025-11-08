@@ -71,6 +71,14 @@ function setupSourceSimulator(sourceType, options = {}) {
         }
 
         console.log(`✅ Simulatore ${sourceType} inizializzato`);
+        
+        // Auto-genera primo evento dopo caricamento pagina
+        if (options.autoGenerate !== false) {  // default true
+            setTimeout(() => {
+                console.log('🎬 Auto-generating initial event...');
+                generateEvent();
+            }, 500);
+        }
     });
 
     /**

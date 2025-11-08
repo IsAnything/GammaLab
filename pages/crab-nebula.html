@@ -30,17 +30,28 @@
     </header>
 
     <main class="container">
-        <!-- Introduzione -->
+        <!-- Immagine Reale -->
         <section class="card">
             <h2>🦀 Crab Nebula: La Candela Standard</h2>
+            <div style="text-align: center; margin: 24px 0;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Crab_Nebula.jpg/1280px-Crab_Nebula.jpg" 
+                     alt="Crab Nebula - NASA/ESA Hubble Space Telescope" 
+                     style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">
+                    📸 <strong>Crab Nebula</strong> - Immagine composita Hubble Space Telescope (NASA/ESA)<br>
+                    La nebulosa è il resto della supernova SN 1054, osservata dagli astronomi cinesi nel 1054 d.C.<br>
+                    Al centro si trova la Crab Pulsar, stella di neutroni che ruota 30 volte al secondo.
+                </p>
+            </div>
+        </section>
+
+        <!-- Introduzione -->
+        <section class="card">
+            <h2>📍 La Candela Standard dell'Astronomia Gamma</h2>
             <p>
-                La <strong>Nebulosa del Granchio (Crab Nebula)</strong> è la sorgente di raggi gamma 
-                più famosa e studiata del cielo. Situata nella costellazione del Toro a circa 
-                <strong>6500 anni luce</strong> dalla Terra, è il resto dell'esplosione di supernova 
-                osservata dagli astronomi cinesi nell'anno <strong>1054 d.C.</strong>
-            </p>
-            <p>
-                È considerata la <strong>"candela standard"</strong> dell'astronomia gamma perché:
+                La <strong>Nebulosa del Granchio</strong> è situata nella costellazione del Toro a circa 
+                <strong>6500 anni luce</strong> dalla Terra. È considerata la <strong>"candela standard"</strong> 
+                dell'astronomia gamma perché:
             </p>
             <ul>
                 <li>📍 <strong>Sorgente puntiforme</strong>: Dimensione angolare ~4' (molto piccola per IACT)</li>
@@ -390,6 +401,12 @@
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
             console.log('✅ Simulatore Crab Nebula inizializzato');
+            
+            // Auto-genera primo evento
+            setTimeout(() => {
+                console.log('🎬 Auto-generating initial Crab event...');
+                generateCrabEvent();
+            }, 500);
         });
 
         /**

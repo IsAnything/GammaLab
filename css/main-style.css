@@ -49,8 +49,7 @@ body {
 
 header {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-bottom: 2px solid var(--accent-blue);
-  padding: 20px 0;
+  padding: 12px 0;
   box-shadow: 0 4px 20px var(--shadow);
 }
 
@@ -72,32 +71,33 @@ header {
 
 .site-subtitle {
   color: var(--text-secondary);
-  font-size: 1.1em;
-  margin-bottom: 20px;
+  font-size: 1em;
+  margin-bottom: 12px;
 }
 
 /* Menu navigazione */
 nav {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .nav-menu {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   list-style: none;
 }
 
 .nav-menu li a {
   display: block;
-  padding: 12px 24px;
+  padding: 8px 16px;
   background: var(--bg-elevated);
   color: var(--text-primary);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .nav-menu li a:hover {
@@ -112,7 +112,32 @@ nav {
   border-color: var(--accent-purple);
 }
 
-/* ==================== CARDS E SEZIONI ==================== */
+/* ==================== CARDS E SECTIONS ==================== */
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 2px solid var(--accent-blue);
+  padding: 48px !important;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  line-height: 1.3;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-text {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
 
 .card {
   background: var(--bg-card);
