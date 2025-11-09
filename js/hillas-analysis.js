@@ -46,6 +46,9 @@ class HillasAnalyzer {
         // 5. Calcola parametri Hillas (passa dimensioni canvas dall'evento)
         const canvasWidth = event.canvasWidth || 1500;
         const canvasHeight = event.canvasHeight || 1000;
+        
+        console.log(`🔍 Hillas Analysis - Canvas: ${canvasWidth}×${canvasHeight}, Center: (${canvasWidth/2}, ${canvasHeight/2})`);
+        
         const params = this._computeHillasParameters(
             cleanedTracks,
             cog,
@@ -175,6 +178,8 @@ class HillasAnalyzer {
         // Centro camera: usa le dimensioni effettive del canvas
         const centerX = canvasWidth / 2;
         const centerY = canvasHeight / 2;
+        
+        console.log(`📐 CoG: (${cog.x.toFixed(1)}, ${cog.y.toFixed(1)}), Center: (${centerX}, ${centerY}), Length: ${lengthPx.toFixed(1)}px, Width: ${widthPx.toFixed(1)}px`);
         
         // Miss (distanza CoG dal centro camera)
         const missPx = Math.sqrt(

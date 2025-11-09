@@ -14,6 +14,27 @@ const QUIZ_CONFIG = {
     maxStreakBonus: 50       // bonus massimo da streak
 };
 
+// === TIPI DI DOMANDE ===
+const QUESTION_TYPES = {
+    SOURCE_IDENTIFICATION: 'source',      // Classica: "Quale sorgente?"
+    PARTICLE_TYPE: 'particle',            // "È un gamma o un adrone?"
+    ENERGY_LEVEL: 'energy',               // "Energia alta o bassa?"
+    MUON_DETECTION: 'muon',               // "È un muone?"
+    SHOWER_SHAPE: 'shape'                 // "Ellisse stretta o larga?"
+};
+
+// Distribuzione tipi di domande per difficoltà crescente
+const QUESTION_DISTRIBUTION = [
+    // Domande 1-3: facili (solo source identification)
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.SOURCE_IDENTIFICATION],
+    // Domande 4-6: medie (mix)
+    [QUESTION_TYPES.PARTICLE_TYPE, QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.ENERGY_LEVEL],
+    // Domande 7-9: difficili (classificazione avanzata)
+    [QUESTION_TYPES.MUON_DETECTION, QUESTION_TYPES.SHOWER_SHAPE, QUESTION_TYPES.PARTICLE_TYPE],
+    // Domanda 10: finale (identificazione source complessa)
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION]
+];
+
 // === CLASSE QUIZ ENGINE ===
 class QuizEngine {
     constructor() {
@@ -49,6 +70,8 @@ class QuizEngine {
         this.currentEvent = null;
         this.currentProfile = null;
         this.currentHillasParams = [];
+        this.currentQuestionType = null;
+        this.currentCorrectAnswer = null;
     }
 
     /**
@@ -74,6 +97,18 @@ class QuizEngine {
         this.renderers.forEach(renderer => {
             renderer.colorPalette = this.colorPalette;
             renderer.lightStyle = true; // Nuovo stile chiaro
+        });
+        
+        // FORZA dimensioni quadrate per i canvas overlay
+        this.renderers.forEach((renderer, i) => {
+            const overlay = renderer.overlay;
+            if (overlay) {
+                // Forza dimensioni display uguali
+                overlay.style.width = '100%';
+                overlay.style.height = '100%';
+                overlay.style.objectFit = 'fill';
+                console.log(`📐 Canvas overlay ${i+1} forzato a dimensioni quadrate`);
+            }
         });
         
         // Setup UI event listeners
@@ -171,52 +206,301 @@ class QuizEngine {
             btn.classList.remove('correct', 'incorrect');
         });
         
-        // Seleziona sorgente random
-        this.currentProfile = getRandomSourceProfile(true); // Include hadron
+        // Determina tipo di domanda basato su progressione
+        this.currentQuestionType = this._selectQuestionType();
         
-        // Imposta sourceType sui renderers per rendering source-specific
-        const sourceType = this.currentProfile.type;
+        // Genera evento basato sul tipo di domanda
+        this._generateQuestionByType();
+        
+        // Start timer
+        this.startTimer();
+    }
+    
+    /**
+     * Seleziona tipo di domanda basato su progressione
+     */
+    _selectQuestionType() {
+        const questionIndex = this.currentQuestion - 1;
+        const types = QUESTION_DISTRIBUTION.flat();
+        return types[questionIndex] || QUESTION_TYPES.SOURCE_IDENTIFICATION;
+    }
+    
+    /**
+     * Genera domanda specifica per tipo
+     */
+    _generateQuestionByType() {
+        const quizCanvasSize = { width: 600, height: 600 };
+        
+        switch(this.currentQuestionType) {
+            case QUESTION_TYPES.PARTICLE_TYPE:
+                this._generateParticleTypeQuestion(quizCanvasSize);
+                break;
+            case QUESTION_TYPES.ENERGY_LEVEL:
+                this._generateEnergyLevelQuestion(quizCanvasSize);
+                break;
+            case QUESTION_TYPES.MUON_DETECTION:
+                this._generateMuonDetectionQuestion(quizCanvasSize);
+                break;
+            case QUESTION_TYPES.SHOWER_SHAPE:
+                this._generateShowerShapeQuestion(quizCanvasSize);
+                break;
+            case QUESTION_TYPES.SOURCE_IDENTIFICATION:
+            default:
+                this._generateSourceIdentificationQuestion(quizCanvasSize);
+                break;
+        }
+        
+        // Mostra parametri Hillas
+        this.displayQuizHillas();
+    }
+    
+    /**
+     * Domanda classica: identifica la sorgente
+     */
+    _generateSourceIdentificationQuestion(canvasSize) {
+        // Seleziona sorgente random (escludi muon per questa domanda)
+        this.currentProfile = getRandomSourceProfile(true); // Include hadron
+        this.currentCorrectAnswer = this.currentProfile.type;
+        
+        // Genera eventi per 3 camere
+        this._generateAndRenderEvents(this.currentProfile, canvasSize);
+        
+        // Imposta opzioni risposta (tutte le sorgenti)
+        this._setAnswerOptions([
+            { value: 'crab', label: '🦀 Crab Nebula' },
+            { value: 'pevatron', label: '💥 Resto di Supernova' },
+            { value: 'blazar', label: '🌀 Blazar (AGN)' },
+            { value: 'grb', label: '⚡ GRB' },
+            { value: 'galactic-center', label: '⭐ Centro Galattico' },
+            { value: 'hadron', label: '⚛️ Background Adronico' }
+        ]);
+        
+        document.getElementById('quizInstruction').textContent = 
+            `Analizza i parametri Hillas e identifica la sorgente. Hai ${QUIZ_CONFIG.timeLimit} secondi!`;
+    }
+    
+    /**
+     * Domanda: È un gamma o un adrone?
+     */
+    _generateParticleTypeQuestion(canvasSize) {
+        // 50% gamma, 50% hadron
+        const isGamma = Math.random() < 0.5;
+        
+        if (isGamma) {
+            // Usa una sorgente gamma qualsiasi (escludi hadron)
+            const gammaProfiles = [
+                SOURCE_PROFILES.crab,
+                SOURCE_PROFILES.pevatron,
+                SOURCE_PROFILES.blazar,
+                SOURCE_PROFILES.grb,
+                SOURCE_PROFILES.galacticCenter
+            ];
+            this.currentProfile = gammaProfiles[Math.floor(Math.random() * gammaProfiles.length)];
+            this._generateAndRenderEvents(this.currentProfile, canvasSize);
+            this.currentCorrectAnswer = 'gamma';
+        } else {
+            // Genera evento adronico
+            this._generateAndRenderHadronicEvents(canvasSize);
+            this.currentCorrectAnswer = 'hadron';
+        }
+        
+        this._setAnswerOptions([
+            { value: 'gamma', label: '🌟 Fotone Gamma' },
+            { value: 'hadron', label: '⚛️ Adrone (Background)' }
+        ]);
+        
+        document.getElementById('quizInstruction').textContent = 
+            `È un fotone gamma da una sorgente astrofisica o un adrone di background? (Osserva la forma dell'ellisse)`;
+    }
+    
+    /**
+     * Domanda: Energia alta o bassa?
+     */
+    _generateEnergyLevelQuestion(canvasSize) {
+        // 50% bassa energia (100-500 GeV), 50% alta energia (2-5 TeV)
+        const isHighEnergy = Math.random() < 0.5;
+        const energy = isHighEnergy ? 
+            2000 + Math.random() * 3000 :  // 2-5 TeV
+            100 + Math.random() * 400;      // 100-500 GeV
+        
+        this.currentProfile = getRandomSourceProfile(false); // Solo gamma
+        this.currentCorrectAnswer = isHighEnergy ? 'high' : 'low';
+        
+        // Genera con energia specifica
+        this._generateAndRenderEvents(this.currentProfile, canvasSize, { energy });
+        
+        this._setAnswerOptions([
+            { value: 'low', label: '📉 Bassa Energia (< 1 TeV)' },
+            { value: 'high', label: '📈 Alta Energia (> 1 TeV)' }
+        ]);
+        
+        document.getElementById('quizInstruction').textContent = 
+            `L'evento ha energia alta o bassa? (Osserva il numero di fotoni e la lunghezza della traccia)`;
+    }
+    
+    /**
+     * Domanda: È un muone?
+     */
+    _generateMuonDetectionQuestion(canvasSize) {
+        const isMuon = Math.random() < 0.5;
+        
+        if (isMuon) {
+            this._generateAndRenderMuonEvents(canvasSize);
+            this.currentCorrectAnswer = 'yes';
+        } else {
+            // Gamma o hadron
+            if (Math.random() < 0.7) {
+                // 70% gamma
+                this.currentProfile = getRandomSourceProfile(false);
+                this._generateAndRenderEvents(this.currentProfile, canvasSize);
+            } else {
+                // 30% hadron
+                this._generateAndRenderHadronicEvents(canvasSize);
+            }
+            this.currentCorrectAnswer = 'no';
+        }
+        
+        this._setAnswerOptions([
+            { value: 'yes', label: '✅ Sì, è un Muone' },
+            { value: 'no', label: '❌ No, non è un Muone' }
+        ]);
+        
+        document.getElementById('quizInstruction').textContent = 
+            `Questo evento è un muone? (I muoni producono tracce lineari e sottili)`;
+    }
+    
+    /**
+     * Domanda: Ellisse stretta o larga?
+     */
+    _generateShowerShapeQuestion(canvasSize) {
+        const isNarrow = Math.random() < 0.5;
+        
+        if (isNarrow) {
+            // Gamma (ellisse stretta)
+            this.currentProfile = getRandomSourceProfile(false);
+            this._generateAndRenderEvents(this.currentProfile, canvasSize);
+            this.currentCorrectAnswer = 'narrow';
+        } else {
+            // Hadron (ellisse larga)
+            this._generateAndRenderHadronicEvents(canvasSize);
+            this.currentCorrectAnswer = 'wide';
+        }
+        
+        this._setAnswerOptions([
+            { value: 'narrow', label: '↔️ Stretta (Gamma-like)' },
+            { value: 'wide', label: '⬌ Larga (Hadron-like)' }
+        ]);
+        
+        document.getElementById('quizInstruction').textContent = 
+            `L'ellisse di Hillas è stretta o larga? (Rapporto lunghezza/larghezza)`;
+    }
+    
+    /**
+     * Genera e renderizza eventi per una sorgente
+     */
+    _generateAndRenderEvents(profile, canvasSize, customParams = null) {
+        const sourceType = profile.type;
         this.renderers.forEach(renderer => {
             renderer.sourceType = sourceType;
         });
         
-        // Genera eventi per 3 camere
         const events = [];
         this.currentHillasParams = [];
         
-        // Dimensioni canvas del quiz (600x600 come i simulatori)
-        const quizCanvasSize = { width: 600, height: 600 };
-        
         for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateEvent(this.currentProfile, i + 1, quizCanvasSize);
+            const event = this.engine.generateEvent(profile, i + 1, canvasSize, customParams);
             events.push(event);
             
-            // Calcola Hillas
             const hillas = this.hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
                 this.currentHillasParams.push(hillas);
             }
             
-            // Renderizza con nuovo stile light
             this.renderers[i].renderEvent(event, i === 0);
             
-            // Overlay ellisse sopra tutto
             if (hillas && hillas.valid) {
                 this.renderers[i].renderHillasOverlay(hillas);
             }
         }
         
         this.currentEvent = events;
+    }
+    
+    /**
+     * Genera e renderizza eventi adronici
+     */
+    _generateAndRenderHadronicEvents(canvasSize) {
+        this.renderers.forEach(renderer => {
+            renderer.sourceType = 'hadron';
+        });
         
-        // Mostra parametri Hillas
-        this.displayQuizHillas();
+        const events = [];
+        this.currentHillasParams = [];
         
-        // Start timer
-        this.startTimer();
+        for (let i = 0; i < 3; i++) {
+            const event = this.engine.generateHadronicEvent(i + 1, canvasSize);
+            events.push(event);
+            
+            const hillas = this.hillasAnalyzer.analyze(event);
+            if (hillas && hillas.valid) {
+                this.currentHillasParams.push(hillas);
+            }
+            
+            this.renderers[i].renderEvent(event, i === 0);
+            
+            if (hillas && hillas.valid) {
+                this.renderers[i].renderHillasOverlay(hillas);
+            }
+        }
         
-        // Update istruzioni
-        document.getElementById('quizInstruction').textContent = 
-            `Analizza i parametri Hillas e identifica la sorgente. Hai ${QUIZ_CONFIG.timeLimit} secondi!`;
+        this.currentEvent = events;
+    }
+    
+    /**
+     * Genera e renderizza eventi muonici
+     */
+    _generateAndRenderMuonEvents(canvasSize) {
+        this.renderers.forEach(renderer => {
+            renderer.sourceType = 'muon';
+        });
+        
+        const events = [];
+        this.currentHillasParams = [];
+        
+        for (let i = 0; i < 3; i++) {
+            const event = this.engine.generateMuonEvent(i + 1, canvasSize);
+            events.push(event);
+            
+            const hillas = this.hillasAnalyzer.analyze(event);
+            if (hillas && hillas.valid) {
+                this.currentHillasParams.push(hillas);
+            }
+            
+            this.renderers[i].renderEvent(event, i === 0);
+            
+            if (hillas && hillas.valid) {
+                this.renderers[i].renderHillasOverlay(hillas);
+            }
+        }
+        
+        this.currentEvent = events;
+    }
+    
+    /**
+     * Imposta opzioni di risposta dinamicamente
+     */
+    _setAnswerOptions(options) {
+        const container = document.getElementById('answerOptions');
+        container.innerHTML = '';
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.setAttribute('data-answer', opt.value);
+            btn.textContent = opt.label;
+            btn.addEventListener('click', (e) => this.checkAnswer(e));
+            container.appendChild(btn);
+        });
     }
 
     /**
@@ -285,7 +569,7 @@ class QuizEngine {
         });
         
         // Mostra risposta corretta
-        const correctBtn = document.querySelector(`.quiz-option[data-answer="${this.currentProfile.type}"]`);
+        const correctBtn = document.querySelector(`.quiz-option[data-answer="${this.currentCorrectAnswer}"]`);
         if (correctBtn) {
             correctBtn.classList.add('correct');
         }
@@ -296,7 +580,8 @@ class QuizEngine {
         // Record answer
         this.answerHistory.push({
             question: this.currentQuestion,
-            correctAnswer: this.currentProfile.type,
+            questionType: this.currentQuestionType,
+            correctAnswer: this.currentCorrectAnswer,
             userAnswer: null,
             correct: false,
             points: 0,
@@ -326,8 +611,8 @@ class QuizEngine {
             btn.disabled = true;
         });
         
-        // Check correct
-        const correct = (answer === this.currentProfile.type);
+        // Check correct (usa currentCorrectAnswer invece di currentProfile.type)
+        const correct = (answer === this.currentCorrectAnswer);
         
         // Calculate points
         let points = 0;
@@ -358,16 +643,19 @@ class QuizEngine {
             console.log(`  ❌ Sbagliato`);
         }
         
-        // Update stats
-        this.sourceStats[this.currentProfile.type].attempts++;
-        if (correct) {
-            this.sourceStats[this.currentProfile.type].correct++;
+        // Update stats (solo se è una domanda source identification)
+        if (this.currentQuestionType === QUESTION_TYPES.SOURCE_IDENTIFICATION && this.currentProfile) {
+            this.sourceStats[this.currentProfile.type].attempts++;
+            if (correct) {
+                this.sourceStats[this.currentProfile.type].correct++;
+            }
         }
         
         // Record answer
         this.answerHistory.push({
             question: this.currentQuestion,
-            correctAnswer: this.currentProfile.type,
+            questionType: this.currentQuestionType,
+            correctAnswer: this.currentCorrectAnswer,
             userAnswer: answer,
             correct: correct,
             points: points,

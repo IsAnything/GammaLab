@@ -88,6 +88,100 @@ class SimulationEngine {
     }
 
     /**
+     * Genera un evento adronico (background)
+     * Gli adroni hanno shower più larghi, meno collimati e più irregolari
+     * @param {Number} cameraId - ID camera (1-3)
+     * @param {Object} canvasSize - Dimensioni canvas {width, height}
+     * @param {Number} energy - Energia in GeV (opzionale)
+     * @returns {Object} Evento adronico generato
+     */
+    generateHadronicEvent(cameraId = 1, canvasSize = null, energy = null) {
+        const canvasW = canvasSize?.width || CANVAS_WIDTH;
+        const canvasH = canvasSize?.height || CANVAS_HEIGHT;
+        
+        // Energia adroni tipicamente 100 GeV - 10 TeV
+        const hadronEnergy = energy || this._randomInRange(100, 10000);
+        
+        // Parametri tipici adronici (molto diversi dai gamma)
+        const params = {
+            length: this._randomInRange(0.15, 0.35),  // Più variabile
+            width: this._randomInRange(0.08, 0.18),   // Molto più largo (rapporto ~2-3)
+            size: this._randomInRange(800, 2500),     // Tanti fotoni
+            alpha: this._randomInRange(5, 40),        // Angoli alpha più grandi
+            elongation: this._randomInRange(0.15, 0.35),  // Meno allungato
+            asymmetry: { mean: 0.25, std: 0.15 }      // Più asimmetrico
+        };
+        
+        // Angolo zenitale random
+        const zenithAngle = this._randomInRange(0, 45);
+        if (zenithAngle > 0) {
+            this._applyZenithEffects(params, zenithAngle, hadronEnergy);
+        }
+        
+        // Genera tracce con caratteristiche adroniche
+        const tracks = this._generateHadronicTracks(params, hadronEnergy, canvasW, canvasH);
+        
+        const event = {
+            sourceType: 'hadron',
+            cameraId: cameraId,
+            energy: hadronEnergy,
+            zenithAngle: zenithAngle,
+            params: params,
+            tracks: tracks,
+            canvasWidth: canvasW,
+            canvasHeight: canvasH,
+            timestamp: Date.now()
+        };
+        
+        this.currentEvent = event;
+        return event;
+    }
+
+    /**
+     * Genera un evento muonico
+     * I muoni producono tracce lineari, sottili, con pochi fotoni
+     * @param {Number} cameraId - ID camera (1-3)
+     * @param {Object} canvasSize - Dimensioni canvas {width, height}
+     * @param {Number} energy - Energia in GeV (opzionale)
+     * @returns {Object} Evento muonico generato
+     */
+    generateMuonEvent(cameraId = 1, canvasSize = null, energy = null) {
+        const canvasW = canvasSize?.width || CANVAS_WIDTH;
+        const canvasH = canvasSize?.height || CANVAS_HEIGHT;
+        
+        // Energia muoni tipicamente 50 GeV - 5 TeV
+        const muonEnergy = energy || this._randomInRange(50, 5000);
+        
+        // Parametri muonici: traccia molto stretta e lineare
+        const params = {
+            length: this._randomInRange(0.4, 0.8),    // Molto lungo (attraversa camera)
+            width: this._randomInRange(0.02, 0.05),   // Estremamente stretto
+            size: this._randomInRange(200, 600),      // Pochi fotoni
+            alpha: this._randomInRange(0, 15),        // Angolo alpha piccolo
+            elongation: 0.95,                         // Quasi perfettamente lineare
+            asymmetry: { mean: 0.05, std: 0.02 }      // Molto simmetrico
+        };
+        
+        // Genera tracce muoniche
+        const tracks = this._generateMuonTracks(params, muonEnergy, canvasW, canvasH);
+        
+        const event = {
+            sourceType: 'muon',
+            cameraId: cameraId,
+            energy: muonEnergy,
+            zenithAngle: 0,
+            params: params,
+            tracks: tracks,
+            canvasWidth: canvasW,
+            canvasHeight: canvasH,
+            timestamp: Date.now()
+        };
+        
+        this.currentEvent = event;
+        return event;
+    }
+
+    /**
      * Campiona parametri dal profilo sorgente
      */
     _sampleFromProfile(profile) {
@@ -206,9 +300,11 @@ class SimulationEngine {
         
         const tracks = [];
         
-    // Numero di fotoni proporzionale a Size con maggiore variabilità
-    // Alcune tracce dense, altre rarefatte
-    const densityFactor = 0.3 + Math.random() * 1.4; // Fattore 0.3-1.7 (variabilità ~5x)
+    // Numero di fotoni dipende fortemente dall'energia
+    // 100 GeV → pochi fotoni, 5000 GeV → tanti fotoni
+    const energyTeV = energy / 1000;
+    const energyBoost = Math.pow(energyTeV, 0.4); // Scala sub-lineare
+    const densityFactor = (0.3 + Math.random() * 1.4) * energyBoost;
     const requestedPhotons = Math.floor(params.size * densityFactor);
     const MAX_PHOTONS = 4000;
     const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
@@ -227,7 +323,10 @@ class SimulationEngine {
         // Converti Length e Width da gradi a pixel
         // Scala in base alle dimensioni effettive del canvas
         const degreeToPixel = canvasWidth / FOV_WIDTH; // Ricalcola per canvas corrente
-        const lengthPx = params.length * degreeToPixel;
+        
+        // Energia influenza lunghezza: alte energie → tracce più lunghe
+        const energyLengthBoost = 1 + (energyTeV - 0.5) * 0.3; // ±30% basato su energia
+        const lengthPx = params.length * degreeToPixel * Math.max(0.7, energyLengthBoost);
         const widthPx = params.width * degreeToPixel;
         
         // Validazione conversione
@@ -315,6 +414,166 @@ class SimulationEngine {
             const photonEnergy = this._samplePhotonEnergy(energy);
             
             // Intensità (photoelectrons)
+            const intensity = this._energyToIntensity(photonEnergy);
+            
+            tracks.push({
+                x: x,
+                y: y,
+                energy: photonEnergy,
+                intensity: intensity
+            });
+        }
+        
+        return tracks;
+    }
+
+    /**
+     * Genera tracce adroniche (più larghe, irregolari, con sub-shower)
+     */
+    _generateHadronicTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+        const tracks = [];
+        
+        // Adroni: più fotoni ma distribuiti in modo più disperso
+        const densityFactor = 0.8 + Math.random() * 1.0;
+        const numPhotons = Math.min(Math.floor(params.size * densityFactor), 4000);
+        
+        // Centro traccia principale
+        const dispersionX = canvasWidth * 0.35;
+        const dispersionY = canvasHeight * 0.35;
+        const centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
+        const centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
+        
+        // Angolo principale
+        const theta = Math.random() * 2 * Math.PI;
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        
+        const degreeToPixel = canvasWidth / FOV_WIDTH;
+        const lengthPx = params.length * degreeToPixel;
+        const widthPx = params.width * degreeToPixel;
+        
+        // Asimmetria maggiore per adroni
+        const asymFactor = this._randomFromDistribution(params.asymmetry);
+        
+        // Genera fotoni con caratteristiche adroniche
+        for (let i = 0; i < numPhotons; i++) {
+            const r = Math.sqrt(-2 * Math.log(Math.random() + 0.001));
+            const angle = Math.random() * 2 * Math.PI;
+            const gx = r * Math.cos(angle);
+            const gy = r * Math.sin(angle);
+            
+            if (!isFinite(gx) || !isFinite(gy)) continue;
+            
+            // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
+            let dx = gx * lengthPx * 1.5;  // Meno allungato rispetto ai gamma (2.5)
+            let dy = gy * widthPx * 0.8;   // Molto più largo rispetto ai gamma (0.3)
+            
+            if (!isFinite(dx) || !isFinite(dy)) continue;
+            
+            // Più asimmetria e irregolarità
+            if (dx > 0) {
+                dx *= (1 + asymFactor * 1.5);  // 50% più asimmetria
+            } else {
+                dx *= (1 - asymFactor * 0.8);
+            }
+            
+            // Aggiungi rumore per irregolarità
+            const noiseFactor = 1 + (Math.random() - 0.5) * 0.4;
+            dx *= noiseFactor;
+            dy *= noiseFactor;
+            
+            if (!isFinite(dx) || !isFinite(dy)) continue;
+            
+            // Ruota
+            const rotX = dx * cosTheta - dy * sinTheta;
+            const rotY = dx * sinTheta + dy * cosTheta;
+            
+            let x = centerX + rotX;
+            let y = centerY + rotY;
+            
+            // 20% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
+            if (Math.random() < 0.2) {
+                const subAngle = Math.random() * 2 * Math.PI;
+                const subDist = Math.random() * lengthPx * 0.8;
+                x += Math.cos(subAngle) * subDist;
+                y += Math.sin(subAngle) * subDist;
+            }
+            
+            if (!isFinite(x) || !isFinite(y)) continue;
+            
+            const photonEnergy = this._samplePhotonEnergy(energy);
+            const intensity = this._energyToIntensity(photonEnergy);
+            
+            tracks.push({
+                x: x,
+                y: y,
+                energy: photonEnergy,
+                intensity: intensity
+            });
+        }
+        
+        return tracks;
+    }
+
+    /**
+     * Genera tracce muoniche (lineari, sottili, attraversano la camera)
+     */
+    _generateMuonTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+        const tracks = [];
+        
+        const numPhotons = Math.min(Math.floor(params.size), 800);
+        
+        // Punto di ingresso del muone (bordo della camera)
+        const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
+        let startX, startY, endX, endY;
+        
+        switch(side) {
+            case 0: // Top
+                startX = Math.random() * canvasWidth;
+                startY = 0;
+                endX = Math.random() * canvasWidth;
+                endY = canvasHeight;
+                break;
+            case 1: // Right
+                startX = canvasWidth;
+                startY = Math.random() * canvasHeight;
+                endX = 0;
+                endY = Math.random() * canvasHeight;
+                break;
+            case 2: // Bottom
+                startX = Math.random() * canvasWidth;
+                startY = canvasHeight;
+                endX = Math.random() * canvasWidth;
+                endY = 0;
+                break;
+            case 3: // Left
+                startX = 0;
+                startY = Math.random() * canvasHeight;
+                endX = canvasWidth;
+                endY = Math.random() * canvasHeight;
+                break;
+        }
+        
+        const degreeToPixel = canvasWidth / FOV_WIDTH;
+        const widthPx = params.width * degreeToPixel;
+        
+        // Genera fotoni lungo la linea
+        for (let i = 0; i < numPhotons; i++) {
+            // Posizione lungo la linea (parametro t da 0 a 1)
+            const t = Math.random();
+            const lineX = startX + t * (endX - startX);
+            const lineY = startY + t * (endY - startY);
+            
+            // Piccola dispersione perpendicolare alla linea
+            const perpAngle = Math.atan2(endY - startY, endX - startX) + Math.PI / 2;
+            const perpDist = (Math.random() - 0.5) * widthPx * 2;
+            
+            const x = lineX + Math.cos(perpAngle) * perpDist;
+            const y = lineY + Math.sin(perpAngle) * perpDist;
+            
+            if (!isFinite(x) || !isFinite(y)) continue;
+            
+            const photonEnergy = this._samplePhotonEnergy(energy);
             const intensity = this._energyToIntensity(photonEnergy);
             
             tracks.push({

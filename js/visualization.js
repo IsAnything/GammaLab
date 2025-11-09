@@ -902,6 +902,8 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = hillasParams.theta * Math.PI / 180;
 
+        console.log(`🎨 Rendering Hillas: CoG(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), Canvas: ${this.overlay.width}×${this.overlay.height}`);
+
         // Ellisse Hillas - bordeaux scuro per light style, verde per dark style
         ctx.save();
         ctx.translate(centerX, centerY);
