@@ -215,6 +215,9 @@ class CanvasRenderer {
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
+        // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
+        // (useful for quizzes where geometric adherence is required)
+        this.respectExactHillas = false;
     }
 
     /**
@@ -912,11 +915,18 @@ class CanvasRenderer {
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);
 
-        // Per light style: allarga artificialmente l'asse minore per ellissi più visibili
-        const displayLengthPx = hillasParams.lengthPx;
-        const displayWidthPx = this.lightStyle 
-            ? Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2)  // Min 20% della lunghezza
-            : hillasParams.widthPx;
+        // By default use the computed semi-axes
+        let displayLengthPx = hillasParams.lengthPx;
+        let displayWidthPx = hillasParams.widthPx;
+
+        // For lightStyle the renderer previously enlarged the minor axis for visibility.
+        // If respectExactHillas is true we override that behaviour and use the exact values
+        // computed by the Hillas analyzer to ensure geometric adherence.
+        if (!this.respectExactHillas) {
+            if (this.lightStyle) {
+                displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);  // Min 20% della lunghezza
+            }
+        }
 
         // Colore più scuro e contrastante per light style
         ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';  // Bordeaux scuro per light style

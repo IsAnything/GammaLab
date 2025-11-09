@@ -97,6 +97,8 @@ class QuizEngine {
         this.renderers.forEach(renderer => {
             renderer.colorPalette = this.colorPalette;
             renderer.lightStyle = true; // Nuovo stile chiaro
+            // In quiz vogliamo che le ellissi siano geometricamente aderenti
+            renderer.respectExactHillas = true;
         });
         
         // FORZA dimensioni quadrate per i canvas overlay

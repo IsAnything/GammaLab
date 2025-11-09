@@ -341,6 +341,18 @@ grad.addColorStop(1,    rgba(0, 0, 0, 0));      // Trasparente
 ```
 **Risultato**: Varietà cromatica visibile legata all'energia
 
+### Fix 4: Ellissi non aderenti in modalità Quiz (correzione)
+**File**: `js/visualization.js`, `js/quiz-engine.js`
+```javascript
+// Nuova opzione nel CanvasRenderer
+renderer.respectExactHillas = true;
+// renderHillasOverlay usa i semiassi calcolati quando respectExactHillas=true
+```
+**Problema**: In modalità `lightStyle` (quiz) l'ellisse veniva ingrandita artificialmente sull'asse minore per visibilità, causando apparente disallineamento geometrico con le tracce.
+**Soluzione**: Aggiunto il flag `respectExactHillas` per permettere di disabilitare l'allargamento visivo; i renderer usati dal quiz impostano `respectExactHillas = true` così le ellissi disegnate nel quiz corrispondono esattamente ai semiassi calcolati dall'analisi di Hillas.
+**Risultato**: Le ellissi nel quiz sono ora geometricamente aderenti alle tracce quando `respectExactHillas` è attivo. Il comportamento visivo di default rimane invariato per le altre pagine dove può essere utile l'allargamento per chiarezza.
+
+
 ## 📊 Profili Sorgenti
 
 **File**: `js/source-profiles.js`
