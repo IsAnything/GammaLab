@@ -195,8 +195,11 @@ class QuizEngine {
         // Reset hint state
         this.currentHintLevel = 0;
         document.getElementById('hint1Btn').disabled = false;
+        document.getElementById('hint1Btn').style.display = 'inline-block';
         document.getElementById('hint2Btn').disabled = true;
+        document.getElementById('hint2Btn').style.display = 'inline-block';
         document.getElementById('hint3Btn').disabled = true;
+        document.getElementById('hint3Btn').style.display = 'inline-block';
         document.getElementById('hintPanel').classList.add('hidden');
         document.getElementById('feedbackPanel').classList.add('hidden');
         
@@ -498,7 +501,10 @@ class QuizEngine {
             btn.className = 'quiz-option';
             btn.setAttribute('data-answer', opt.value);
             btn.textContent = opt.label;
-            btn.addEventListener('click', (e) => this.checkAnswer(e));
+            btn.addEventListener('click', (e) => {
+                const answer = e.target.dataset.answer;
+                this.submitAnswer(answer);
+            });
             container.appendChild(btn);
         });
     }
@@ -568,6 +574,11 @@ class QuizEngine {
             btn.disabled = true;
         });
         
+        // Nascondi bottoni hint (tempo scaduto)
+        document.getElementById('hint1Btn').style.display = 'none';
+        document.getElementById('hint2Btn').style.display = 'none';
+        document.getElementById('hint3Btn').style.display = 'none';
+        
         // Mostra risposta corretta
         const correctBtn = document.querySelector(`.quiz-option[data-answer="${this.currentCorrectAnswer}"]`);
         if (correctBtn) {
@@ -606,10 +617,15 @@ class QuizEngine {
         this.stopTimer();
         const timeSpent = QUIZ_CONFIG.timeLimit - this.timeRemaining;
         
-        // Disabilita bottoni
+        // Disabilita bottoni risposta
         document.querySelectorAll('.quiz-option').forEach(btn => {
             btn.disabled = true;
         });
+        
+        // Nascondi bottoni hint (non servono più dopo aver risposto)
+        document.getElementById('hint1Btn').style.display = 'none';
+        document.getElementById('hint2Btn').style.display = 'none';
+        document.getElementById('hint3Btn').style.display = 'none';
         
         // Check correct (usa currentCorrectAnswer invece di currentProfile.type)
         const correct = (answer === this.currentCorrectAnswer);
@@ -694,6 +710,11 @@ class QuizEngine {
         this.currentHintLevel = level;
         this.hintsUsed++;
         
+        // Assicurati che i bottoni risposta siano abilitati (potresti aver bisogno di hint PRIMA di rispondere)
+        document.querySelectorAll('.quiz-option').forEach(btn => {
+            btn.disabled = false;
+        });
+        
         // Disable current hint button
         document.getElementById(`hint${level}Btn`).disabled = true;
         
@@ -726,14 +747,18 @@ class QuizEngine {
                 return `
                     <h4>💡 Hint 1: Analisi Size (-30 punti)</h4>
                     <p>Il parametro <strong>Size</strong> osservato è circa <strong>${avgHillas.size.toFixed(0)} p.e.</strong></p>
+                    <p style="font-size: 12px; color: var(--text-secondary); font-style: italic; margin-top: 8px;">
+                        ℹ️ <strong>p.e.</strong> = photoelectrons (fotoelettroni) - carica totale misurata dai fotomoltiplicatori
+                    </p>
                     <p>Ricorda:</p>
                     <ul style="margin-left: 20px; font-size: 13px;">
-                        <li>🦀 <strong>Crab</strong>: 800-1200 p.e. (medio)</li>
-                        <li>💥 <strong>PeVatron</strong>: >2000 p.e. (ESTREMO!)</li>
-                        <li>🌀 <strong>Blazar</strong>: 1000-1500 p.e. (medio-alto)</li>
-                        <li>⚡ <strong>GRB</strong>: 1200-2000 p.e. (alto)</li>
-                        <li>⭐ <strong>Centro Galattico</strong>: 1500-2200 p.e. (alto)</li>
-                        <li>⚛️ <strong>Hadron</strong>: 500-3000 p.e. (molto variabile)</li>
+                        <li>🦀 <strong>Crab</strong>: 600-1000 p.e. (medio)</li>
+                        <li>💥 <strong>PeVatron</strong>: >1500 p.e. (ALTO!)</li>
+                        <li>🌀 <strong>Blazar</strong>: 700-1200 p.e. (medio-alto)</li>
+                        <li>⚡ <strong>GRB</strong>: 800-1400 p.e. (medio-alto)</li>
+                        <li>⭐ <strong>Centro Galattico</strong>: 1000-1600 p.e. (alto)</li>
+                        <li>⚛️ <strong>Hadron</strong>: 400-2000 p.e. (molto variabile)</li>
+                        <li>🔬 <strong>Muone</strong>: 200-500 p.e. (BASSO!)</li>
                     </ul>
                 `;
             

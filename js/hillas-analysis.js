@@ -172,8 +172,10 @@ class HillasAnalyzer {
         const length = lengthPx * PIXEL_TO_DEGREE;
         const width = widthPx * PIXEL_TO_DEGREE;
 
-        // Size (intensità totale)
-        const size = cog.totalIntensity * 100; // Scala a photoelectrons
+        // Size (intensità totale) - scala in modo più realistico
+        // totalIntensity è già proporzionale al numero di fotoni e alla loro energia
+        // Dividiamo per avere valori nell'ordine di centinaia/migliaia
+        const size = cog.totalIntensity / 10; // Ridotta scala (era *100)
 
         // Centro camera: usa le dimensioni effettive del canvas
         const centerX = canvasWidth / 2;

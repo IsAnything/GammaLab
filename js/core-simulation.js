@@ -300,13 +300,13 @@ class SimulationEngine {
         
         const tracks = [];
         
-    // Numero di fotoni dipende fortemente dall'energia
-    // 100 GeV → pochi fotoni, 5000 GeV → tanti fotoni
+    // Numero di fotoni dipende dall'energia ma in modo più moderato
+    // 100 GeV → pochi fotoni, 5000 GeV → più fotoni (non troppi)
     const energyTeV = energy / 1000;
-    const energyBoost = Math.pow(energyTeV, 0.4); // Scala sub-lineare
-    const densityFactor = (0.3 + Math.random() * 1.4) * energyBoost;
+    const energyBoost = Math.pow(energyTeV, 0.25); // Scala molto sub-lineare (era 0.4)
+    const densityFactor = (0.4 + Math.random() * 1.0) * energyBoost; // Ridotta variabilità
     const requestedPhotons = Math.floor(params.size * densityFactor);
-    const MAX_PHOTONS = 4000;
+    const MAX_PHOTONS = 2500; // Ridotto da 4000
     const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
         
         // Centro della traccia - maggiore dispersione per tracce anche vicino ai bordi
@@ -435,7 +435,7 @@ class SimulationEngine {
         
         // Adroni: più fotoni ma distribuiti in modo più disperso
         const densityFactor = 0.8 + Math.random() * 1.0;
-        const numPhotons = Math.min(Math.floor(params.size * densityFactor), 4000);
+        const numPhotons = Math.min(Math.floor(params.size * densityFactor), 2500); // Ridotto da 4000
         
         // Centro traccia principale
         const dispersionX = canvasWidth * 0.35;
