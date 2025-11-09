@@ -92,7 +92,7 @@
                 events.push(event);
                 renderers[i].renderEvent(event, i === 0);
                 const hillas = hillasAnalyzer.analyze(event);
-                if (hillas && hillas.valid) { hillasParams.push(hillas); hillasMap[camKey] = hillas; renderers[i].renderHillasOverlay(hillas);
+                if (hillas && hillas.valid) { hillasParams.push(hillas); hillasMap[camKey] = hillas; renderers[i].renderHillasOverlay(hillas); }
             }
             const stereoCanvas = document.getElementById('stereo');
             if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) window.renderStereoReconstruction(stereoCanvas, hillasMap, {showGeometry: true, showCameraPositions: true, showArrows: true});
