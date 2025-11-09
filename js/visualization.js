@@ -576,14 +576,55 @@ class CanvasRenderer {
     renderPhotonHexagonal(track) {
         const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
         
-        const pixelRadius = 4; // Ridotto da 5 per circoletti più piccoli
-        const spreadRadiusLong = this.intensityToRadius(track.intensity) * 14; // Ridotto da 20
-        const spreadRadiusShort = this.intensityToRadius(track.intensity) * 1.8; // Ridotto da 2.5 (più sottile)
+        // Parametri source-specific (default: Crab Nebula)
+        let longMultiplier = 10;
+        let shortMultiplier = 2.0;
+        let maxPixels = 22;
+        let densityMin = 0.7;
+        let densityMax = 1.0;
         
-        // Meno pixel totali, maggiore rarefazione
-        const densityVariation = 0.3 + Math.random() * 0.7; // Fattore 0.3-1.0
-        const numPixels = Math.max(5, Math.floor(intensityFactor * 22 * densityVariation)); // Ridotto: 5-22 pixel (era 6-30)
-        const minDistance = pixelRadius * 3; // Distanza minima tra pixel
+        // Personalizza in base al tipo di sorgente
+        switch(this.sourceType) {
+            case 'pevatron': // SNR - tracce ESTESE, molti fotoni
+                longMultiplier = 15;
+                shortMultiplier = 3.0;
+                maxPixels = 40;
+                densityMin = 0.5;
+                densityMax = 1.2;
+                break;
+            case 'blazar': // Tracce COMPATTE, alta elongation
+                longMultiplier = 8;
+                shortMultiplier = 1.5;
+                maxPixels = 20;
+                densityMin = 0.8;
+                densityMax = 1.0;
+                break;
+            case 'grb': // L/W basso, tracce medie
+                longMultiplier = 9;
+                shortMultiplier = 2.5;
+                maxPixels = 28;
+                densityMin = 0.6;
+                densityMax = 1.3;
+                break;
+            case 'galactic-center': // Varianza alta, irregolare
+                longMultiplier = 12;
+                shortMultiplier = 2.5;
+                maxPixels = 30;
+                densityMin = 0.3;
+                densityMax = 1.5;
+                break;
+            default: // Crab Nebula (crab o undefined)
+                // Usa valori di default già impostati
+                break;
+        }
+        
+        const pixelRadius = 4;
+        const spreadRadiusLong = this.intensityToRadius(track.intensity) * longMultiplier;
+        const spreadRadiusShort = this.intensityToRadius(track.intensity) * shortMultiplier;
+        
+        const densityVariation = densityMin + Math.random() * (densityMax - densityMin);
+        const numPixels = Math.max(5, Math.floor(intensityFactor * maxPixels * densityVariation));
+        const minDistance = pixelRadius * 3;
 
         const pixels = [];
         const canvasW = this.canvas.width;
@@ -815,40 +856,47 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = hillasParams.theta * Math.PI / 180;
 
-        // Ellisse Hillas - magenta for light style, green for dark style
+        // Ellisse Hillas - bordeaux scuro per light style, verde per dark style
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);
 
-        ctx.strokeStyle = this.lightStyle ? '#ff1493' : '#00ff88';  // Deep pink (magenta) for light style
-        ctx.lineWidth = 2.5;
+        // Per light style: allarga artificialmente l'asse minore per ellissi più visibili
+        const displayLengthPx = hillasParams.lengthPx;
+        const displayWidthPx = this.lightStyle 
+            ? Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2)  // Min 20% della lunghezza
+            : hillasParams.widthPx;
+
+        // Colore più scuro e contrastante per light style
+        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';  // Bordeaux scuro per light style
+        ctx.lineWidth = 4; // Aumentato ulteriormente per massima visibilità
         ctx.beginPath();
-        ctx.ellipse(0, 0, hillasParams.lengthPx, hillasParams.widthPx, 0, 0, 2 * Math.PI);
+        ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, 2 * Math.PI);
         ctx.stroke();
 
         // Assi
-        ctx.strokeStyle = this.lightStyle ? '#ff1493' : '#ffaa00';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';  // Stesso bordeaux scuro
+        ctx.lineWidth = 2.5; // Aumentato per maggiore visibilità
         // Asse maggiore
         ctx.beginPath();
-        ctx.moveTo(-hillasParams.lengthPx, 0);
-        ctx.lineTo(hillasParams.lengthPx, 0);
+        ctx.moveTo(-displayLengthPx, 0);
+        ctx.lineTo(displayLengthPx, 0);
         ctx.stroke();
         // Asse minore
         ctx.beginPath();
-        ctx.moveTo(0, -hillasParams.widthPx);
-        ctx.lineTo(0, hillasParams.widthPx);
+        ctx.moveTo(0, -displayWidthPx);
+        ctx.lineTo(0, displayWidthPx);
         ctx.stroke();
 
         ctx.restore();
 
-        // Centro di gravità
-        ctx.fillStyle = this.lightStyle ? '#ff1493' : '#ff0055';
+        // Centro di gravità - più grande e contrastante
+        ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';  // Bordeaux scuro
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);  // Aumentato da 6 a 8
         ctx.fill();
-        ctx.strokeStyle = this.lightStyle ? '#333333' : '#ffffff';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#ffffff';  // Bordo bianco sempre
+        ctx.lineWidth = 3;  // Aumentato da 2
         ctx.stroke();
 
         // Linea Alpha (CoG → Centro camera)

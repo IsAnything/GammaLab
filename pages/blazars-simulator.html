@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulatore Crab Nebula - GammaLab</title>
+    <title>Simulatore Blazars - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
     <style>
-        /* Stile specifico simulatore */
         .simulator-container {
             max-width: 1600px;
             margin: 0 auto;
@@ -29,12 +28,11 @@
         .telescope-camera canvas {
             width: 100%;
             height: auto;
-            border-radius: 0; /* Rimosso border-radius circolare */
+            border-radius: 0;
             box-shadow: 0 8px 24px rgba(0,0,0,0.3);
             clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
         }
         
-        /* Canvas overlay per le ellissi di Hillas */
         canvas[id$="-overlay"] {
             z-index: 5 !important;
             pointer-events: none;
@@ -67,12 +65,11 @@
             width: 20px;
             height: 100%;
             background: linear-gradient(to bottom,
-                rgb(255, 240, 80) 0%,
-                rgb(100, 220, 80) 25%,
-                rgb(20, 160, 150) 50%,
-                rgb(24, 80, 220) 75%,
-                rgb(20, 120, 200) 100%
-            );
+                rgb(150, 200, 255) 0%,
+                rgb(80, 180, 240) 25%,
+                rgb(40, 150, 220) 50%,
+                rgb(20, 120, 200) 75%,
+                rgb(10, 80, 180) 100%);
             border: 1px solid #999;
             border-radius: 4px;
         }
@@ -90,12 +87,12 @@
     <header>
         <div class="header-content">
             <h1 class="site-title">🔭 GammaLab</h1>
-            <p class="site-subtitle">🎮 Simulatore IACT - Crab Nebula</p>
+            <p class="site-subtitle">🎮 Simulatore IACT - Blazars</p>
             
             <nav>
                 <ul class="nav-menu">
                     <li><a href="../homepage.html">🏠 Home</a></li>
-                    <li><a href="crab-nebula.html">🦀 Info Crab Nebula</a></li>
+                    <li><a href="blazars.html">🌀 Info Blazars</a></li>
                     <li><a href="comparison.html">📊 Confronto</a></li>
                 </ul>
             </nav>
@@ -104,15 +101,16 @@
 
     <main class="simulator-container">
         <section class="card">
-            <h2>🎮 Simulatore IACT - Crab Nebula</h2>
+            <h2>🎮 Simulatore IACT - Blazars/AGN</h2>
             <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                Simulazione di un evento gamma dalla Crab Nebula osservato da <strong>3 telescopi Cherenkov</strong> in configurazione stereoscopica.
-                Clicca "Genera Evento" per simulare l'arrivo di un fotone gamma.
+                Simulazione di un evento gamma da un <strong>Blazar</strong> (getto relativistico di AGN) 
+                osservato da <strong>3 telescopi Cherenkov</strong>. Le tracce sono molto compatte e concentrate, 
+                con α~0° grazie al beaming relativistico del getto puntato verso di noi.
             </p>
 
             <div style="text-align: center; margin: 24px 0;">
                 <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">
-                    🌟 Genera Evento Crab
+                    🌀 Genera Evento Blazar
                 </button>
                 <button id="clearBtn" class="btn btn-secondary" style="font-size: 1.2rem; padding: 16px 32px;">
                     🗑️ Pulisci
@@ -128,10 +126,10 @@
                     <div class="energy-scale-vertical">
                         <div class="scale-bar"></div>
                         <div class="scale-tick" style="top: 0%;">30</div>
-                        <div class="scale-tick" style="top: 25%;">8</div>
-                        <div class="scale-tick" style="top: 50%;">2</div>
-                        <div class="scale-tick" style="top: 75%;">0.5</div>
-                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                        <div class="scale-tick" style="top: 25%;">10</div>
+                        <div class="scale-tick" style="top: 50%;">3</div>
+                        <div class="scale-tick" style="top: 75%;">1</div>
+                        <div class="scale-tick" style="top: 100%;">0.1</div>
                     </div>
                 </div>
 
@@ -142,10 +140,10 @@
                     <div class="energy-scale-vertical">
                         <div class="scale-bar"></div>
                         <div class="scale-tick" style="top: 0%;">30</div>
-                        <div class="scale-tick" style="top: 25%;">8</div>
-                        <div class="scale-tick" style="top: 50%;">2</div>
-                        <div class="scale-tick" style="top: 75%;">0.5</div>
-                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                        <div class="scale-tick" style="top: 25%;">10</div>
+                        <div class="scale-tick" style="top: 50%;">3</div>
+                        <div class="scale-tick" style="top: 75%;">1</div>
+                        <div class="scale-tick" style="top: 100%;">0.1</div>
                     </div>
                 </div>
 
@@ -156,10 +154,10 @@
                     <div class="energy-scale-vertical">
                         <div class="scale-bar"></div>
                         <div class="scale-tick" style="top: 0%;">30</div>
-                        <div class="scale-tick" style="top: 25%;">8</div>
-                        <div class="scale-tick" style="top: 50%;">2</div>
-                        <div class="scale-tick" style="top: 75%;">0.5</div>
-                        <div class="scale-tick" style="top: 100%;">0.05</div>
+                        <div class="scale-tick" style="top: 25%;">10</div>
+                        <div class="scale-tick" style="top: 50%;">3</div>
+                        <div class="scale-tick" style="top: 75%;">1</div>
+                        <div class="scale-tick" style="top: 100%;">0.1</div>
                     </div>
                 </div>
             </div>
@@ -196,60 +194,51 @@
     <script src="../js/stereo-reconstruction.js?v=8"></script>
     <script src="../js/lightbox.js"></script>
     <script>
-        // === SIMULATORE CRAB NEBULA ===
+        // === SIMULATORE BLAZARS ===
         let engine, renderers, hillasAnalyzer, colorPalette;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Inizializza componenti
             engine = new SimulationEngine();
             hillasAnalyzer = new HillasAnalyzer();
             colorPalette = new EnergyColorPalette();
             engine.colorPalette = colorPalette;
 
-            // Inizializza renderers per 3 telescopi con nuovo stile
             renderers = [
                 new CanvasRenderer('cam1', 'cam1-overlay'),
                 new CanvasRenderer('cam2', 'cam2-overlay'),
                 new CanvasRenderer('cam3', 'cam3-overlay')
             ];
 
-            // Abilita rendering stile chiaro
             renderers.forEach(renderer => {
                 renderer.colorPalette = colorPalette;
-                renderer.lightStyle = true; // Nuovo flag per stile chiaro
-                renderer.sourceType = 'crab'; // Tipo sorgente
+                renderer.lightStyle = true;
+                renderer.sourceType = 'blazar'; // FIRMA BLAZAR
             });
 
-            console.log('🎨 Simulatore Crab con stile chiaro inizializzato');
+            console.log('🎨 Simulatore Blazar/AGN inizializzato');
 
-            // Event listeners
-            document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
+            document.getElementById('generateBtn').addEventListener('click', generateBlazarEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
-            console.log('✅ Simulatore Crab Nebula inizializzato');
-            
-            // Auto-genera primo evento
             setTimeout(() => {
-                console.log('🎬 Auto-generating initial Crab event...');
-                generateCrabEvent();
+                console.log('🎬 Auto-generating initial Blazar event...');
+                generateBlazarEvent();
             }, 500);
         });
 
-        function generateCrabEvent() {
-            console.log('🦀 Generazione evento Crab Nebula...');
+        function generateBlazarEvent() {
+            console.log('🌀 Generazione evento Blazar...');
 
-            const crabProfile = getSourceProfile('crab');
+            const blazarProfile = getSourceProfile('blazar');
             const events = [];
             const hillasParams = [];
             const hillasMap = {};
 
-            // Genera per 3 telescopi
             for (let i = 0; i < 3; i++) {
                 const cameraId = i + 1;
                 const camKey = `cam${cameraId}`;
                 
-                // Specifica dimensioni canvas corrette: 600×600px
-                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 });
+                const event = engine.generateEvent(blazarProfile, cameraId, { width: 600, height: 600 });
                 events.push(event);
 
                 renderers[i].renderEvent(event, i === 0);
@@ -263,7 +252,6 @@
                 }
             }
 
-            // Ricostruzione stereoscopica
             const stereoCanvas = document.getElementById('stereo');
             if (stereoCanvas && hillasParams.length >= 2) {
                 if (typeof window.renderStereoReconstruction === 'function') {
@@ -291,8 +279,8 @@
             
             hillasArray.forEach((hillas, idx) => {
                 html += `
-                    <div style="padding: 16px; background: rgba(0, 40, 80, 0.3); border-radius: 8px; border: 2px solid var(--accent-cyan);">
-                        <h5 style="color: #00d9ff; margin-bottom: 12px; text-align: center;">T${idx + 1}</h5>
+                    <div style="padding: 16px; background: rgba(10, 40, 80, 0.3); border-radius: 8px; border: 2px solid #4488ff;">
+                        <h5 style="color: #66aaff; margin-bottom: 12px; text-align: center;">T${idx + 1}</h5>
                         <table style="width: 100%; font-family: 'Courier New', monospace; font-size: 13px;">
                             <tr>
                                 <td style="padding: 4px;"><strong>Length:</strong></td>
@@ -302,9 +290,9 @@
                                 <td style="padding: 4px;"><strong>Width:</strong></td>
                                 <td style="text-align: right;">${hillas.width.toFixed(3)}°</td>
                             </tr>
-                            <tr style="background: rgba(255, 200, 0, 0.1);">
+                            <tr style="background: rgba(60, 140, 255, 0.2);">
                                 <td style="padding: 4px;"><strong>Size:</strong></td>
-                                <td style="text-align: right;"><span style="color: #ffc800;">${hillas.size.toFixed(0)} p.e.</span></td>
+                                <td style="text-align: right;"><span style="color: #66ccff;">${hillas.size.toFixed(0)} p.e.</span></td>
                             </tr>
                             <tr>
                                 <td style="padding: 4px;"><strong>Alpha:</strong></td>
@@ -323,13 +311,16 @@
             const container = document.getElementById('hillasDisplay');
             if (!container) return;
 
-            const coherenceColor = comparison.coherence > 90 ? '#00ff88' : 
-                                    comparison.coherence > 80 ? '#ffaa00' : '#ff4444';
+            const coherenceColor = comparison.coherence > 92 ? '#44aaff' : 
+                                    comparison.coherence > 85 ? '#66ccff' : '#ffaa44';
 
             container.innerHTML += `
-                <div style="margin-top: 24px; padding: 16px; background: rgba(0, 80, 40, 0.3); border-radius: 8px; border: 2px solid ${coherenceColor};">
+                <div style="margin-top: 24px; padding: 16px; background: rgba(10, 50, 100, 0.3); border-radius: 8px; border: 2px solid ${coherenceColor};">
                     <h4 style="color: ${coherenceColor};">📊 Analisi Stereoscopica</h4>
                     <p><strong>Coerenza Inter-Telescopi:</strong> <span style="color: ${coherenceColor}; font-size: 20px;">${comparison.coherence.toFixed(1)}%</span></p>
+                    <p style="color: #88ccff; font-size: 14px; margin-top: 8px;">
+                        ⭐ Eccellente coerenza tipica di sorgenti puntiformi (Blazar) con α~0°
+                    </p>
                 </div>
             `;
         }

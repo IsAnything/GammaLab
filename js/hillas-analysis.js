@@ -258,7 +258,8 @@ class HillasAnalyzer {
             validated.warnings.push('Size fuori range tipico');
         }
 
-        if (params.elongation < 1.0 || params.elongation > 10) {
+        // Elongation aumentata per accettare tracce gamma molto allungate (fino a 50:1)
+        if (params.elongation < 1.0 || params.elongation > 50) {
             validated.warnings.push('Elongation anomala');
             validated.valid = false;
         }
