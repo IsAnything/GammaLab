@@ -574,6 +574,7 @@ Tutti gli script usano `?v=7` per invalidare cache:
 - [x] Colori differenziati (70/30 intensity/energy)
 - [x] Riempimento ellissi (alpha 0.55)
 - [x] Fix quiz rendering (applicata stessa pipeline)
+ - [x] Modalità 1 (Quiz CLEAN: solo sorgenti gamma, senza rumore/trace adroniche/muoniche)
 
 ### In Sospeso
 - [ ] Test completo su tutti i 6 simulatori
@@ -581,6 +582,36 @@ Tutti gli script usano `?v=7` per invalidare cache:
 - [ ] Ottimizzazione mobile (responsive)
 - [ ] Esportazione dati eventi (JSON/CSV)
 - [ ] Tutorial interattivo per parametri Hillas
+
+## 🔔 Modalità 1 - Quiz "Clean" (IMPLEMENTATO)
+
+Breve descrizione:
+- Modalità didattica per il quiz che genera immagini "pulite" pensate per l'apprendimento: solo sorgenti gamma, senza rumore di fondo e senza tracce adroniche/muoniche, con ellissi di Hillas geometricamente aderenti alla traccia.
+
+File coinvolti:
+- `js/quiz-engine.js`  — nuova flag `quizGammaOnly` (default true), logica di resampling con `forceCenter` per rigenerare eventi gamma finché il CoG è vicino al centro camera (max 8 tentativi, r di accettazione ~12 px). Inoltre passa `onlyGamma`/`forceCenter` a `generateEvent`.
+- `js/visualization.js` — nuovo flag `CanvasRenderer.suppressNoise`; renderer del quiz imposta `suppressNoise = true` quando Modalità 1 è attiva; `renderHillasOverlay` rispetta `respectExactHillas = true` per disegnare i semiassi esatti.
+- `js/core-simulation.js` — `generateEvent` e generatori interni accettano `customParams` (`forceCenter`, `onlyGamma`) per supportare posizionamento centrato quando richiesto.
+
+Flag e comportamento:
+- `quizGammaOnly` (QuizEngine): abilita Modalità 1 (default ON)
+- `suppressNoise` (CanvasRenderer): sopprime il rendering del background/noise quando true
+- `respectExactHillas` (CanvasRenderer): disegna i semiassi esatti calcolati dall'analisi Hillas (usato nel quiz)
+- `forceCenter` / resampling: quando richiesto e per profili gamma, il quiz rigenera l'evento fino a 8 volte finché il centro di gravità (CoG) è entro ~12 px dal centro della camera; non forzato per hadron/muon
+
+Verifica veloce (consigliata):
+1. Aprire `pages/quiz.html` e ricaricare la pagina.
+2. Aprire la Console del browser (F12) e cercare i log diagnostici come:
+  - "🔎 HillasOverlay: CoG(...), CameraCenter(...), Δ=(...,...) px, r=... px"
+  - "🔁 Resampling event ... - CoG dist ... px"
+3. Le immagini del quiz dovrebbero mostrare tracce centrali e le ellissi rosse dovrebbero contenere visivamente la traccia principale.
+4. Se vuoi testare casi realistici (adronici/muonici), disabilita `quizGammaOnly` nel costruttore `QuizEngine` o aggiungi un toggle UI (prossimo step opzionale).
+
+Note tecniche:
+- Il comportamento mantiene realismo per le domande che richiedono hadron/muon: in quei casi non viene forzato il centramento.
+- Il resampling evita di alterare la fisica degli eventi adronici/muonici; rigenerazione è limitata per evitare blocchi.
+
+Stato: Implementato e committato nel codice. Resto disponibile per aggiungere un toggle UI nel pannello quiz se desideri un controllo in tempo reale.
 
 ## 🔗 Dipendenze
 

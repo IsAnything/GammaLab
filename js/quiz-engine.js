@@ -65,6 +65,8 @@ class QuizEngine {
         this.hillasAnalyzer = null;
         this.colorPalette = null;
         this.renderers = [];
+    // Modalità quiz: se true, il quiz userà SOLO sorgenti gamma e immagini pulite
+    this.quizGammaOnly = true;
         
         // Domanda corrente
         this.currentEvent = null;
@@ -99,6 +101,8 @@ class QuizEngine {
             renderer.lightStyle = true; // Nuovo stile chiaro
             // In quiz vogliamo che le ellissi siano geometricamente aderenti
             renderer.respectExactHillas = true;
+            // Modalità didattica: sopprimi rumore di background
+            if (this.quizGammaOnly) renderer.suppressNoise = true;
         });
         
         // FORZA dimensioni quadrate per i canvas overlay
@@ -266,11 +270,12 @@ class QuizEngine {
      */
     _generateSourceIdentificationQuestion(canvasSize) {
         // Seleziona sorgente random (escludi muon per questa domanda)
-        this.currentProfile = getRandomSourceProfile(true); // Include hadron
+        // If quizGammaOnly is enabled, force a gamma-only profile for clearer Hillas examples
+        this.currentProfile = this.quizGammaOnly ? getRandomSourceProfile(false) : getRandomSourceProfile(true);
         this.currentCorrectAnswer = this.currentProfile.type;
         
     // Genera eventi per 3 camere (forza eventi centrati per didattica)
-    this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
+        this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
         
         // Imposta opzioni risposta (tutte le sorgenti)
         this._setAnswerOptions([
@@ -303,7 +308,8 @@ class QuizEngine {
                 SOURCE_PROFILES.galacticCenter
             ];
             this.currentProfile = gammaProfiles[Math.floor(Math.random() * gammaProfiles.length)];
-            this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
+            // If quizGammaOnly is enabled, ask for onlyGamma images (no hadron/muon, no noise)
+            this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
             this.currentCorrectAnswer = 'gamma';
         } else {
             // Genera evento adronico

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GammaLab — Quiz Automated Test</title>
+  <link rel="stylesheet" href="../css/main-style.css">
+  <style>
+    body { background: #0b1220; color: #e6f2ff; font-family: system-ui, sans-serif; padding: 20px; }
+    .panel { background: rgba(255,255,255,0.04); padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    .row { display:flex; gap:12px; align-items:center; }
+    .small { font-size: 13px; color: #bcd; }
+    #results { white-space: pre-wrap; font-family: monospace; }
+    canvas { background: #000; width: 280px; height: 280px; }
+  </style>
+</head>
+<body>
+  <h1>GammaLab — Quiz Automated Test</h1>
+  <p class="small">This page runs quick automated checks of the Quiz generation/rendering pipeline. It will generate events and report how close the Hillas center-of-gravity (CoG) is to the camera center.</p>
+
+  <div class="panel">
+    <label for="mode">Mode:</label>
+    <select id="mode">
+      <option value="gamma">Gamma-only (Modalità 1)</option>
+      <option value="mixed">Mixed (default distribution)</option>
+      <option value="hadron">Hadron-only</option>
+    </select>
+    <label for="iterations">Iterations:</label>
+    <input id="iterations" type="number" value="40" min="1" style="width:80px">
+    <button id="runBtn">Run Test</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+
+  <div class="panel row">
+    <div>
+      <p style="margin:0 0 8px 0">Canvas previews (three cameras):</p>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        <canvas id="c1" width="600" height="600"></canvas>
+        <canvas id="c2" width="600" height="600"></canvas>
+        <canvas id="c3" width="600" height="600"></canvas>
+      </div>
+    </div>
+    <div style="flex:1">
+      <h3>Results</h3>
+      <div id="results" style="min-height: 240px; background: rgba(0,0,0,0.25); padding:8px; border-radius:6px;"></div>
+    </div>
+  </div>
+
+  <div class="panel small">
+    <strong>Notes:</strong>
+    <ul>
+      <li>Open the browser Console (F12) to view diagnostic logs emitted by the Quiz renderer (CoG vs CameraCenter).</li>
+      <li>Modalità 1 uses <code>forceCenter</code> and <code>onlyGamma</code> flags to try producing centered gamma events.</li>
+    </ul>
+  </div>
+
+  <!-- Load core scripts used by QuizEngine -->
+  <script src="../js/source-profiles.js"></script>
+  <script src="../js/hillas-analysis.js"></script>
+  <script src="../js/core-simulation.js"></script>
+  <script src="../js/visualization.js"></script>
+  <script src="../js/quiz-engine.js"></script>
+
+  <script>
+    // Simple harness that reuses QuizEngine internals to generate events without user interaction.
+    (function () {
+      const runBtn = document.getElementById('runBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const resultsEl = document.getElementById('results');
+      const modeSel = document.getElementById('mode');
+      const iterationsInput = document.getElementById('iterations');
+
+      let engine = null;
+
+      function setupEngine() {
+        if (engine) return engine;
+        engine = new QuizEngine();
+        // Prevent QuizEngine from starting timers and UI flows
+        engine.quizGammaOnly = true; // default, we'll override per run
+
+        // Replace renderers with ones bound to our canvases
+        const c1 = document.getElementById('c1');
+        const c2 = document.getElementById('c2');
+        const c3 = document.getElementById('c3');
+
+        // Create CanvasRenderer instances (constructor args may vary in your codebase)
+        engine.renderers = [
+          new CanvasRenderer(c1.getContext('2d'), { canvas: c1 }),
+          new CanvasRenderer(c2.getContext('2d'), { canvas: c2 }),
+          new CanvasRenderer(c3.getContext('2d'), { canvas: c3 })
+        ];
+
+        // Ensure suppressNoise/respectExactHillas are settable
+        engine.renderers.forEach(r => {
+          if (typeof r.suppressNoise !== 'undefined') r.suppressNoise = true;
+          if (typeof r.respectExactHillas !== 'undefined') r.respectExactHillas = true;
+        });
+
+        // Hook analyzer/engine references if QuizEngine did not create them
+        if (!engine.engine) engine.engine = new SimulationEngine();
+        if (!engine.hillasAnalyzer) engine.hillasAnalyzer = new HillasAnalyzer();
+
+        return engine;
+      }
+
+      // Utility: compute CoG distance from center
+      function cogDistancePx(hillas, canvasSize) {
+        const cx = hillas.cogX;
+        const cy = hillas.cogY;
+        const centerX = canvasSize.width / 2;
+        const centerY = canvasSize.height / 2;
+        const dx = cx - centerX;
+        const dy = cy - centerY;
+        return Math.sqrt(dx*dx + dy*dy);
+      }
+
+      async function runTest() {
+        const iters = parseInt(iterationsInput.value, 10) || 20;
+        const mode = modeSel.value;
+        resultsEl.textContent = 'Running...';
+
+        const engine = setupEngine();
+        engine.quizGammaOnly = (mode === 'gamma');
+
+        const profileGamma = SOURCE_PROFILES.crab || window.SOURCE_PROFILES && window.SOURCE_PROFILES.crab || null;
+        if (!profileGamma) {
+          resultsEl.textContent = 'ERROR: cannot find SOURCE_PROFILES.crab';
+          return;
+        }
+
+        const canvasSize = { width: 600, height: 600 };
+
+        const stats = { total: 0, within12px: 0, distances: [] };
+
+        for (let i = 0; i < iters; i++) {
+          // Choose profile based on mode
+          let profile = null;
+          let customParams = { forceCenter: true, onlyGamma: (mode === 'gamma') };
+
+          if (mode === 'gamma') {
+            profile = profileGamma;
+          } else if (mode === 'hadron') {
+            profile = { type: 'hadron' }; // generateHadronicEvent uses type
+            customParams = null; // no forceCenter for hadron
+          } else {
+            // mixed: random choose gamma or hadron
+            profile = (Math.random() < 0.7) ? profileGamma : { type: 'hadron' };
+            if (profile.type === 'hadron') customParams = null;
+          }
+
+          // Use internal generator to create event for camera 1 (we only analyze camera 1 here)
+          const event = (profile.type === 'hadron') ?
+            engine.engine.generateHadronicEvent(1, canvasSize, customParams) :
+            engine.engine.generateEvent(profile, 1, canvasSize, customParams);
+
+          const hillas = engine.hillasAnalyzer.analyze(event);
+
+          // Render into the first renderer so you can visually inspect
+          engine.renderers[0].renderEvent(event, true);
+          if (hillas && hillas.valid) engine.renderers[0].renderHillasOverlay(hillas);
+
+          if (hillas && hillas.valid) {
+            const d = cogDistancePx(hillas, canvasSize);
+            stats.total++;
+            stats.distances.push(d);
+            if (d <= 12) stats.within12px++;
+            console.log(`Test iter ${i+1}/${iters} — profile=${profile.type}, CoG dist = ${d.toFixed(2)} px`);
+          } else {
+            console.log(`Test iter ${i+1}/${iters} — no valid Hillas`);
+          }
+
+          // small delay to allow canvas updates
+          await new Promise(resolve => setTimeout(resolve, 60));
+        }
+
+        // Summarize
+        const avg = stats.distances.reduce((a,b) => a+b, 0) / (stats.distances.length || 1);
+        const pct = ((stats.within12px / (stats.total || 1)) * 100).toFixed(1);
+
+        resultsEl.textContent = `Mode: ${mode}\nIterations: ${iters}\nValid Hillas: ${stats.total}\nWithin 12px: ${stats.within12px} (${pct}%)\nAverage distance: ${avg.toFixed(2)} px`;
+      }
+
+      runBtn.addEventListener('click', () => {
+        runBtn.disabled = true;
+        runTest().then(() => runBtn.disabled = false).catch(e => { runBtn.disabled = false; console.error(e); resultsEl.textContent = 'ERROR: ' + e; });
+      });
+
+      clearBtn.addEventListener('click', () => {
+        resultsEl.textContent = '';
+        const cvs = [document.getElementById('c1'), document.getElementById('c2'), document.getElementById('c3')];
+        cvs.forEach(c => c.getContext('2d').clearRect(0,0,c.width,c.height));
+      });
+
+    })();
+  </script>
+</body>
+</html>

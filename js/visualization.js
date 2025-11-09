@@ -215,6 +215,8 @@ class CanvasRenderer {
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
+    // When true the renderer will suppress background noise (useful for clean quiz images)
+    this.suppressNoise = false;
         // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
         // (useful for quizzes where geometric adherence is required)
         this.respectExactHillas = false;
@@ -452,7 +454,7 @@ class CanvasRenderer {
         });
 
         // Aggiungi rumore di background (solo light style)
-        if (this.lightStyle) {
+        if (this.lightStyle && !this.suppressNoise) {
             this.renderBackgroundNoise();
         }
 
@@ -506,7 +508,7 @@ class CanvasRenderer {
             } else {
                 // Animazione completata
                 if (this.lightStyle) {
-                    this.renderBackgroundNoise();
+                    if (!this.suppressNoise) this.renderBackgroundNoise();
                 }
                 if (showLegend) {
                     this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
