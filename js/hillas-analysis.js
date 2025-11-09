@@ -168,9 +168,21 @@ class HillasAnalyzer {
         // Size (intensità totale)
         const size = cog.totalIntensity * 100; // Scala a photoelectrons
 
-        // Miss (distanza CoG dal centro camera)
-        const centerX = 750; // CANVAS_WIDTH / 2
-        const centerY = 500; // CANVAS_HEIGHT / 2
+        // Miss e Alpha: determina centro camera dalle coordinate dei fotoni
+        // Usa le dimensioni effettive dei tracks per trovare il centro
+        const maxX = Math.max(...tracks.map(t => t.x));
+        const minX = Math.min(...tracks.map(t => t.x));
+        const maxY = Math.max(...tracks.map(t => t.y));
+        const minY = Math.min(...tracks.map(t => t.y));
+        
+        // Stima dimensioni canvas (assumendo margine ~10%)
+        const estimatedWidth = (maxX - minX) * 1.2;
+        const estimatedHeight = (maxY - minY) * 1.2;
+        
+        // Centro camera basato sulla distribuzione dei fotoni
+        const centerX = (maxX + minX) / 2;
+        const centerY = (maxY + minY) / 2;
+        
         const missPx = Math.sqrt(
             Math.pow(cog.x - centerX, 2) +
             Math.pow(cog.y - centerY, 2)

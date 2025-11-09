@@ -935,13 +935,33 @@ table tr:hover {
   padding: 30px;
 }
 
+/* Camere affiancate orizzontalmente come nei simulatori */
+#quizScreen .cameras-grid {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+#quizScreen .camera-container {
+  position: relative;
+  width: 450px;
+  flex-shrink: 0;
+}
+
 /* Canvas più grandi e leggibili con stile esagonale */
 #quizScreen .camera-canvas {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
 }
 
 #quizScreen .overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 5 !important;
   pointer-events: none;
 }

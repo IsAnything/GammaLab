@@ -184,8 +184,8 @@ class QuizEngine {
         const events = [];
         this.currentHillasParams = [];
         
-        // Dimensioni canvas del quiz (ottimizzate per layout verticale)
-        const quizCanvasSize = { width: 900, height: 600 };
+        // Dimensioni canvas del quiz (600x600 come i simulatori)
+        const quizCanvasSize = { width: 600, height: 600 };
         
         for (let i = 0; i < 3; i++) {
             const event = this.engine.generateEvent(this.currentProfile, i + 1, quizCanvasSize);
