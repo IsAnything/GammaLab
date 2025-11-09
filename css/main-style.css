@@ -935,9 +935,15 @@ table tr:hover {
   padding: 30px;
 }
 
-/* Canvas più grandi e leggibili */
+/* Canvas più grandi e leggibili con stile esagonale */
 #quizScreen .camera-canvas {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+}
+
+#quizScreen .overlay-canvas {
+  z-index: 5 !important;
+  pointer-events: none;
 }
 
 #quizScreen .camera-label {

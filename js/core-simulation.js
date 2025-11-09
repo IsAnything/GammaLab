@@ -37,9 +37,10 @@ class SimulationEngine {
      * @param {Object} sourceProfile - Profilo sorgente da source-profiles.js
      * @param {Number} cameraId - ID camera (1-3)
      * @param {Object} canvasSize - Dimensioni canvas {width, height} (opzionale, default 1500x1000)
+     * @param {Object} customParams - Parametri personalizzati: {energy: Number, zenithAngle: Number}
      * @returns {Object} Evento generato con tracce e parametri
      */
-    generateEvent(sourceProfile, cameraId = 1, canvasSize = null) {
+    generateEvent(sourceProfile, cameraId = 1, canvasSize = null, customParams = null) {
         // Log per debug
         if (!sourceProfile || !sourceProfile.type) {
             console.error('❌ sourceProfile non valido:', sourceProfile);
@@ -57,8 +58,14 @@ class SimulationEngine {
         const cameraVariance = sourceProfile.interCameraVariance || 0.05;
         const params = this._applyCameraVariance(baseParams, cameraVariance, cameraId);
         
-        // Genera energia del fotone primario
-        const energy = this._sampleEnergy(sourceProfile.energyRange);
+        // Genera energia del fotone primario (custom o random)
+        const energy = customParams?.energy || this._sampleEnergy(sourceProfile.energyRange);
+        
+        // Applica effetti angolo zenitale se fornito
+        const zenithAngle = customParams?.zenithAngle || 0;
+        if (zenithAngle > 0) {
+            this._applyZenithEffects(params, zenithAngle, energy);
+        }
         
         // Genera tracce Cherenkov con dimensioni canvas
         const tracks = this._generateTracks(params, energy, canvasW, canvasH);
@@ -68,6 +75,7 @@ class SimulationEngine {
             sourceType: sourceProfile.type,
             cameraId: cameraId,
             energy: energy,
+            zenithAngle: zenithAngle,
             params: params,
             tracks: tracks,
             timestamp: Date.now()
@@ -126,6 +134,35 @@ class SimulationEngine {
             elongation: params.elongation,
             asymmetry: params.asymmetry
         };
+    }
+
+    /**
+     * Applica effetti dell'angolo zenitale ai parametri della cascata
+     * @param {Object} params - Parametri Hillas
+     * @param {Number} zenithAngle - Angolo zenitale in gradi (0-60)
+     * @param {Number} energy - Energia in GeV
+     */
+    _applyZenithEffects(params, zenithAngle, energy) {
+        // A angoli zenitali maggiori:
+        // 1. La cascata attraversa più atmosfera → più fotoni Cherenkov
+        // 2. La cascata appare più lunga (proiezione geometrica)
+        // 3. Width rimane circa costante
+        // 4. Più scattering → leggero aumento width per energie basse
+        
+        const zenithRad = zenithAngle * Math.PI / 180;
+        const cosZenith = Math.cos(zenithRad);
+        
+        // Fattore di allungamento geometrico (1/cos(θ))
+        const lengthFactor = 1 / cosZenith;
+        
+        // Effetto energia: a bassa energia più scattering
+        const energyTeV = energy / 1000;
+        const scatteringFactor = energyTeV < 1 ? 1 + (1 - energyTeV) * 0.3 : 1;
+        
+        // Applica modifiche
+        params.length *= lengthFactor;
+        params.width *= (1 + (1 - cosZenith) * 0.15 * scatteringFactor);
+        params.size *= (1 + (1 - cosZenith) * 0.5); // Più fotoni attraverso atmosfera
     }
 
     /**

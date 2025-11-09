@@ -70,6 +70,12 @@ class QuizEngine {
             new CanvasRenderer('quizCam3', 'quizCam3-overlay')
         ];
         
+        // Abilita rendering stile chiaro e source-specific per quiz
+        this.renderers.forEach(renderer => {
+            renderer.colorPalette = this.colorPalette;
+            renderer.lightStyle = true; // Nuovo stile chiaro
+        });
+        
         // Setup UI event listeners
         this.setupEventListeners();
         
@@ -168,6 +174,12 @@ class QuizEngine {
         // Seleziona sorgente random
         this.currentProfile = getRandomSourceProfile(true); // Include hadron
         
+        // Imposta sourceType sui renderers per rendering source-specific
+        const sourceType = this.currentProfile.type;
+        this.renderers.forEach(renderer => {
+            renderer.sourceType = sourceType;
+        });
+        
         // Genera eventi per 3 camere
         const events = [];
         this.currentHillasParams = [];
@@ -182,24 +194,10 @@ class QuizEngine {
             // Calcola Hillas
             const hillas = this.hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
-                // Aggiusta ellisse per contenere tutti i fotoni
-                try {
-                    this.renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
-                } catch (e) {
-                    console.warn('⚠️ adjustHillasToContainTracks failed:', e);
-                }
-                
-                // Riempi ellisse prima di disegnare i fotoni
-                try {
-                    this.renderers[i].fillEllipseBackground(hillas, event.tracks);
-                } catch (e) {
-                    console.warn('⚠️ fillEllipseBackground failed:', e);
-                }
-                
                 this.currentHillasParams.push(hillas);
             }
             
-            // Renderizza fotoni sopra il riempimento
+            // Renderizza con nuovo stile light
             this.renderers[i].renderEvent(event, i === 0);
             
             // Overlay ellisse sopra tutto

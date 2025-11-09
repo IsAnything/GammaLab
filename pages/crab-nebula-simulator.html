@@ -110,6 +110,51 @@
                 Clicca "Genera Evento" per simulare l'arrivo di un fotone gamma.
             </p>
 
+            <!-- Controlli Interattivi -->
+            <div class="controls-panel" style="background: linear-gradient(135deg, rgba(255,200,100,0.1), rgba(100,200,255,0.1)); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(100,150,255,0.3);">
+                <h3 style="margin-top: 0; color: var(--accent-blue);">⚙️ Controlli Evento</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 16px;">
+                    
+                    <!-- Controllo Energia -->
+                    <div>
+                        <label for="energySlider" style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
+                            ⚡ Energia Fotone Gamma: <span id="energyValue" style="color: #ff8800;">AUTO</span>
+                        </label>
+                        <input type="range" id="energySlider" min="0" max="100" value="0" step="1" 
+                               style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #4488ff, #ff8800, #ff4444); cursor: pointer;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
+                            <span>AUTO</span>
+                            <span>0.1 TeV</span>
+                            <span>1 TeV</span>
+                            <span>10 TeV</span>
+                            <span>100 TeV</span>
+                        </div>
+                    </div>
+
+                    <!-- Controllo Angolo Zenitale -->
+                    <div>
+                        <label for="zenithSlider" style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
+                            📐 Angolo Zenitale: <span id="zenithValue" style="color: #4488ff;">0°</span>
+                        </label>
+                        <input type="range" id="zenithSlider" min="0" max="60" value="0" step="5" 
+                               style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #44ff88, #ffaa44); cursor: pointer;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
+                            <span>0° (zenit)</span>
+                            <span>30°</span>
+                            <span>60° (orizzonte)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkbox Animazione -->
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; background: rgba(100,150,255,0.1); border-radius: 8px;">
+                    <input type="checkbox" id="animateCheckbox" checked style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="animateCheckbox" style="cursor: pointer; user-select: none; font-weight: bold; color: var(--accent-purple);">
+                        🎬 Anima arrivo fotoni Cherenkov (cascata temporale)
+                    </label>
+                </div>
+            </div>
+
             <div style="text-align: center; margin: 24px 0;">
                 <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">
                     🌟 Genera Evento Crab
@@ -189,10 +234,10 @@
         <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
     </footer>
 
-    <script src="../js/core-simulation.js?v=8"></script>
+    <script src="../js/core-simulation.js?v=9"></script>
     <script src="../js/source-profiles.js?v=8"></script>
     <script src="../js/hillas-analysis.js?v=10"></script>
-    <script src="../js/visualization.js?v=13"></script>
+    <script src="../js/visualization.js?v=15"></script>
     <script src="../js/stereo-reconstruction.js?v=8"></script>
     <script src="../js/lightbox.js"></script>
     <script>
@@ -216,71 +261,124 @@
             // Abilita rendering stile chiaro
             renderers.forEach(renderer => {
                 renderer.colorPalette = colorPalette;
-                renderer.lightStyle = true; // Nuovo flag per stile chiaro
-                renderer.sourceType = 'crab'; // Tipo sorgente
+                renderer.lightStyle = true;
+                renderer.sourceType = 'crab';
             });
 
-            console.log('🎨 Simulatore Crab con stile chiaro inizializzato');
-
-            // Event listeners
+            // Event listeners controlli
+            setupControls();
             document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
-            console.log('✅ Simulatore Crab Nebula inizializzato');
+            console.log('✅ Simulatore Crab Nebula con controlli inizializzato');
             
             // Auto-genera primo evento
-            setTimeout(() => {
-                console.log('🎬 Auto-generating initial Crab event...');
-                generateCrabEvent();
-            }, 500);
+            setTimeout(() => generateCrabEvent(), 500);
         });
+
+        // Setup controlli interattivi
+        function setupControls() {
+            const energySlider = document.getElementById('energySlider');
+            const energyValue = document.getElementById('energyValue');
+            const zenithSlider = document.getElementById('zenithSlider');
+            const zenithValue = document.getElementById('zenithValue');
+
+            energySlider.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value);
+                if (val === 0) {
+                    energyValue.textContent = 'AUTO';
+                } else {
+                    const energyTeV = Math.pow(10, (val - 50) / 25);
+                    energyValue.textContent = energyTeV < 1 
+                        ? `${(energyTeV * 1000).toFixed(0)} GeV`
+                        : `${energyTeV.toFixed(1)} TeV`;
+                }
+            });
+
+            zenithSlider.addEventListener('input', (e) => {
+                zenithValue.textContent = e.target.value + '°';
+            });
+        }
+
+        function getCustomParams() {
+            const energySlider = document.getElementById('energySlider');
+            const zenithSlider = document.getElementById('zenithSlider');
+            
+            const energyVal = parseInt(energySlider.value);
+            const zenithAngle = parseInt(zenithSlider.value);
+            
+            const customParams = {};
+            
+            // Solo se non è AUTO (0)
+            if (energyVal > 0) {
+                const energyTeV = Math.pow(10, (energyVal - 50) / 25);
+                customParams.energy = energyTeV * 1000; // Converti in GeV
+            }
+            
+            if (zenithAngle > 0) {
+                customParams.zenithAngle = zenithAngle;
+            }
+            
+            return Object.keys(customParams).length > 0 ? customParams : null;
+        }
 
         function generateCrabEvent() {
             console.log('🦀 Generazione evento Crab Nebula...');
 
             const crabProfile = getSourceProfile('crab');
+            const customParams = getCustomParams();
+            const shouldAnimate = document.getElementById('animateCheckbox').checked;
             const events = [];
             const hillasParams = [];
             const hillasMap = {};
 
-            // Genera per 3 telescopi
+            // Genera eventi per 3 telescopi
             for (let i = 0; i < 3; i++) {
                 const cameraId = i + 1;
                 const camKey = `cam${cameraId}`;
                 
-                // Specifica dimensioni canvas corrette: 600×600px
-                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 });
+                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 }, customParams);
                 events.push(event);
-
-                renderers[i].renderEvent(event, i === 0);
-                console.log(`🎨 Telescopio T${cameraId}: ${event.tracks.length} fotoni renderizzati`);
-
+                
+                // Renderizza con o senza animazione
+                if (shouldAnimate) {
+                    renderers[i].renderEventAnimated(event, i === 0);
+                } else {
+                    renderers[i].renderEvent(event, i === 0);
+                }
+                
+                // Calcola Hillas
                 const hillas = hillasAnalyzer.analyze(event);
                 if (hillas && hillas.valid) {
                     hillasParams.push(hillas);
                     hillasMap[camKey] = hillas;
-                    renderers[i].renderHillasOverlay(hillas);
+                    
+                    // Renderizza ellisse dopo animazione o subito
+                    if (shouldAnimate) {
+                        setTimeout(() => renderers[i].renderHillasOverlay(hillas), 2500);
+                    } else {
+                        renderers[i].renderHillasOverlay(hillas);
+                    }
                 }
             }
 
-            // Ricostruzione stereoscopica
-            const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas && hillasParams.length >= 2) {
-                if (typeof window.renderStereoReconstruction === 'function') {
+            // Mostra parametri e stereo
+            const delay = shouldAnimate ? 2500 : 0;
+            setTimeout(() => {
+                displayHillasParameters(hillasParams);
+                if (hillasParams.length >= 2) {
+                    displayCoherence(compareHillasAcrossCameras(hillasParams));
+                }
+                
+                const stereoCanvas = document.getElementById('stereo');
+                if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) {
                     window.renderStereoReconstruction(stereoCanvas, hillasMap, {
                         showGeometry: true,
                         showCameraPositions: true,
                         showArrows: true
                     });
                 }
-            }
-
-            displayHillasParameters(hillasParams);
-
-            if (hillasParams.length >= 2) {
-                const comparison = compareHillasAcrossCameras(hillasParams);
-                displayCoherence(comparison);
-            }
+            }, delay);
         }
 
         function displayHillasParameters(hillasArray) {

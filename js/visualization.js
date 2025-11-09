@@ -471,6 +471,52 @@ class CanvasRenderer {
     }
 
     /**
+     * Renderizza evento con animazione temporale
+     * Simula l'arrivo progressivo dei fotoni Cherenkov
+     */
+    renderEventAnimated(event, showLegend = true) {
+        this.clear();
+        
+        // Ordina tracce per tempo di arrivo simulato
+        const sortedTracks = [...event.tracks].sort((a, b) => {
+            // I fotoni arrivano con timing basato su energia e posizione radiale
+            const radiusA = Math.sqrt(Math.pow(a.x - event.params.centerX, 2) + Math.pow(a.y - event.params.centerY, 2));
+            const radiusB = Math.sqrt(Math.pow(b.x - event.params.centerX, 2) + Math.pow(b.y - event.params.centerY, 2));
+            return radiusA - radiusB; // Prima il centro, poi i bordi
+        });
+
+        const totalDuration = 2000; // 2 secondi totali
+        const batchSize = Math.ceil(sortedTracks.length / 50); // 50 frame
+        let currentIndex = 0;
+
+        const renderBatch = () => {
+            const batch = sortedTracks.slice(currentIndex, currentIndex + batchSize);
+            
+            batch.forEach(track => {
+                this.renderPhoton(track);
+            });
+
+            currentIndex += batchSize;
+
+            if (currentIndex < sortedTracks.length) {
+                requestAnimationFrame(renderBatch);
+            } else {
+                // Animazione completata
+                if (this.lightStyle) {
+                    this.renderBackgroundNoise();
+                }
+                if (showLegend) {
+                    this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+                }
+                this.drawCameraInfo(event);
+            }
+        };
+
+        // Inizia animazione
+        requestAnimationFrame(renderBatch);
+    }
+
+    /**
      * Renderizza singolo fotone
      */
     renderPhoton(track) {
@@ -585,35 +631,35 @@ class CanvasRenderer {
         
         // Personalizza in base al tipo di sorgente
         switch(this.sourceType) {
-            case 'pevatron': // SNR - tracce ESTESE, molti fotoni
-                longMultiplier = 15;
-                shortMultiplier = 3.0;
-                maxPixels = 40;
-                densityMin = 0.5;
-                densityMax = 1.2;
-                break;
-            case 'blazar': // Tracce COMPATTE, alta elongation
-                longMultiplier = 8;
-                shortMultiplier = 1.5;
-                maxPixels = 20;
+            case 'pevatron': // SNR - tracce MOLTO ESTESE, SATURATE
+                longMultiplier = 25;
+                shortMultiplier = 5.0;
+                maxPixels = 60;
                 densityMin = 0.8;
-                densityMax = 1.0;
-                break;
-            case 'grb': // L/W basso, tracce medie
-                longMultiplier = 9;
-                shortMultiplier = 2.5;
-                maxPixels = 28;
-                densityMin = 0.6;
-                densityMax = 1.3;
-                break;
-            case 'galactic-center': // Varianza alta, irregolare
-                longMultiplier = 12;
-                shortMultiplier = 2.5;
-                maxPixels = 30;
-                densityMin = 0.3;
                 densityMax = 1.5;
                 break;
-            default: // Crab Nebula (crab o undefined)
+            case 'blazar': // Tracce MOLTO COMPATTE, SOTTILI
+                longMultiplier = 6;
+                shortMultiplier = 0.8;
+                maxPixels = 15;
+                densityMin = 0.9;
+                densityMax = 1.0;
+                break;
+            case 'grb': // L/W MOLTO BASSO, tracce LARGHE
+                longMultiplier = 8;
+                shortMultiplier = 4.0;
+                maxPixels = 35;
+                densityMin = 0.5;
+                densityMax = 1.4;
+                break;
+            case 'galactic-center': // ALTA DISPERSIONE, molto irregolare
+                longMultiplier = 14;
+                shortMultiplier = 3.5;
+                maxPixels = 45;
+                densityMin = 0.2;
+                densityMax = 1.8;
+                break;
+            default: // Crab Nebula (crab o undefined) - STANDARD
                 // Usa valori di default già impostati
                 break;
         }
