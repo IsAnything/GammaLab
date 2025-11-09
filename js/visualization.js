@@ -981,7 +981,47 @@ class CanvasRenderer {
         ctx.lineWidth = 3;
         ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
         ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
+        // Diagnostic: draw camera center marker and log offset when exact-hillas mode is enabled
+        try {
+            const dx = centerX - cameraCenterX;
+            const dy = centerY - cameraCenterY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (this.respectExactHillas) {
+                console.log(`🔎 HillasOverlay: CoG(${centerX.toFixed(1)},${centerY.toFixed(1)}), CameraCenter(${cameraCenterX.toFixed(1)},${cameraCenterY.toFixed(1)}), Δ=(${dx.toFixed(1)},${dy.toFixed(1)}) px, r=${dist.toFixed(1)} px, canvas=${this.overlay.width}x${this.overlay.height}`);
+            }
+
+            // Draw a prominent marker at camera center for visual inspection
+            ctx.save();
+            // Filled circle for high contrast
+            ctx.fillStyle = '#ffff66';
+            ctx.beginPath();
+            ctx.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Outer ring
+            ctx.strokeStyle = '#222200';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // Large cross for visibility
+            ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
+            ctx.lineWidth = 3;
+            const s = 18;
+            ctx.beginPath();
+            ctx.moveTo(cameraCenterX - s, cameraCenterY);
+            ctx.lineTo(cameraCenterX + s, cameraCenterY);
+            ctx.moveTo(cameraCenterX, cameraCenterY - s);
+            ctx.lineTo(cameraCenterX, cameraCenterY + s);
+            ctx.stroke();
+            ctx.restore();
+// === FUNZIONI UTILITY ===
+        } catch (e) {
+            console.warn('Errore diagnostico HillasOverlay:', e);
+        }
     }
+
 }
 
 // === FUNZIONI UTILITY ===
