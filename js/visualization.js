@@ -1016,6 +1016,41 @@ class CanvasRenderer {
             ctx.lineTo(cameraCenterX, cameraCenterY + s);
             ctx.stroke();
             ctx.restore();
+            // --- Also draw camera center and CoG marker on the main canvas for visual comparison ---
+            try {
+                if (this.ctx) {
+                    const main = this.ctx;
+                    // small translucent marker at camera center on main canvas
+                    main.save();
+                    main.strokeStyle = 'rgba(255, 255, 102, 0.9)';
+                    main.fillStyle = 'rgba(255, 255, 102, 0.25)';
+                    main.lineWidth = 2;
+                    main.beginPath();
+                    main.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+                    main.fill();
+                    main.stroke();
+
+                    // cross
+                    main.beginPath();
+                    main.moveTo(cameraCenterX - 12, cameraCenterY);
+                    main.lineTo(cameraCenterX + 12, cameraCenterY);
+                    main.moveTo(cameraCenterX, cameraCenterY - 12);
+                    main.lineTo(cameraCenterX, cameraCenterY + 12);
+                    main.stroke();
+
+                    // Draw CoG position on main canvas (magenta)
+                    main.fillStyle = 'rgba(204, 0, 102, 0.95)';
+                    main.strokeStyle = 'rgba(255,255,255,0.9)';
+                    main.lineWidth = 2;
+                    main.beginPath();
+                    main.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+                    main.fill();
+                    main.stroke();
+                    main.restore();
+                }
+            } catch (e) {
+                // ignore
+            }
 // === FUNZIONI UTILITY ===
         } catch (e) {
             console.warn('Errore diagnostico HillasOverlay:', e);

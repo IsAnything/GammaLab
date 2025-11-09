@@ -269,8 +269,8 @@ class QuizEngine {
         this.currentProfile = getRandomSourceProfile(true); // Include hadron
         this.currentCorrectAnswer = this.currentProfile.type;
         
-        // Genera eventi per 3 camere
-        this._generateAndRenderEvents(this.currentProfile, canvasSize);
+    // Genera eventi per 3 camere (forza eventi centrati per didattica)
+    this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
         
         // Imposta opzioni risposta (tutte le sorgenti)
         this._setAnswerOptions([
@@ -293,7 +293,7 @@ class QuizEngine {
         // 50% gamma, 50% hadron
         const isGamma = Math.random() < 0.5;
         
-        if (isGamma) {
+            if (isGamma) {
             // Usa una sorgente gamma qualsiasi (escludi hadron)
             const gammaProfiles = [
                 SOURCE_PROFILES.crab,
@@ -303,7 +303,7 @@ class QuizEngine {
                 SOURCE_PROFILES.galacticCenter
             ];
             this.currentProfile = gammaProfiles[Math.floor(Math.random() * gammaProfiles.length)];
-            this._generateAndRenderEvents(this.currentProfile, canvasSize);
+            this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
             this.currentCorrectAnswer = 'gamma';
         } else {
             // Genera evento adronico
@@ -334,7 +334,7 @@ class QuizEngine {
         this.currentCorrectAnswer = isHighEnergy ? 'high' : 'low';
         
         // Genera con energia specifica
-        this._generateAndRenderEvents(this.currentProfile, canvasSize, { energy });
+    this._generateAndRenderEvents(this.currentProfile, canvasSize, { energy, forceCenter: true });
         
         this._setAnswerOptions([
             { value: 'low', label: '📉 Bassa Energia (< 1 TeV)' },
@@ -351,7 +351,7 @@ class QuizEngine {
     _generateMuonDetectionQuestion(canvasSize) {
         const isMuon = Math.random() < 0.5;
         
-        if (isMuon) {
+            if (isMuon) {
             this._generateAndRenderMuonEvents(canvasSize);
             this.currentCorrectAnswer = 'yes';
         } else {
@@ -359,7 +359,7 @@ class QuizEngine {
             if (Math.random() < 0.7) {
                 // 70% gamma
                 this.currentProfile = getRandomSourceProfile(false);
-                this._generateAndRenderEvents(this.currentProfile, canvasSize);
+                this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
             } else {
                 // 30% hadron
                 this._generateAndRenderHadronicEvents(canvasSize);
@@ -385,7 +385,7 @@ class QuizEngine {
         if (isNarrow) {
             // Gamma (ellisse stretta)
             this.currentProfile = getRandomSourceProfile(false);
-            this._generateAndRenderEvents(this.currentProfile, canvasSize);
+            this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true });
             this.currentCorrectAnswer = 'narrow';
         } else {
             // Hadron (ellisse larga)
@@ -415,16 +415,45 @@ class QuizEngine {
         this.currentHillasParams = [];
         
         for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateEvent(profile, i + 1, canvasSize, customParams);
+            let event = null;
+            let hillas = null;
+            const maxAttempts = 8;
+            let attempt = 0;
+
+            // If caller requested forceCenter, try resampling events until CoG is near camera center
+            // BUT do not force centering for hadronic or muonic events (their CoG can legitimately be far)
+            const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
+            const acceptRadiusPx = 12; // Accept if CoG within 12 px of center
+
+            do {
+                event = this.engine.generateEvent(profile, i + 1, canvasSize, customParams);
+                hillas = this.hillasAnalyzer.analyze(event);
+                attempt++;
+
+                if (!wantCentered) break; // no need to resample
+
+                if (hillas && hillas.valid) {
+                    const cx = hillas.cogX;
+                    const cy = hillas.cogY;
+                    const centerX = (canvasSize && canvasSize.width) ? canvasSize.width / 2 : 300;
+                    const centerY = (canvasSize && canvasSize.height) ? canvasSize.height / 2 : 300;
+                    const dx = cx - centerX;
+                    const dy = cy - centerY;
+                    const r = Math.sqrt(dx * dx + dy * dy);
+                    if (r <= acceptRadiusPx) break; // acceptable
+                    console.log(`🔁 Resampling event for camera ${i+1} (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
+                }
+
+            } while (attempt < maxAttempts);
+
             events.push(event);
-            
-            const hillas = this.hillasAnalyzer.analyze(event);
+
             if (hillas && hillas.valid) {
                 this.currentHillasParams.push(hillas);
             }
-            
+
             this.renderers[i].renderEvent(event, i === 0);
-            
+
             if (hillas && hillas.valid) {
                 this.renderers[i].renderHillasOverlay(hillas);
             }
@@ -436,7 +465,7 @@ class QuizEngine {
     /**
      * Genera e renderizza eventi adronici
      */
-    _generateAndRenderHadronicEvents(canvasSize) {
+    _generateAndRenderHadronicEvents(canvasSize, customParams = null) {
         this.renderers.forEach(renderer => {
             renderer.sourceType = 'hadron';
         });
@@ -445,7 +474,7 @@ class QuizEngine {
         this.currentHillasParams = [];
         
         for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateHadronicEvent(i + 1, canvasSize);
+            const event = this.engine.generateHadronicEvent(i + 1, canvasSize, customParams);
             events.push(event);
             
             const hillas = this.hillasAnalyzer.analyze(event);
@@ -466,7 +495,7 @@ class QuizEngine {
     /**
      * Genera e renderizza eventi muonici
      */
-    _generateAndRenderMuonEvents(canvasSize) {
+    _generateAndRenderMuonEvents(canvasSize, customParams = null) {
         this.renderers.forEach(renderer => {
             renderer.sourceType = 'muon';
         });
@@ -475,7 +504,7 @@ class QuizEngine {
         this.currentHillasParams = [];
         
         for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateMuonEvent(i + 1, canvasSize);
+            const event = this.engine.generateMuonEvent(i + 1, canvasSize, customParams);
             events.push(event);
             
             const hillas = this.hillasAnalyzer.analyze(event);

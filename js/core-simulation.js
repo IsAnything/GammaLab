@@ -67,8 +67,8 @@ class SimulationEngine {
             this._applyZenithEffects(params, zenithAngle, energy);
         }
         
-        // Genera tracce Cherenkov con dimensioni canvas
-        const tracks = this._generateTracks(params, energy, canvasW, canvasH);
+    // Genera tracce Cherenkov con dimensioni canvas
+    const tracks = this._generateTracks(params, energy, canvasW, canvasH, customParams || {});
         
         // Crea l'evento
         const event = {
@@ -95,12 +95,12 @@ class SimulationEngine {
      * @param {Number} energy - Energia in GeV (opzionale)
      * @returns {Object} Evento adronico generato
      */
-    generateHadronicEvent(cameraId = 1, canvasSize = null, energy = null) {
+    generateHadronicEvent(cameraId = 1, canvasSize = null, customParams = null) {
         const canvasW = canvasSize?.width || CANVAS_WIDTH;
         const canvasH = canvasSize?.height || CANVAS_HEIGHT;
         
         // Energia adroni tipicamente 100 GeV - 10 TeV
-        const hadronEnergy = energy || this._randomInRange(100, 10000);
+        const hadronEnergy = (customParams && customParams.energy) || this._randomInRange(100, 10000);
         
         // Parametri tipici adronici (molto diversi dai gamma)
         const params = {
@@ -119,7 +119,7 @@ class SimulationEngine {
         }
         
         // Genera tracce con caratteristiche adroniche
-        const tracks = this._generateHadronicTracks(params, hadronEnergy, canvasW, canvasH);
+    const tracks = this._generateHadronicTracks(params, hadronEnergy, canvasW, canvasH, customParams || {});
         
         const event = {
             sourceType: 'hadron',
@@ -145,12 +145,12 @@ class SimulationEngine {
      * @param {Number} energy - Energia in GeV (opzionale)
      * @returns {Object} Evento muonico generato
      */
-    generateMuonEvent(cameraId = 1, canvasSize = null, energy = null) {
+    generateMuonEvent(cameraId = 1, canvasSize = null, customParams = null) {
         const canvasW = canvasSize?.width || CANVAS_WIDTH;
         const canvasH = canvasSize?.height || CANVAS_HEIGHT;
         
         // Energia muoni tipicamente 50 GeV - 5 TeV
-        const muonEnergy = energy || this._randomInRange(50, 5000);
+        const muonEnergy = (customParams && customParams.energy) || this._randomInRange(50, 5000);
         
         // Parametri muonici: traccia molto stretta e lineare
         const params = {
@@ -163,7 +163,7 @@ class SimulationEngine {
         };
         
         // Genera tracce muoniche
-        const tracks = this._generateMuonTracks(params, muonEnergy, canvasW, canvasH);
+    const tracks = this._generateMuonTracks(params, muonEnergy, canvasW, canvasH, customParams || {});
         
         const event = {
             sourceType: 'muon',
@@ -289,7 +289,7 @@ class SimulationEngine {
     /**
      * Genera le tracce Cherenkov sul piano camera
      */
-    _generateTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+    _generateTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT, options = {}) {
         // Validazione parametri
         if (!params || typeof params.length !== 'number' || typeof params.width !== 'number' ||
             !isFinite(params.length) || !isFinite(params.width) ||
@@ -312,8 +312,14 @@ class SimulationEngine {
         // Centro della traccia - maggiore dispersione per tracce anche vicino ai bordi
         const dispersionX = canvasWidth * 0.35;  // 35% della larghezza (era 15%)
         const dispersionY = canvasHeight * 0.35; // 35% dell'altezza (era 15%)
-        const centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
-        const centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
+        let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
+        let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
+
+        // If options.forceCenter is set, generate the shower centered in the camera
+        if (options && options.forceCenter) {
+            centerX = canvasWidth / 2;
+            centerY = canvasHeight / 2;
+        }
         
         // Angolo di orientazione (random)
         const theta = Math.random() * 2 * Math.PI;
@@ -354,7 +360,7 @@ class SimulationEngine {
         }
         
         // Genera fotoni
-        for (let i = 0; i < numPhotons; i++) {
+    for (let i = 0; i < numPhotons; i++) {
             // Distribuzione ellittica con asimmetria
             const u = Math.random() - 0.5;
             const v = Math.random() - 0.5;
@@ -430,7 +436,7 @@ class SimulationEngine {
     /**
      * Genera tracce adroniche (più larghe, irregolari, con sub-shower)
      */
-    _generateHadronicTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+    _generateHadronicTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT, options = {}) {
         const tracks = [];
         
         // Adroni: più fotoni ma distribuiti in modo più disperso
@@ -440,8 +446,13 @@ class SimulationEngine {
         // Centro traccia principale
         const dispersionX = canvasWidth * 0.35;
         const dispersionY = canvasHeight * 0.35;
-        const centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
-        const centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
+        let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
+        let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
+
+        if (options && options.forceCenter) {
+            centerX = canvasWidth / 2;
+            centerY = canvasHeight / 2;
+        }
         
         // Angolo principale
         const theta = Math.random() * 2 * Math.PI;
@@ -518,7 +529,7 @@ class SimulationEngine {
     /**
      * Genera tracce muoniche (lineari, sottili, attraversano la camera)
      */
-    _generateMuonTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
+    _generateMuonTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT, options = {}) {
         const tracks = [];
         
         const numPhotons = Math.min(Math.floor(params.size), 800);
@@ -556,7 +567,16 @@ class SimulationEngine {
         
         const degreeToPixel = canvasWidth / FOV_WIDTH;
         const widthPx = params.width * degreeToPixel;
-        
+
+        // If forceCenter is set, create a muon that crosses near the camera center
+        if (options && options.forceCenter) {
+            // Create a near-central straight muon passing through center
+            startX = canvasWidth * 0.1;
+            startY = canvasHeight / 2 + (Math.random() - 0.5) * canvasHeight * 0.05;
+            endX = canvasWidth * 0.9;
+            endY = canvasHeight / 2 + (Math.random() - 0.5) * canvasHeight * 0.05;
+        }
+
         // Genera fotoni lungo la linea
         for (let i = 0; i < numPhotons; i++) {
             // Posizione lungo la linea (parametro t da 0 a 1)
