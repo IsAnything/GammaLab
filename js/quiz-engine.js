@@ -225,7 +225,9 @@ class QuizEngine {
     _selectQuestionType() {
         const questionIndex = this.currentQuestion - 1;
         const types = QUESTION_DISTRIBUTION.flat();
-        return types[questionIndex] || QUESTION_TYPES.SOURCE_IDENTIFICATION;
+        const selectedType = types[questionIndex] || QUESTION_TYPES.SOURCE_IDENTIFICATION;
+        console.log(`🎲 Domanda ${this.currentQuestion}: tipo = ${selectedType} (index: ${questionIndex}, totale tipi: ${types.length})`);
+        return selectedType;
     }
     
     /**
