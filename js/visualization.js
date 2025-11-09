@@ -733,17 +733,20 @@ class CanvasRenderer {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 const maxDistance = Math.sqrt(spreadRadiusLong * spreadRadiusLong + spreadRadiusShort * spreadRadiusShort) / 2;
                 const distanceFactor = 1 - (distance / maxDistance);
-                const pixelAlpha = Math.min(0.85, (intensityFactor * 0.4 + 0.4) * Math.pow(distanceFactor, 0.5));
+                const pixelAlpha = Math.min(0.95, (intensityFactor * 0.5 + 0.5) * Math.pow(distanceFactor, 0.5)); // Aumentata opacità
                 
-                // Colore varia con la distanza: pixel centrali = alta energia (giallo/verde), esterni = bassa energia (blu/cyan)
-                const energyNorm = 1 - distanceFactor; // Inverso: centro = 0 (alta E), esterno = 1 (bassa E)
+                // Colore più vario: mix tra energia del fotone e posizione
+                // Aggiungi variazione casuale per più diversità
+                const energyVariation = Math.random() * 0.3; // ±30% variazione
+                const energyNorm = Math.min(1, Math.max(0, (1 - distanceFactor) + energyVariation));
                 const colorRGB = this.colorPalette.mapNormalized(energyNorm);
                 
-                // Boost saturation
-                const saturationBoost = 1.6;
-                const r = Math.min(255, Math.max(0, Math.round(colorRGB[0] * saturationBoost)));
-                const g = Math.min(255, Math.max(0, Math.round(colorRGB[1] * saturationBoost)));
-                const b = Math.min(255, Math.max(0, Math.round(colorRGB[2] * saturationBoost)));
+                // Colori più scuri e saturi
+                const darkenFactor = 0.7; // Più scuro (era 1.0 implicito)
+                const saturationBoost = 1.8; // Più saturato (era 1.6)
+                const r = Math.min(255, Math.max(0, Math.round(colorRGB[0] * saturationBoost * darkenFactor)));
+                const g = Math.min(255, Math.max(0, Math.round(colorRGB[1] * saturationBoost * darkenFactor)));
+                const b = Math.min(255, Math.max(0, Math.round(colorRGB[2] * saturationBoost * darkenFactor)));
                 
                 pixels.push({ x: px, y: py, alpha: pixelAlpha, r, g, b, isWhite: false });
             }

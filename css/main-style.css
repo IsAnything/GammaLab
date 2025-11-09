@@ -951,6 +951,17 @@ table tr:hover {
   flex-shrink: 0;
 }
 
+/* Wrapper per sovrapporre i canvas con grid */
+#quizScreen .canvas-wrapper {
+  display: grid;
+  width: 280px;
+  height: 280px;
+}
+
+#quizScreen .canvas-wrapper > * {
+  grid-area: 1 / 1; /* Tutti gli elementi nella stessa cella della griglia */
+}
+
 /* Canvas più grandi e leggibili con stile esagonale */
 #quizScreen .camera-canvas {
   display: block;
@@ -961,12 +972,9 @@ table tr:hover {
 }
 
 #quizScreen .overlay-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
   display: block;
-  width: 280px;
-  height: 280px;
+  width: 100%;
+  height: 100%;
   z-index: 5;
   pointer-events: none;
   clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
