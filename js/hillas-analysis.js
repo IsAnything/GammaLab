@@ -43,12 +43,16 @@ class HillasAnalyzer {
         // 4. Diagonalizza matrice dei momenti
         const eigenvalues = this._diagonalize(moments);
 
-        // 5. Calcola parametri Hillas
+        // 5. Calcola parametri Hillas (passa dimensioni canvas dall'evento)
+        const canvasWidth = event.canvasWidth || 1500;
+        const canvasHeight = event.canvasHeight || 1000;
         const params = this._computeHillasParameters(
             cleanedTracks,
             cog,
             moments,
-            eigenvalues
+            eigenvalues,
+            canvasWidth,
+            canvasHeight
         );
 
         // 6. Validazione
@@ -154,7 +158,7 @@ class HillasAnalyzer {
     /**
      * Calcola tutti i parametri Hillas
      */
-    _computeHillasParameters(tracks, cog, moments, eigenvalues) {
+    _computeHillasParameters(tracks, cog, moments, eigenvalues, canvasWidth, canvasHeight) {
         const { lambda1, lambda2, theta } = eigenvalues;
 
         // Length e Width (RMS lungo assi principali)
@@ -168,21 +172,11 @@ class HillasAnalyzer {
         // Size (intensità totale)
         const size = cog.totalIntensity * 100; // Scala a photoelectrons
 
-        // Miss e Alpha: determina centro camera dalle coordinate dei fotoni
-        // Usa le dimensioni effettive dei tracks per trovare il centro
-        const maxX = Math.max(...tracks.map(t => t.x));
-        const minX = Math.min(...tracks.map(t => t.x));
-        const maxY = Math.max(...tracks.map(t => t.y));
-        const minY = Math.min(...tracks.map(t => t.y));
+        // Centro camera: usa le dimensioni effettive del canvas
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
         
-        // Stima dimensioni canvas (assumendo margine ~10%)
-        const estimatedWidth = (maxX - minX) * 1.2;
-        const estimatedHeight = (maxY - minY) * 1.2;
-        
-        // Centro camera basato sulla distribuzione dei fotoni
-        const centerX = (maxX + minX) / 2;
-        const centerY = (maxY + minY) / 2;
-        
+        // Miss (distanza CoG dal centro camera)
         const missPx = Math.sqrt(
             Math.pow(cog.x - centerX, 2) +
             Math.pow(cog.y - centerY, 2)

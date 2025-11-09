@@ -78,6 +78,8 @@ class SimulationEngine {
             zenithAngle: zenithAngle,
             params: params,
             tracks: tracks,
+            canvasWidth: canvasW,
+            canvasHeight: canvasH,
             timestamp: Date.now()
         };
         
