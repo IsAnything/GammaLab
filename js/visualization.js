@@ -1226,6 +1226,10 @@ class CanvasRenderer {
             if (this.lightStyle) {
                 displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);
             }
+
+            const visibilityScale = 1.12; // enlarge outline slightly for hover visibility
+            displayLengthPx *= visibilityScale;
+            displayWidthPx *= visibilityScale;
         }
 
         ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';
