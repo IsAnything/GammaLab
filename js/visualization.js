@@ -246,10 +246,10 @@ class CanvasRenderer {
         this.suppressNoise = false;
         // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
         // (useful for quizzes where geometric adherence is required)
-        this.respectExactHillas = false;
+    this.respectExactHillas = true;
         // If true, allow sub-pixel placement / small jitter for photon's positions
         // improves realism by avoiding integer-only placement
-        this.subpixelEnabled = true;
+    this.subpixelEnabled = false;
         // Exposure parameter for tone-mapping (higher = brighter / more responsive highlights)
         this.exposureK = 4.0;
         // NEW: If true, render only the Hillas ellipse outline (no photons) for didactic clarity
@@ -1723,13 +1723,9 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
 
             const spCheckbox = document.createElement('input');
             spCheckbox.type = 'checkbox';
-            spCheckbox.checked = (renderers[0] && !!renderers[0].subpixelEnabled);
+            spCheckbox.checked = false;
             spCheckbox.style.marginLeft = '6px';
-            spCheckbox.addEventListener('change', (ev) => {
-                const enabled = !!ev.target.checked;
-                renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
-                console.log('🔧 subpixelEnabled set to', enabled);
-            });
+            spCheckbox.disabled = true;
 
             // NEW: Ellipse-only checkbox
             const ellLabel = document.createElement('label');
@@ -1776,7 +1772,7 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
                 help.style.marginLeft = '8px';
                 help.style.maxWidth = '420px';
                 help.textContent = 'Exposure: regola luminosità e glow (consigliato 2–6).';
-                help.title = 'Exposure: regola luminosità e dimensione del glow attorno ai fotoni. Sub-pixel attiva un leggero jitter per migliorare la texture.';
+                help.title = 'Exposure: regola luminosità e dimensione del glow attorno ai fotoni. Sub-pixel è disattivato per mantenere ellissi aderenti ai fotoni.';
                 controlsContainer.appendChild(help);
             })();
 

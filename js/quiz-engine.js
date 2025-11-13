@@ -101,6 +101,7 @@ class QuizEngine {
             renderer.lightStyle = true; // Nuovo stile chiaro
             // In quiz vogliamo che le ellissi siano geometricamente aderenti
             renderer.respectExactHillas = true;
+            renderer.subpixelEnabled = false;
             // Modalità didattica: sopprimi rumore di background
             if (this.quizGammaOnly) renderer.suppressNoise = true;
         });

@@ -64,16 +64,14 @@ window.addExposureControls = function(renderers, generateBtn) {
         spLabel.style.fontSize = '13px';
         spLabel.style.marginLeft = '8px';
         spLabel.textContent = 'Sub-pixel:';
+    spLabel.title = 'Bloccato per mantenere ellissi aderenti ai fotoni.';
 
         const spCheckbox = document.createElement('input');
         spCheckbox.type = 'checkbox';
-        spCheckbox.checked = (renderers[0] && !!renderers[0].subpixelEnabled);
+        spCheckbox.checked = false;
+    spCheckbox.title = 'Jitter disattivato per garantire il rispetto esatto delle ellissi.';
+        spCheckbox.disabled = true;
         spCheckbox.style.marginLeft = '6px';
-        spCheckbox.addEventListener('change', (ev) => {
-            const enabled = !!ev.target.checked;
-            renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
-            console.log('🔧 subpixelEnabled set to', enabled);
-        });
 
         // NEW: Ellipse-only checkbox
         const ellLabel = document.createElement('label');
@@ -120,7 +118,7 @@ window.addExposureControls = function(renderers, generateBtn) {
             help.style.marginLeft = '8px';
             help.style.maxWidth = '420px';
             help.textContent = 'Exposure: regola luminosità e glow (consigliato 2–6).';
-            help.title = 'Exposure: regola luminosità e dimensione del glow attorno ai fotoni. Sub-pixel attiva un leggero jitter per migliorare la texture.';
+            help.title = 'Exposure: regola luminosità e dimensione del glow attorno ai fotoni. Sub-pixel è bloccato (off) per mantenere le ellissi allineate ai fotoni.';
             controlsContainer.appendChild(help);
         })();
 
@@ -169,6 +167,8 @@ function setupSourceSimulator(sourceType, options = {}) {
         // Assegna nuova palette a tutti i renderers
         renderers.forEach(renderer => {
             renderer.colorPalette = colorPalette;
+            renderer.respectExactHillas = true;
+            renderer.subpixelEnabled = false;
         });
 
         console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
@@ -230,16 +230,14 @@ function setupSourceSimulator(sourceType, options = {}) {
                         spLabel.style.fontSize = '13px';
                         spLabel.style.marginLeft = '8px';
                         spLabel.textContent = 'Sub-pixel:';
+                        spLabel.title = 'Bloccato per mantenere ellissi aderenti ai fotoni.';
 
                         const spCheckbox = document.createElement('input');
                         spCheckbox.type = 'checkbox';
-                        spCheckbox.checked = (renderers[0] && !!renderers[0].subpixelEnabled);
+                        spCheckbox.checked = false;
+                        spCheckbox.title = 'Jitter disattivato per garantire il rispetto esatto delle ellissi.';
+                        spCheckbox.disabled = true;
                         spCheckbox.style.marginLeft = '6px';
-                        spCheckbox.addEventListener('change', (ev) => {
-                            const enabled = !!ev.target.checked;
-                            renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
-                            console.log('🔧 subpixelEnabled set to', enabled);
-                        });
 
                         const left = document.createElement('div');
                         left.style.display = 'flex';
