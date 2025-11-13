@@ -113,6 +113,33 @@ class EnergyColorPalette {
     }
 
     /**
+     * Tone mapping + gamma correction helper
+     * - Applies an exponential exposure curve then gamma-corrects
+     * @param {number} v normalized value 0..1
+     * @param {number} k exposure strength
+     */
+    toneMap(v, k = 4.0) {
+        v = Math.max(0, Math.min(1, v));
+        // exponential exposure operator (filmic-like)
+        const mapped = 1 - Math.exp(-k * v);
+        // gamma correction (approx sRGB/gamma)
+        const gamma = 1 / 2.2;
+        return Math.pow(mapped, gamma);
+    }
+
+    /**
+     * Scales an RGB array by a brightness factor and clamps
+     */
+    applyBrightnessToRGB(rgbArr, brightness) {
+        const b = Math.max(0, Math.min(1, brightness));
+        return [
+            Math.min(255, Math.round(rgbArr[0] * b)),
+            Math.min(255, Math.round(rgbArr[1] * b)),
+            Math.min(255, Math.round(rgbArr[2] * b))
+        ];
+    }
+
+    /**
      * Ottieni colore con trasparenza
      */
     getColorWithAlpha(energy, alpha) {
@@ -220,6 +247,9 @@ class CanvasRenderer {
         // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
         // (useful for quizzes where geometric adherence is required)
         this.respectExactHillas = false;
+        // If true, allow sub-pixel placement / small jitter for photon's positions
+        // improves realism by avoiding integer-only placement
+        this.subpixelEnabled = true;
     }
 
     /**
@@ -542,53 +572,72 @@ class CanvasRenderer {
 
         // Dark style: rendering tradizionale con glow
         const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
-        
-        let baseRGB;
+
+        // Color mapping: combine energy and intensity, then tone-map for photographic dynamic range
+        let baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
         try {
-            const energyNorm = Math.log10(track.energy / this.colorPalette.minEnergy) / 
+            const energyNorm = Math.log10(track.energy / this.colorPalette.minEnergy) /
                               Math.log10(this.colorPalette.maxEnergy / this.colorPalette.minEnergy);
             const colorT = (intensityFactor * 0.7 + energyNorm * 0.3);
             baseRGB = this.colorPalette.mapNormalized(colorT);
+
+            // Exposure / tone-mapping -> brightness scalar in 0..1
+            const exposureK = 4.0; // tuned constant; could be exposed as a renderer property
+            const brightness = this.colorPalette.toneMap(colorT, exposureK);
+
+            // Mix intensity into final brightness for extra punch for brighter photons
+            const finalBrightness = Math.max(0.04, brightness * (0.7 + 0.6 * intensityFactor));
+
+            // Apply brightness to base color
+            const finalRGB = this.colorPalette.applyBrightnessToRGB(baseRGB, finalBrightness);
+
+            // keep integer RGB for drawing
+            var r = finalRGB[0];
+            var g = finalRGB[1];
+            var b = finalRGB[2];
         } catch (e) {
-            baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
+            r = baseRGB[0]; g = baseRGB[1]; b = baseRGB[2];
         }
 
-        const jitter = (Math.sin((track.x + track.y) * 0.12) + (Math.random() - 0.5) * 0.8) * 12;
-        const r = Math.min(255, Math.max(0, Math.round(baseRGB[0] + jitter + intensityFactor * 35)));
-        const g = Math.min(255, Math.max(0, Math.round(baseRGB[1] + jitter * 0.7 + intensityFactor * 25)));
-        const b = Math.min(255, Math.max(0, Math.round(baseRGB[2] - jitter * 0.5 + intensityFactor * 15)));
+        // Sub-pixel jitter / small deterministic pattern (kept small to avoid large offsets)
+        const sinPattern = Math.sin((track.x + track.y) * 0.12) * 0.3;
+        const jitterMag = this.subpixelEnabled ? (Math.random() - 0.5) * 0.6 : 0.0;
+        const offsetX = sinPattern + jitterMag;
+        const offsetY = Math.cos((track.x - track.y) * 0.09) * 0.28 + (this.subpixelEnabled ? (Math.random() - 0.5) * 0.5 : 0.0);
 
-        const color = `rgb(${r}, ${g}, ${b})`;
+        const drawX = track.x + offsetX;
+        const drawY = track.y + offsetY;
+
         const radius = this.intensityToRadius(track.intensity);
         const alpha = Math.min(1, track.intensity * 1.2 + 0.5);
 
         if (!isFinite(radius) || radius <= 0) return;
 
-        // Glow esterno
+        // Glow esterno: use computed final color with alpha ramp
         const gradient = this.ctx.createRadialGradient(
-            track.x, track.y, 0,
-            track.x, track.y, radius * 5.0
+            drawX, drawY, 0,
+            drawX, drawY, radius * 5.0
         );
-        gradient.addColorStop(0, this.colorPalette.getColorWithAlpha(track.energy, alpha));
-        gradient.addColorStop(0.2, this.colorPalette.getColorWithAlpha(track.energy, alpha * 0.8));
-        gradient.addColorStop(0.5, this.colorPalette.getColorWithAlpha(track.energy, alpha * 0.4));
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
+        gradient.addColorStop(0.2, `rgba(${r}, ${g}, ${b}, ${Math.max(0, alpha * 0.75)})`);
+        gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${Math.max(0, alpha * 0.35)})`);
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         this.ctx.fillStyle = gradient;
         this.ctx.beginPath();
-        this.ctx.arc(track.x, track.y, radius * 5.0, 0, 2 * Math.PI);
+        this.ctx.arc(drawX, drawY, radius * 5.0, 0, 2 * Math.PI);
         this.ctx.fill();
 
         // Core brillante
         this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         this.ctx.beginPath();
-        this.ctx.arc(track.x, track.y, radius * 1.5, 0, 2 * Math.PI);
+        this.ctx.arc(drawX, drawY, radius * 1.5, 0, 2 * Math.PI);
         this.ctx.fill();
 
         // Punto centrale ultra-brillante
         this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
         this.ctx.beginPath();
-        this.ctx.arc(track.x, track.y, radius * 0.5, 0, 2 * Math.PI);
+        this.ctx.arc(drawX, drawY, radius * 0.5, 0, 2 * Math.PI);
         this.ctx.fill();
     }
 
@@ -1244,12 +1293,16 @@ function renderHexCamera(eventData, canvas, options = {}) {
             if (ix >= 0 && ix < W && iy >= 0 && iy < H) {
                 let v = img[iy * W + ix];
                 
-                // Tonemap: sqrt for better visibility
+                // Tonemap: sqrt for better visibility then apply exposure/gamma
                 v = Math.sqrt(Math.max(0, v));
                 v = Math.min(1, v / opts.normMax);
 
-                // Get color from palette
-                const col = palette.mapNormalized(v);
+                // Apply palette tone mapping (exposure) then map to RGB and apply brightness
+                const exposureK = opts.exposureK || 4.0;
+                const vTone = palette.toneMap(v, exposureK);
+                let col = palette.mapNormalized(vTone);
+                const brightScalar = Math.max(0.04, vTone * 1.1);
+                col = palette.applyBrightnessToRGB(col, brightScalar);
 
                 // Draw hexagon
                 ctx.fillStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
