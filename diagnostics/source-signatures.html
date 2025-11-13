@@ -145,6 +145,7 @@
                 blazar: 'blazar-signature-seed',
                 grb: 'grb-signature-seed'
             };
+                let regenIndex = 0;
 
             function withSeed(seed, fn) {
                 const originalRandom = Math.random;
@@ -193,11 +194,17 @@
                 return `E = ${energyTeV} TeV • Fotoni = ${photonCount} • Alpha = ${alpha}°`;
             }
 
+            function getEffectiveSeed(base, index) {
+                return `${base}#${index}`;
+            }
+
             function renderProfile(profile) {
                 const renderer = renderers[profile.key];
                 const metaTarget = document.getElementById(profile.meta);
 
-                withSeed(SEEDS[profile.key], () => {
+                const seed = getEffectiveSeed(SEEDS[profile.key], regenIndex);
+
+                withSeed(seed, () => {
                     const sourceProfile = getSourceProfile(profile.key);
                     const canvas = document.getElementById(profile.canvas);
                     const canvasSize = { width: canvas.width, height: canvas.height };
@@ -211,7 +218,7 @@
                     }
 
                     if (metaTarget) {
-                        metaTarget.textContent = formatMeta(event, event.tracks);
+                        metaTarget.textContent = `${formatMeta(event, event.tracks)} • Seed #${regenIndex}`;
                     }
                 });
             }
@@ -220,7 +227,10 @@
                 profiles.forEach(renderProfile);
             }
 
-            document.getElementById('regen-btn').addEventListener('click', renderAll);
+            document.getElementById('regen-btn').addEventListener('click', () => {
+                regenIndex += 1;
+                renderAll();
+            });
 
             // Prima renderizzazione
             renderAll();
