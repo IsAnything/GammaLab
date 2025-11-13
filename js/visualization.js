@@ -272,8 +272,11 @@ class CanvasRenderer {
     _setupMouseListeners() {
         if (!this.canvas) return;
         
-        this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
+        // Listen to both canvas and overlay for mouse events
+        const listenCanvas = this.overlay || this.canvas;
+        
+        listenCanvas.addEventListener('mousemove', (e) => {
+            const rect = listenCanvas.getBoundingClientRect();
             this.mouseX = e.clientX - rect.left;
             this.mouseY = e.clientY - rect.top;
             
@@ -282,6 +285,11 @@ class CanvasRenderer {
                 const wasHovering = this.isHovering;
                 this.isHovering = this._isMouseOverTrace(this.mouseX, this.mouseY, this.currentHillasParams);
                 
+                // Debug log
+                if (wasHovering !== this.isHovering) {
+                    console.log('🖱️ Hover state changed:', this.isHovering, 'at', this.mouseX, this.mouseY);
+                }
+                
                 // Re-render if hover state changed
                 if (wasHovering !== this.isHovering) {
                     this._redrawHillasOverlay();
@@ -289,10 +297,11 @@ class CanvasRenderer {
             }
         });
         
-        this.canvas.addEventListener('mouseleave', () => {
+        listenCanvas.addEventListener('mouseleave', () => {
             if (this.isHovering) {
                 this.isHovering = false;
                 this._redrawHillasOverlay();
+                console.log('🖱️ Mouse left, hiding ellipse');
             }
             this.mouseX = -1;
             this.mouseY = -1;
@@ -303,7 +312,10 @@ class CanvasRenderer {
      * Check if mouse is over the trace (within ellipse bounds + buffer)
      */
     _isMouseOverTrace(mx, my, hillas) {
-        if (!hillas || !hillas.valid) return false;
+        if (!hillas || !hillas.valid) {
+            console.log('🖱️ No valid hillas params');
+            return false;
+        }
         
         const cx = hillas.cogX;
         const cy = hillas.cogY;
@@ -321,14 +333,27 @@ class CanvasRenderer {
         
         // Check if inside ellipse
         const normalized = (rotX * rotX) / (a * a) + (rotY * rotY) / (b * b);
-        return normalized <= 1.0;
+        const isInside = normalized <= 1.0;
+        
+        // Debug log occasionally
+        if (Math.random() < 0.05) {
+            console.log('🖱️ Mouse at', mx.toFixed(0), my.toFixed(0), 
+                       'CoG:', cx.toFixed(0), cy.toFixed(0), 
+                       'normalized:', normalized.toFixed(2), 
+                       'inside:', isInside);
+        }
+        
+        return isInside;
     }
     
     /**
      * Redraw only the Hillas overlay (if overlay canvas exists)
      */
     _redrawHillasOverlay() {
-        if (!this.overlay || !this.overlayCtx || !this.currentHillasParams) return;
+        if (!this.overlay || !this.overlayCtx || !this.currentHillasParams) {
+            console.log('🖱️ Cannot redraw: overlay=', !!this.overlay, 'ctx=', !!this.overlayCtx, 'params=', !!this.currentHillasParams);
+            return;
+        }
         
         // Clear overlay
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
@@ -336,10 +361,14 @@ class CanvasRenderer {
         // Draw Hillas only if hovering (when showHillasOnHover is true)
         if (this.showHillasOnHover) {
             if (this.isHovering) {
+                console.log('✅ Drawing ellipse on hover');
                 this.renderHillasOverlay(this.currentHillasParams);
+            } else {
+                console.log('⏸️ Hiding ellipse (not hovering)');
             }
         } else {
             // Always show if showHillasOnHover is false
+            console.log('✅ Drawing ellipse (hover mode disabled)');
             this.renderHillasOverlay(this.currentHillasParams);
         }
     }
