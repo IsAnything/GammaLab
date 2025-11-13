@@ -610,7 +610,10 @@ class CanvasRenderer {
             const brightness = this.colorPalette.toneMap(colorT, exposureK);
 
             // Mix intensity into final brightness for extra punch for brighter photons
-            const finalBrightness = Math.max(0.04, brightness * (0.7 + 0.6 * intensityFactor));
+            // Make exposureK have a stronger, perceptible effect:
+            // exposureFactor grows ~1.2^(exposure-4) for visible amplification when slider is moved.
+            const exposureFactor = Math.pow(1.18, (Math.max(0, (this.exposureK || 4.0) - 4.0)));
+            const finalBrightness = Math.max(0.02, brightness * (0.7 + 0.6 * intensityFactor) * exposureFactor);
 
             // Apply brightness to base color
             const finalRGB = this.colorPalette.applyBrightnessToRGB(baseRGB, finalBrightness);
@@ -638,9 +641,11 @@ class CanvasRenderer {
         if (!isFinite(radius) || radius <= 0) return;
 
         // Glow esterno: use computed final color with alpha ramp
+        // Scale glow radius with exposure for clearer visual feedback
+        const glowScale = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.28; // modest per-step increase
         const gradient = this.ctx.createRadialGradient(
             drawX, drawY, 0,
-            drawX, drawY, radius * 5.0
+            drawX, drawY, radius * 5.0 * glowScale
         );
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
         gradient.addColorStop(0.2, `rgba(${r}, ${g}, ${b}, ${Math.max(0, alpha * 0.75)})`);
@@ -649,7 +654,7 @@ class CanvasRenderer {
 
         this.ctx.fillStyle = gradient;
         this.ctx.beginPath();
-        this.ctx.arc(drawX, drawY, radius * 5.0, 0, 2 * Math.PI);
+    this.ctx.arc(drawX, drawY, radius * 5.0 * glowScale, 0, 2 * Math.PI);
         this.ctx.fill();
 
         // Core brillante
@@ -823,7 +828,10 @@ class CanvasRenderer {
                 let colorRGB = this.colorPalette.mapNormalized(energyNorm);
 
                 // Brightness scalar derived from tone and intensity/distance
-                const brightScalar = Math.max(0.06, tone * (0.6 + 0.6 * intensityFactor) * Math.pow(distanceFactor, 0.4));
+                // Include exposureK to make brightness differences more visible
+                const exposureK_local = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
+                const exposureBoost = 1 + (Math.max(0, exposureK_local - 4.0)) * 0.28; // modest boost per step
+                const brightScalar = Math.max(0.04, tone * (0.6 + 0.6 * intensityFactor) * Math.pow(distanceFactor, 0.4) * exposureBoost);
                 const toned = this.colorPalette.applyBrightnessToRGB(colorRGB, brightScalar);
 
                 // Small saturation/darken tweak (keeps hue while increasing contrast)
@@ -915,13 +923,15 @@ class CanvasRenderer {
     const centerEnergyNorm = 0; // max energy mapping index in mapNormalized
     const centerTone = this.colorPalette.toneMap(centerEnergyNorm, this.exposureK || 4.0);
     const centerColor = this.colorPalette.mapNormalized(centerEnergyNorm);
-    const centerRGB = this.colorPalette.applyBrightnessToRGB(centerColor, Math.max(0.6, centerTone * (0.9 + 0.6 * intensityFactor)));
+    // Boost central core brightness when exposure is high so it's easier to spot
+    const centerBoost = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.35;
+    const centerRGB = this.colorPalette.applyBrightnessToRGB(centerColor, Math.max(0.5, centerTone * (0.9 + 0.6 * intensityFactor) * centerBoost));
 
-    const cr = Math.min(255, Math.round(centerRGB[0] + 40));
-    const cg = Math.min(255, Math.round(centerRGB[1] + 40));
-    const cb = Math.min(255, Math.round(centerRGB[2] + 40));
+    const cr = Math.min(255, Math.round(centerRGB[0] + 32));
+    const cg = Math.min(255, Math.round(centerRGB[1] + 32));
+    const cb = Math.min(255, Math.round(centerRGB[2] + 32));
 
-    this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.1)})`;
+    this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.15)})`;
         this.ctx.beginPath();
         this.ctx.arc(track.x, track.y, pixelRadius * 1.4, 0, 2 * Math.PI);
         this.ctx.fill();
@@ -993,6 +1003,17 @@ class CanvasRenderer {
         this.ctx.font = '12px "Courier New", monospace';
         this.ctx.fillText(`Energia: ${(event.energy / 1000).toFixed(1)} TeV`, 20, 50);
         this.ctx.fillText(`Fotoni: ${event.tracks.length}`, 20, 65);
+        // Show current exposure and subpixel settings for immediate feedback
+        try {
+            const exp = (typeof this.exposureK === 'number') ? this.exposureK.toFixed(1) : '4.0';
+            const sp = !!this.subpixelEnabled ? 'ON' : 'OFF';
+            this.ctx.fillStyle = 'rgba(255, 230, 180, 0.95)';
+            this.ctx.font = '12px "Courier New", monospace';
+            this.ctx.fillText(`Exposure: ${exp}`, 20, 82);
+            this.ctx.fillText(`Sub-pixel: ${sp}`, 20, 98);
+        } catch (e) {
+            // ignore drawing errors
+        }
     }
 
     /**
