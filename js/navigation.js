@@ -54,7 +54,7 @@ window.addExposureControls = function(renderers, generateBtn) {
         expSlider.addEventListener('input', (ev) => {
             const v = parseFloat(ev.target.value);
             expValue.textContent = v.toFixed(1);
-            renderers.forEach(r => { r.exposureK = v; });
+            renderers.forEach(r => { r.exposureK = v; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
             console.log('🔧 exposureK set to', v);
         });
 
@@ -187,7 +187,7 @@ function setupSourceSimulator(sourceType, options = {}) {
                         expSlider.addEventListener('input', (ev) => {
                             const v = parseFloat(ev.target.value);
                             expValue.textContent = v.toFixed(1);
-                            renderers.forEach(r => { r.exposureK = v; });
+                            renderers.forEach(r => { r.exposureK = v; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
                             console.log('🔧 exposureK set to', v);
                         });
 
@@ -204,7 +204,7 @@ function setupSourceSimulator(sourceType, options = {}) {
                         spCheckbox.style.marginLeft = '6px';
                         spCheckbox.addEventListener('change', (ev) => {
                             const enabled = !!ev.target.checked;
-                            renderers.forEach(r => { r.subpixelEnabled = enabled; });
+                            renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
                             console.log('🔧 subpixelEnabled set to', enabled);
                         });
 

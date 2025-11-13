@@ -475,6 +475,9 @@ class CanvasRenderer {
      * Renderizza evento con effetti glow
      */
     renderEvent(event, showLegend = true) {
+        // Keep a reference to the last rendered event so UI controls can re-render live
+        try { this._lastEvent = event; } catch (e) {}
+
         this.clear();
 
         // Ordina tracce per intensità (prima i deboli, poi i brillanti)
@@ -512,6 +515,9 @@ class CanvasRenderer {
      * Simula l'arrivo progressivo dei fotoni Cherenkov
      */
     renderEventAnimated(event, showLegend = true) {
+        // Keep a reference to the last rendered event so UI controls can re-render live
+        try { this._lastEvent = event; } catch (e) {}
+
         this.clear();
         
         // Ordina tracce per tempo di arrivo simulato
@@ -551,6 +557,22 @@ class CanvasRenderer {
 
         // Inizia animazione
         requestAnimationFrame(renderBatch);
+    }
+
+    /**
+     * Re-render the last event currently stored in the renderer.
+     * Useful to apply live parameter changes (exposure, subpixel) without
+     * regenerating the whole event.
+     */
+    reRenderLastEvent(showLegend = true) {
+        try {
+            if (this._lastEvent) {
+                // Prefer non-animated re-render for immediate visual feedback
+                this.renderEvent(this._lastEvent, showLegend);
+            }
+        } catch (e) {
+            console.warn('reRenderLastEvent failed:', e);
+        }
     }
 
     /**
@@ -1434,7 +1456,7 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
             expSlider.addEventListener('input', (ev) => {
                 const v = parseFloat(ev.target.value);
                 expValue.textContent = v.toFixed(1);
-                renderers.forEach(r => { r.exposureK = v; });
+                renderers.forEach(r => { r.exposureK = v; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
                 console.log('🔧 exposureK set to', v);
             });
 
@@ -1451,7 +1473,7 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
             spCheckbox.style.marginLeft = '6px';
             spCheckbox.addEventListener('change', (ev) => {
                 const enabled = !!ev.target.checked;
-                renderers.forEach(r => { r.subpixelEnabled = enabled; });
+                renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
                 console.log('🔧 subpixelEnabled set to', enabled);
             });
 
