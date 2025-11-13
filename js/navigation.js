@@ -71,8 +71,26 @@ window.addExposureControls = function(renderers, generateBtn) {
         spCheckbox.style.marginLeft = '6px';
         spCheckbox.addEventListener('change', (ev) => {
             const enabled = !!ev.target.checked;
-            renderers.forEach(r => { r.subpixelEnabled = enabled; });
+            renderers.forEach(r => { r.subpixelEnabled = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
             console.log('🔧 subpixelEnabled set to', enabled);
+        });
+
+        // NEW: Ellipse-only checkbox
+        const ellLabel = document.createElement('label');
+        ellLabel.style.color = '#ffffff';
+        ellLabel.style.fontFamily = '"Courier New", monospace';
+        ellLabel.style.fontSize = '13px';
+        ellLabel.style.marginLeft = '12px';
+        ellLabel.textContent = 'Solo Ellisse:';
+
+        const ellCheckbox = document.createElement('input');
+        ellCheckbox.type = 'checkbox';
+        ellCheckbox.checked = (renderers[0] && !!renderers[0].showEllipseOnly);
+        ellCheckbox.style.marginLeft = '6px';
+        ellCheckbox.addEventListener('change', (ev) => {
+            const enabled = !!ev.target.checked;
+            renderers.forEach(r => { r.showEllipseOnly = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
+            console.log('🔧 showEllipseOnly set to', enabled);
         });
 
         const left = document.createElement('div');
@@ -87,6 +105,8 @@ window.addExposureControls = function(renderers, generateBtn) {
         right.style.alignItems = 'center';
         right.appendChild(spLabel);
         right.appendChild(spCheckbox);
+        right.appendChild(ellLabel);
+        right.appendChild(ellCheckbox);
 
     controlsContainer.appendChild(left);
     controlsContainer.appendChild(right);

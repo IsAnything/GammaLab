@@ -242,16 +242,18 @@ class CanvasRenderer {
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
-    // When true the renderer will suppress background noise (useful for clean quiz images)
-    this.suppressNoise = false;
+        // When true the renderer will suppress background noise (useful for clean quiz images)
+        this.suppressNoise = false;
         // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
         // (useful for quizzes where geometric adherence is required)
         this.respectExactHillas = false;
         // If true, allow sub-pixel placement / small jitter for photon's positions
         // improves realism by avoiding integer-only placement
         this.subpixelEnabled = true;
-    // Exposure parameter for tone-mapping (higher = brighter / more responsive highlights)
-    this.exposureK = 4.0;
+        // Exposure parameter for tone-mapping (higher = brighter / more responsive highlights)
+        this.exposureK = 4.0;
+        // NEW: If true, render only the Hillas ellipse outline (no photons) for didactic clarity
+        this.showEllipseOnly = false;
     }
 
     /**
@@ -480,6 +482,12 @@ class CanvasRenderer {
 
         this.clear();
 
+        // Se showEllipseOnly è attivo, disegna solo l'ellisse Hillas senza fotoni
+        if (this.showEllipseOnly) {
+            this.renderEllipseOnlyMode(event, showLegend);
+            return;
+        }
+
         // Ordina tracce per intensità (prima i deboli, poi i brillanti)
         const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
 
@@ -576,6 +584,111 @@ class CanvasRenderer {
     }
 
     /**
+     * Modalità didattica: renderizza solo ellisse Hillas (no fotoni)
+     * Calcola i parametri Hillas dall'evento e disegna l'ellisse teorica
+     */
+    renderEllipseOnlyMode(event, showLegend = true) {
+        // Sfondo nero
+        this.ctx.fillStyle = '#000814';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Calcola Hillas dall'evento (richiede HillasAnalyzer)
+        let hillasParams = null;
+        try {
+            // Se disponibile usa HillasAnalyzer globale
+            if (typeof HillasAnalyzer !== 'undefined') {
+                const analyzer = new HillasAnalyzer();
+                hillasParams = analyzer.analyze(event);
+            }
+        } catch (e) {
+            console.warn('HillasAnalyzer not available:', e);
+        }
+
+        if (!hillasParams || !hillasParams.valid) {
+            // Fallback: disegna messaggio
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = '16px system-ui';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('Modalità Ellisse: Hillas non disponibile', this.canvas.width / 2, this.canvas.height / 2);
+            return;
+        }
+
+        // Disegna ellisse Hillas
+        const cx = hillasParams.cogX;
+        const cy = hillasParams.cogY;
+        const a = hillasParams.lengthPx;
+        const b = hillasParams.widthPx;
+        const theta = (hillasParams.theta * Math.PI / 180);
+
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(theta);
+
+        // Ellisse riempita (semi-trasparente)
+        this.ctx.fillStyle = 'rgba(0, 200, 255, 0.15)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+
+        // Ellisse outline (brillante)
+        this.ctx.strokeStyle = '#00ff88';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+        this.ctx.stroke();
+
+        // Assi principali
+        this.ctx.strokeStyle = '#ffaa00';
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([5, 3]);
+        // Asse maggiore
+        this.ctx.beginPath();
+        this.ctx.moveTo(-a, 0);
+        this.ctx.lineTo(a, 0);
+        this.ctx.stroke();
+        // Asse minore
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -b);
+        this.ctx.lineTo(0, b);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+
+        this.ctx.restore();
+
+        // Centro di gravità
+        this.ctx.fillStyle = '#ff0055';
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+        this.ctx.fill();
+
+        // Annotazioni parametri
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = '14px monospace';
+        this.ctx.textAlign = 'left';
+        const infoX = 20;
+        let infoY = 30;
+        this.ctx.fillText(`Length: ${hillasParams.length.toFixed(3)}° (${hillasParams.lengthPx.toFixed(1)} px)`, infoX, infoY);
+        infoY += 20;
+        this.ctx.fillText(`Width: ${hillasParams.width.toFixed(3)}° (${hillasParams.widthPx.toFixed(1)} px)`, infoX, infoY);
+        infoY += 20;
+        this.ctx.fillText(`L/W Ratio: ${hillasParams.elongation.toFixed(2)}`, infoX, infoY);
+        infoY += 20;
+        this.ctx.fillText(`Size: ${hillasParams.size.toFixed(0)} p.e.`, infoX, infoY);
+        infoY += 20;
+        this.ctx.fillText(`Alpha: ${hillasParams.alpha.toFixed(1)}°`, infoX, infoY);
+
+        // Label modalità
+        this.ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
+        this.ctx.font = 'bold 16px system-ui';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Modalità Ellisse (solo outline)', this.canvas.width / 2, this.canvas.height - 20);
+
+        if (showLegend) {
+            this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+        }
+    }
+
+    /**
      * Renderizza singolo fotone
      */
     renderPhoton(track) {
@@ -641,11 +754,11 @@ class CanvasRenderer {
         if (!isFinite(radius) || radius <= 0) return;
 
         // Glow esterno: use computed final color with alpha ramp
-        // Scale glow radius with exposure for clearer visual feedback
+        // Ridotto glow radius (da 5.0 → 2.5) per rendere ellissi più definite
         const glowScale = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.28; // modest per-step increase
         const gradient = this.ctx.createRadialGradient(
             drawX, drawY, 0,
-            drawX, drawY, radius * 5.0 * glowScale
+            drawX, drawY, radius * 2.5 * glowScale
         );
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
         gradient.addColorStop(0.2, `rgba(${r}, ${g}, ${b}, ${Math.max(0, alpha * 0.75)})`);
@@ -654,7 +767,7 @@ class CanvasRenderer {
 
         this.ctx.fillStyle = gradient;
         this.ctx.beginPath();
-    this.ctx.arc(drawX, drawY, radius * 5.0 * glowScale, 0, 2 * Math.PI);
+        this.ctx.arc(drawX, drawY, radius * 2.5 * glowScale, 0, 2 * Math.PI);
         this.ctx.fill();
 
         // Core brillante
@@ -942,14 +1055,15 @@ class CanvasRenderer {
     }
 
     /**
-     * Converte intensità in raggio (aumentato per migliore visibilità)
+     * Converte intensità in raggio (ridotto per ellissi più definite)
      */
     intensityToRadius(intensity) {
         if (typeof intensity !== 'number' || !isFinite(intensity)) {
             console.warn('⚠️ Intensity non valida:', intensity);
-            return 8.0; // Valore di default molto più grande
+            return 3.0; // Valore di default ridotto
         }
-        return 5.0 + intensity * 10.0; // Raggi MOLTO più grandi (5-15px)!
+        // Ridotto da 5.0 + intensity * 10.0 → 2.0 + intensity * 5.0 per fotoni più piccoli e ellissi più visibili
+        return 2.0 + intensity * 5.0;
     }
 
     /**
@@ -1498,6 +1612,24 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
                 console.log('🔧 subpixelEnabled set to', enabled);
             });
 
+            // NEW: Ellipse-only checkbox
+            const ellLabel = document.createElement('label');
+            ellLabel.style.color = '#ffffff';
+            ellLabel.style.fontFamily = '"Courier New", monospace';
+            ellLabel.style.fontSize = '13px';
+            ellLabel.style.marginLeft = '12px';
+            ellLabel.textContent = 'Solo Ellisse:';
+
+            const ellCheckbox = document.createElement('input');
+            ellCheckbox.type = 'checkbox';
+            ellCheckbox.checked = (renderers[0] && !!renderers[0].showEllipseOnly);
+            ellCheckbox.style.marginLeft = '6px';
+            ellCheckbox.addEventListener('change', (ev) => {
+                const enabled = !!ev.target.checked;
+                renderers.forEach(r => { r.showEllipseOnly = enabled; try { if (typeof r.reRenderLastEvent === 'function') r.reRenderLastEvent(); } catch(e) {} });
+                console.log('🔧 showEllipseOnly set to', enabled);
+            });
+
             const left = document.createElement('div');
             left.style.display = 'flex';
             left.style.alignItems = 'center';
@@ -1510,6 +1642,8 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
             right.style.alignItems = 'center';
             right.appendChild(spLabel);
             right.appendChild(spCheckbox);
+            right.appendChild(ellLabel);
+            right.appendChild(ellCheckbox);
 
             controlsContainer.appendChild(left);
             controlsContainer.appendChild(right);
