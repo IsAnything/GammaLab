@@ -221,7 +221,7 @@ class EnergyColorPalette {
         ctx.fillStyle = '#dfe9ff';
         ctx.font = '9px "Courier New", monospace';
         ctx.fillText('Core brillante = fotoni ad alta energia', x, y + height + 30);
-        ctx.fillText('Code verdi lunghe ⇒ GRB in raffreddamento', x, y + height + 42);
+        ctx.fillText('Asse verde → Blazar | Code verdi → GRB', x, y + height + 42);
     }
 }
 
@@ -245,6 +245,7 @@ class CanvasRenderer {
         
         this.colorPalette = new EnergyColorPalette();
         this.sourceType = null;
+        this.signatureHint = '';
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
@@ -635,6 +636,7 @@ class CanvasRenderer {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
+        this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
 
         this.clear();
 
@@ -681,6 +683,7 @@ class CanvasRenderer {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
+        this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
 
         this.clear();
         
@@ -872,7 +875,12 @@ class CanvasRenderer {
         }
 
         const overThreshold = Math.max(0, energyTeV - 10);
-        const tintStrength = Math.min(0.5, 0.15 + 0.04 * overThreshold);
+        let tintStrength;
+        if (sourceTag === 'blazar') {
+            tintStrength = Math.min(0.9, 0.25 + 0.08 * overThreshold);
+        } else {
+            tintStrength = Math.min(0.7, 0.18 + 0.05 * overThreshold);
+        }
         if (tintStrength <= 0) {
             return baseRGB;
         }
@@ -882,6 +890,32 @@ class CanvasRenderer {
             : [60, 235, 210];
 
         return this._mixRGBTowards(baseRGB, target, tintStrength);
+    }
+
+    _drawSignatureHint(x, startY, text, maxWidth) {
+        if (!text || !this.ctx) {
+            return startY;
+        }
+
+        const words = text.split(/\s+/);
+        let line = '';
+        let y = startY;
+        const lineHeight = 14;
+        for (let i = 0; i < words.length; i++) {
+            const testLine = line ? `${line} ${words[i]}` : words[i];
+            const metrics = this.ctx.measureText(testLine);
+            if (metrics.width > maxWidth && line) {
+                this.ctx.fillText(line, x, y);
+                line = words[i];
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        if (line) {
+            this.ctx.fillText(line, x, y);
+        }
+        return y;
     }
 
     /**
@@ -1052,6 +1086,17 @@ class CanvasRenderer {
             const rgb = this.colorPalette.getColorRGB(bin.sample);
             this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${this.lightStyle ? 0.75 : 0.9})`;
             this.ctx.fillRect(barX, barY, barWidth, barH);
+
+            const highlightBar = (
+                (this.sourceType === 'blazar' && i === 3) ||
+                (this.sourceType === 'grb' && (i === 2 || i === 3)) ||
+                (this.sourceType === 'crab' && i === 0)
+            );
+            if (highlightBar) {
+                this.ctx.strokeStyle = this.sourceType === 'crab' ? '#ffd966' : '#7cffc9';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(barX - 1, barY - 1, barWidth + 2, barH + 2);
+            }
 
             this.ctx.fillStyle = textColor;
             this.ctx.textAlign = 'center';
@@ -1371,6 +1416,12 @@ class CanvasRenderer {
             this.ctx.fillText(`Exposure: ${exp}`, baseX, lineY);
             lineY += 16;
             this.ctx.fillText(`Sub-pixel: ${sp}`, baseX, lineY);
+            if (this.signatureHint) {
+                lineY += 20;
+                this.ctx.fillStyle = '#9fe8ff';
+                const finalY = this._drawSignatureHint(baseX, lineY, this.signatureHint, Math.max(220, this.canvas.width * 0.3));
+                lineY = finalY + 6;
+            }
         } catch (e) {
             // ignore drawing errors
         }

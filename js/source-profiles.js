@@ -18,6 +18,7 @@ const CRAB_NEBULA_PROFILE = {
     type: 'crab',
     name: 'Crab Nebula',
     displayName: 'Nebulosa del Granchio',
+    signatureHint: 'Core estremamente compatto e brillante senza coda estesa.',
     
     // Parametri Hillas (in gradi, convertiti automaticamente in pixel)
     length: { min: 0.20, max: 0.30 },  // 20-30 pixel
@@ -35,15 +36,18 @@ const CRAB_NEBULA_PROFILE = {
 
     // Firma visiva per la generazione delle tracce
     visualSignature: {
-        dispersionScaleX: 0.16,
-        dispersionScaleY: 0.16,
-        alphaNoiseScale: 0.35,
+        dispersionScaleX: 0.12,
+        dispersionScaleY: 0.12,
+        alphaNoiseScale: 0.3,
         centralCoreBoost: true,
-        intensityVariance: 0.2,
-        energyInitialBoost: 1.0,
-        energyCoreBoost: 0.35,
-        energyRadialFalloff: 1.6,
-        energyNoise: 0.05
+        intensityVariance: 0.12,
+        lengthScale: 0.95,
+        widthScale: 0.85,
+        spineTightening: 0.4,
+        energyInitialBoost: 1.15,
+        energyCoreBoost: 0.65,
+        energyRadialFalloff: 1.25,
+        energyNoise: 0.04
     },
     
     // Parametri energetici
@@ -74,6 +78,7 @@ const PEVATRON_PROFILE = {
     type: 'pevatron',
     name: 'PeVatron SNR',
     displayName: 'Resto di Supernova (PeVatron)',
+    signatureHint: 'Sciame enorme con filamenti multipli e hot-spot tra i gusci.',
     
     length: { min: 0.30, max: 0.50 },  // 30-50 pixel - ESTESO
     width: { min: 0.10, max: 0.20 },   // 10-20 pixel
@@ -132,6 +137,7 @@ const BLAZAR_PROFILE = {
     type: 'blazar',
     name: 'Blazar/AGN',
     displayName: 'Blazar (AGN)',
+    signatureHint: 'Getto stretto ad asse brillante; oltre 10 TeV vira al verde.',
     
     length: { min: 0.10, max: 0.20 },  // 10-20 pixel - COMPATTO
     width: { min: 0.04, max: 0.07 },   // 4-7 pixel - MOLTO stretto
@@ -146,22 +152,22 @@ const BLAZAR_PROFILE = {
     asymmetry: { mean: 0.08, std: 0.05 },
 
     visualSignature: {
-        dispersionScaleX: 0.12,
-        dispersionScaleY: 0.12,
-        widthScale: 0.7,
-        alphaNoiseScale: 0.25,
-        spineTightening: 0.45,
+        dispersionScaleX: 0.1,
+        dispersionScaleY: 0.1,
+        widthScale: 0.55,
+        alphaNoiseScale: 0.22,
+        spineTightening: 0.3,
         centralCoreBoost: true,
-        hotspotCount: 2,
-        hotspotSpread: 0.25,
-        hotspotFill: 0.3,
-        hotspotBoost: 1.1,
-        intensityVariance: 0.25,
-        energyInitialBoost: 1.25,
-        energyCoreBoost: 0.55,
-        energySpineBoost: 0.6,
-        energyRadialFalloff: 1.4,
-        energyNoise: 0.08
+        hotspotCount: 3,
+        hotspotSpread: 0.22,
+        hotspotFill: 0.42,
+        hotspotBoost: 1.35,
+        intensityVariance: 0.2,
+        energyInitialBoost: 1.35,
+        energyCoreBoost: 0.65,
+        energySpineBoost: 1.1,
+        energyRadialFalloff: 1.25,
+        energyNoise: 0.1
     },
     
     energyRange: {
@@ -190,6 +196,7 @@ const GRB_PROFILE = {
     type: 'grb',
     name: 'Gamma-Ray Burst',
     displayName: 'Lampo Gamma (GRB)',
+    signatureHint: 'Coda ampia che si raffredda: sfumatura verso il verde lungo la scia.',
     
     length: { min: 0.10, max: 0.20 },  // 10-20 pixel
     width: { min: 0.05, max: 0.10 },   // 5-10 pixel
@@ -204,23 +211,23 @@ const GRB_PROFILE = {
     asymmetry: { mean: 0.12, std: 0.06 },
 
     visualSignature: {
-        dispersionScaleX: 0.22,
-        dispersionScaleY: 0.22,
-        lengthScale: 1.08,
-        widthScale: 0.95,
-        alphaNoiseScale: 0.55,
-        tailStrength: 0.45,
-        tailDecay: 0.65,
-        hotspotCount: 1,
-        hotspotSpread: 0.35,
-        hotspotFill: 0.25,
-        hotspotBoost: 0.9,
-        intensityVariance: 0.45,
-        energyInitialBoost: 1.35,
-        energyTailDrop: 0.75,
-        energyCoreBoost: 0.25,
-        energyRadialFalloff: 2.2,
-        energyNoise: 0.12
+        dispersionScaleX: 0.26,
+        dispersionScaleY: 0.24,
+        lengthScale: 1.22,
+        widthScale: 0.9,
+        alphaNoiseScale: 0.6,
+        tailStrength: 0.72,
+        tailDecay: 0.78,
+        hotspotCount: 2,
+        hotspotSpread: 0.48,
+        hotspotFill: 0.32,
+        hotspotBoost: 0.95,
+        intensityVariance: 0.5,
+        energyInitialBoost: 1.45,
+        energyTailDrop: 0.92,
+        energyCoreBoost: 0.3,
+        energyRadialFalloff: 2.6,
+        energyNoise: 0.14
     },
     
     energyRange: {

@@ -82,7 +82,8 @@ class SimulationEngine {
             tracks: tracks,
             canvasWidth: canvasW,
             canvasHeight: canvasH,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            signatureHint: params.signatureHint || ''
         };
         
         this.currentEvent = event;
@@ -106,12 +107,14 @@ class SimulationEngine {
         
         // Parametri tipici adronici (molto diversi dai gamma)
         let hadronSignature = null;
+        let hadronHint = '';
         try {
             if (typeof getSourceProfile === 'function') {
                 const profile = getSourceProfile('hadron');
                 if (profile && profile.visualSignature) {
                     hadronSignature = { ...profile.visualSignature };
                 }
+                hadronHint = profile && profile.signatureHint ? profile.signatureHint : '';
             }
         } catch (e) {
             hadronSignature = null;
@@ -125,7 +128,8 @@ class SimulationEngine {
             elongation: this._randomInRange(0.15, 0.35),  // Meno allungato
             asymmetry: { mean: 0.25, std: 0.15 },     // Più asimmetrico
             sourceType: 'hadron',
-            visualSignature: hadronSignature
+            visualSignature: hadronSignature,
+            signatureHint: hadronHint
         };
         
         // Angolo zenitale random
@@ -146,7 +150,8 @@ class SimulationEngine {
             tracks: tracks,
             canvasWidth: canvasW,
             canvasHeight: canvasH,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            signatureHint: params.signatureHint || ''
         };
         
         this.currentEvent = event;
@@ -177,7 +182,8 @@ class SimulationEngine {
             elongation: 0.95,                         // Quasi perfettamente lineare
             asymmetry: { mean: 0.05, std: 0.02 },     // Molto simmetrico
             sourceType: 'muon',
-            visualSignature: null
+            visualSignature: null,
+            signatureHint: 'Traccia muonica quasi perfettamente lineare.'
         };
         
         // Genera tracce muoniche
@@ -192,7 +198,8 @@ class SimulationEngine {
             tracks: tracks,
             canvasWidth: canvasW,
             canvasHeight: canvasH,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            signatureHint: params.signatureHint || ''
         };
         
         this.currentEvent = event;
@@ -231,7 +238,8 @@ class SimulationEngine {
             elongation: profile.elongation || 0.3,
             asymmetry: profile.asymmetry || { mean: 0.1, std: 0.05 },
             sourceType: profile.type,
-            visualSignature: profile.visualSignature ? { ...profile.visualSignature } : null
+            visualSignature: profile.visualSignature ? { ...profile.visualSignature } : null,
+            signatureHint: profile.signatureHint || ''
         };
     }
 
@@ -250,7 +258,8 @@ class SimulationEngine {
             elongation: params.elongation,
             asymmetry: params.asymmetry,
             sourceType: params.sourceType,
-            visualSignature: params.visualSignature ? { ...params.visualSignature } : null
+            visualSignature: params.visualSignature ? { ...params.visualSignature } : null,
+            signatureHint: params.signatureHint || ''
         };
     }
 
@@ -706,7 +715,8 @@ class SimulationEngine {
                 x: x,
                 y: y,
                 energy: photonEnergy,
-                intensity: intensity
+                intensity: intensity,
+                sourceType: params.sourceType || 'hadron'
             });
         }
         
@@ -809,7 +819,8 @@ class SimulationEngine {
                 x: x,
                 y: y,
                 energy: photonEnergy,
-                intensity: intensity
+                intensity: intensity,
+                sourceType: params.sourceType || 'muon'
             });
         }
         
