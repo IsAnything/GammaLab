@@ -283,8 +283,10 @@ class CanvasRenderer {
             }
 
             const rect = listenTarget.getBoundingClientRect();
-            const x = ev.clientX - rect.left;
-            const y = ev.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            const x = (ev.clientX - rect.left) * scaleX;
+            const y = (ev.clientY - rect.top) * scaleY;
 
             this.mouseX = x;
             this.mouseY = y;
@@ -302,6 +304,8 @@ class CanvasRenderer {
             }
             if (this.isHovering) {
                 this.isHovering = false;
+                this.mouseX = -1;
+                this.mouseY = -1;
                 this._redrawHillasOverlay();
             }
         });
