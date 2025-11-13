@@ -93,33 +93,32 @@ window.addExposureControls = function(renderers, generateBtn) {
             console.log('🔧 showEllipseOnly set to', enabled);
         });
 
-        // NEW: Hillas on hover checkbox
+        // NEW: Hillas always visible checkbox (inverted logic for better UX)
         const hoverLabel = document.createElement('label');
         hoverLabel.style.color = '#ffffff';
         hoverLabel.style.fontFamily = '"Courier New", monospace';
         hoverLabel.style.fontSize = '13px';
         hoverLabel.style.marginLeft = '12px';
-        hoverLabel.textContent = 'Hillas su Hover:';
+        hoverLabel.textContent = 'Hillas Sempre:';
 
         const hoverCheckbox = document.createElement('input');
         hoverCheckbox.type = 'checkbox';
-        hoverCheckbox.checked = (renderers[0] && !!renderers[0].showHillasOnHover);
+        hoverCheckbox.checked = (renderers[0] && !renderers[0].showHillasOnHover); // Inverted!
         hoverCheckbox.style.marginLeft = '6px';
         hoverCheckbox.addEventListener('change', (ev) => {
-            const enabled = !!ev.target.checked;
+            const alwaysShow = !!ev.target.checked;
             renderers.forEach(r => { 
-                r.showHillasOnHover = enabled; 
-                if (!enabled) {
-                    // If disabling hover mode, force show ellipse immediately
+                r.showHillasOnHover = !alwaysShow; // Inverted logic
+                if (alwaysShow) {
+                    // If always show, force render ellipse
                     r.isHovering = true;
                     try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                 } else {
-                    // If enabling hover mode, hide ellipse until hover
+                    // If hover-only mode, hide ellipse until hover
                     r.isHovering = false;
                     try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                 }
             });
-            console.log('🔧 showHillasOnHover set to', enabled);
         });
 
         const left = document.createElement('div');

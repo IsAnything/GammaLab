@@ -285,11 +285,6 @@ class CanvasRenderer {
                 const wasHovering = this.isHovering;
                 this.isHovering = this._isMouseOverTrace(this.mouseX, this.mouseY, this.currentHillasParams);
                 
-                // Debug log
-                if (wasHovering !== this.isHovering) {
-                    console.log('🖱️ Hover state changed:', this.isHovering, 'at', this.mouseX, this.mouseY);
-                }
-                
                 // Re-render if hover state changed
                 if (wasHovering !== this.isHovering) {
                     this._redrawHillasOverlay();
@@ -301,7 +296,6 @@ class CanvasRenderer {
             if (this.isHovering) {
                 this.isHovering = false;
                 this._redrawHillasOverlay();
-                console.log('🖱️ Mouse left, hiding ellipse');
             }
             this.mouseX = -1;
             this.mouseY = -1;
@@ -312,10 +306,7 @@ class CanvasRenderer {
      * Check if mouse is over the trace (within ellipse bounds + buffer)
      */
     _isMouseOverTrace(mx, my, hillas) {
-        if (!hillas || !hillas.valid) {
-            console.log('🖱️ No valid hillas params');
-            return false;
-        }
+        if (!hillas || !hillas.valid) return false;
         
         const cx = hillas.cogX;
         const cy = hillas.cogY;
@@ -333,27 +324,14 @@ class CanvasRenderer {
         
         // Check if inside ellipse
         const normalized = (rotX * rotX) / (a * a) + (rotY * rotY) / (b * b);
-        const isInside = normalized <= 1.0;
-        
-        // Debug log occasionally
-        if (Math.random() < 0.05) {
-            console.log('🖱️ Mouse at', mx.toFixed(0), my.toFixed(0), 
-                       'CoG:', cx.toFixed(0), cy.toFixed(0), 
-                       'normalized:', normalized.toFixed(2), 
-                       'inside:', isInside);
-        }
-        
-        return isInside;
+        return normalized <= 1.0;
     }
     
     /**
      * Redraw only the Hillas overlay (if overlay canvas exists)
      */
     _redrawHillasOverlay() {
-        if (!this.overlay || !this.overlayCtx || !this.currentHillasParams) {
-            console.log('🖱️ Cannot redraw: overlay=', !!this.overlay, 'ctx=', !!this.overlayCtx, 'params=', !!this.currentHillasParams);
-            return;
-        }
+        if (!this.overlay || !this.overlayCtx || !this.currentHillasParams) return;
         
         // Clear overlay
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
@@ -361,14 +339,10 @@ class CanvasRenderer {
         // Draw Hillas only if hovering (when showHillasOnHover is true)
         if (this.showHillasOnHover) {
             if (this.isHovering) {
-                console.log('✅ Drawing ellipse on hover');
                 this.renderHillasOverlay(this.currentHillasParams);
-            } else {
-                console.log('⏸️ Hiding ellipse (not hovering)');
             }
         } else {
             // Always show if showHillasOnHover is false
-            console.log('✅ Drawing ellipse (hover mode disabled)');
             this.renderHillasOverlay(this.currentHillasParams);
         }
     }
@@ -1756,33 +1730,32 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
                 console.log('🔧 showEllipseOnly set to', enabled);
             });
 
-            // NEW: Hillas on hover checkbox
+            // NEW: Hillas always visible checkbox (inverted logic for better UX)
             const hoverLabel = document.createElement('label');
             hoverLabel.style.color = '#ffffff';
             hoverLabel.style.fontFamily = '"Courier New", monospace';
             hoverLabel.style.fontSize = '13px';
             hoverLabel.style.marginLeft = '12px';
-            hoverLabel.textContent = 'Hillas su Hover:';
+            hoverLabel.textContent = 'Hillas Sempre:';
 
             const hoverCheckbox = document.createElement('input');
             hoverCheckbox.type = 'checkbox';
-            hoverCheckbox.checked = (renderers[0] && !!renderers[0].showHillasOnHover);
+            hoverCheckbox.checked = (renderers[0] && !renderers[0].showHillasOnHover); // Inverted!
             hoverCheckbox.style.marginLeft = '6px';
             hoverCheckbox.addEventListener('change', (ev) => {
-                const enabled = !!ev.target.checked;
+                const alwaysShow = !!ev.target.checked;
                 renderers.forEach(r => { 
-                    r.showHillasOnHover = enabled; 
-                    if (!enabled) {
-                        // If disabling hover mode, force show ellipse immediately
+                    r.showHillasOnHover = !alwaysShow; // Inverted logic
+                    if (alwaysShow) {
+                        // If always show, force render ellipse
                         r.isHovering = true;
                         try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                     } else {
-                        // If enabling hover mode, hide ellipse until hover
+                        // If hover-only mode, hide ellipse until hover
                         r.isHovering = false;
                         try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                     }
                 });
-                console.log('🔧 showHillasOnHover set to', enabled);
             });
 
             const left = document.createElement('div');
