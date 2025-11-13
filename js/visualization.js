@@ -275,37 +275,72 @@ class CanvasRenderer {
     _setupMouseListeners() {
         if (!this.canvas) return;
 
-        // Hover: mostra/nascondi ellisse Hillas
-        this.canvas.addEventListener('mousemove', (ev) => {
-            if (!this.showHillasOnHover) return;
+        const listenTarget = this.canvas;
 
-            const rect = this.canvas.getBoundingClientRect();
+        listenTarget.addEventListener('mousemove', (ev) => {
+            if (!this.showHillasOnHover || !this.currentHillasParams) {
+                return;
+            }
+
+            const rect = listenTarget.getBoundingClientRect();
             const x = ev.clientX - rect.left;
             const y = ev.clientY - rect.top;
 
             this.mouseX = x;
             this.mouseY = y;
 
-            // Trova Hillas sotto il cursore (se presente)
-            const hillasParams = this._findHillasAtPosition(x, y);
-            this.isHovering = !!hillasParams;
-
-            if (hillasParams) {
-                this.currentHillasParams = hillasParams;
-                // Rendi solo l'ellisse Hillas in modalità didattica
-                this.renderEvent({ tracks: [] }, false); // Pulisci fotoni
-                this.renderEllipseOnlyMode({ hillas: hillasParams }, false);
-            } else {
-                this.reRenderLastEvent(false); // Ripristina ultimo evento
+            const hovering = this._isPointInsideHillas(x, y, this.currentHillasParams);
+            if (hovering !== this.isHovering) {
+                this.isHovering = hovering;
+                this._redrawHillasOverlay();
             }
         });
 
-        // Nascondi ellisse Hillas quando il mouse esce
-        this.canvas.addEventListener('mouseout', () => {
-            this.isHovering = false;
-            this.currentHillasParams = null;
-            this.reRenderLastEvent(false);
+        listenTarget.addEventListener('mouseleave', () => {
+            if (!this.showHillasOnHover) {
+                return;
+            }
+            if (this.isHovering) {
+                this.isHovering = false;
+                this._redrawHillasOverlay();
+            }
         });
+    }
+
+    _isPointInsideHillas(x, y, hillas) {
+        if (!hillas || !hillas.valid) return false;
+
+        const a = Math.max(hillas.lengthPx || 0, 1);
+        const b = Math.max(hillas.widthPx || 0, 1);
+        const theta = (hillas.theta || 0) * Math.PI / 180;
+
+        const dx = x - hillas.cogX;
+        const dy = y - hillas.cogY;
+
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+
+        const xr = dx * cosT + dy * sinT;
+        const yr = -dx * sinT + dy * cosT;
+
+        const normalized = (xr * xr) / (a * a) + (yr * yr) / (b * b);
+        return normalized <= 1.15; // leggero margine per facilitare l'hover
+    }
+
+    _redrawHillasOverlay() {
+        if (!this.overlayCtx || !this.overlay) return;
+
+        this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+
+        if (!this.currentHillasParams || !this.currentHillasParams.valid) {
+            return;
+        }
+
+        if (this.showHillasOnHover && !this.isHovering) {
+            return;
+        }
+
+        this._drawHillasOverlay(this.currentHillasParams);
     }
 
     /**
@@ -869,53 +904,52 @@ class CanvasRenderer {
      */
     renderPhotonHexagonal(track) {
         const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
-        
+
         // Parametri source-specific (default: Crab Nebula)
         let longMultiplier = 10;
         let shortMultiplier = 2.0;
         let maxPixels = 22;
         let densityMin = 0.7;
         let densityMax = 1.0;
-        
-        // Personalizza in base al tipo di sorgente
-        switch(this.sourceType) {
-            case 'pevatron': // SNR - tracce MOLTO ESTESE, SATURATE
+
+        switch (this.sourceType) {
+            case 'pevatron':
                 longMultiplier = 25;
                 shortMultiplier = 5.0;
                 maxPixels = 60;
                 densityMin = 0.8;
                 densityMax = 1.5;
                 break;
-            case 'blazar': // Tracce MOLTO COMPATTE, SOTTILI
+            case 'blazar':
                 longMultiplier = 6;
                 shortMultiplier = 0.8;
                 maxPixels = 15;
                 densityMin = 0.9;
                 densityMax = 1.0;
                 break;
-            case 'grb': // L/W MOLTO BASSO, tracce LARGHE
+            case 'grb':
                 longMultiplier = 8;
                 shortMultiplier = 4.0;
                 maxPixels = 35;
                 densityMin = 0.5;
                 densityMax = 1.4;
                 break;
-            case 'galactic-center': // ALTA DISPERSIONE, molto irregolare
+            case 'galactic-center':
                 longMultiplier = 14;
                 shortMultiplier = 3.5;
                 maxPixels = 45;
                 densityMin = 0.2;
                 densityMax = 1.8;
                 break;
-            default: // Crab Nebula (crab o undefined) - STANDARD
-                // Usa valori di default già impostati
+            default:
                 break;
         }
-        
+
         const pixelRadius = 4;
-        const spreadRadiusLong = this.intensityToRadius(track.intensity) * longMultiplier;
-        const spreadRadiusShort = this.intensityToRadius(track.intensity) * shortMultiplier;
-        
+        const radiusBase = this.intensityToRadius(track.intensity);
+        const spreadRadiusLong = radiusBase * longMultiplier;
+        const spreadRadiusShort = radiusBase * shortMultiplier;
+
         const densityVariation = densityMin + Math.random() * (densityMax - densityMin);
         const numPixels = Math.max(5, Math.floor(intensityFactor * maxPixels * densityVariation));
         const minDistance = pixelRadius * 3;
@@ -924,82 +958,37 @@ class CanvasRenderer {
         const canvasW = this.canvas.width;
         const canvasH = this.canvas.height;
         const margin = pixelRadius * 2;
-        
-        // Angolo casuale per orientamento della traccia ellittica
+
         const trackAngle = Math.random() * Math.PI * 2;
         const cosAngle = Math.cos(trackAngle);
         const sinAngle = Math.sin(trackAngle);
-        
-        // Genera posizioni dei pixel evitando sovrapposizioni (distribuzione ellittica)
-        // Con probabilità decrescente verso l'esterno (forma affusolata)
+
         for (let i = 0; i < numPixels; i++) {
             let attempts = 0;
-            let px, py;
             let validPosition = false;
-            
-            while (!validPosition && attempts < 30) {
-                // Distribuzione ellittica con bias verso il centro (affusolata)
+            let px = track.x;
+            let py = track.y;
+
+            while (!validPosition && attempts < 32) {
                 const t = Math.random() * Math.PI * 2;
-                // Uso Math.pow per concentrare i pixel al centro
-                const radiusFactor = Math.pow(Math.random(), 1.8); // Esponente >1 = più concentrato al centro
-                
-                // Coordinate ellittiche locali
+                const radiusFactor = Math.pow(Math.random(), 1.8);
+
                 const localX = Math.cos(t) * spreadRadiusLong * radiusFactor;
                 const localY = Math.sin(t) * spreadRadiusShort * radiusFactor;
-                
-                // Ruota secondo trackAngle
+
                 const rotX = localX * cosAngle - localY * sinAngle;
                 const rotY = localX * sinAngle + localY * cosAngle;
-                
+
                 px = track.x + rotX;
                 py = track.y + rotY;
-                
-                // Verifica che sia dentro i bordi del canvas
+
                 if (px < margin || px > canvasW - margin || py < margin || py > canvasH - margin) {
                     attempts++;
                     continue;
                 }
-                
-                // Verifica che non sia troppo vicino ad altri pixel
-                validPosition = true;
-                for (let existing of pixels) {
-                    const dx = px - existing.x;
-                    const dy = py - existing.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < minDistance) {
-                        validPosition = false;
-                        break;
-                    }
-                }
-                attempts++;
-            }
-            
-            if (validPosition) {
-                // Intensità diminuisce con la distanza dal centro
-                const dx = px - track.x;
-                const dy = py - track.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                const maxDistance = Math.sqrt(spreadRadiusLong * spreadRadiusLong + spreadRadiusShort * spreadRadiusShort) / 2;
-                const distanceFactor = 1 - (distance / maxDistance);
-                const pixelAlpha = Math.min(0.95, (intensityFactor * 0.5 + 0.5) * Math.pow(distanceFactor, 0.5)); // Aumentata opacità
-                
-                // Colore più vario: mix tra energia del fotone e posizione
-                // Aggiungi variazione casuale per più diversità
-                const energyVariation = Math.random() * 0.3; // ±30% variazione
-                const energyNorm = Math.min(1, Math.max(0, (1 - distanceFactor) + energyVariation));
-                // Apply tone-mapping/exposure to better control dynamic range even in lightStyle
-                const exposureK = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
-                const tone = this.colorPalette.toneMap(energyNorm, exposureK);
-                let colorRGB = this.colorPalette.mapNormalized(energyNorm);
 
-                // Brightness scalar derived from tone and intensity/distance
-                // Include exposureK to make brightness differences more visible
-                const exposureK_local = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
-                const exposureBoost = 1 + (Math.max(0, exposureK_local - 4.0)) * 0.28; // modest boost per step
-                }
-                
                 validPosition = true;
-                for (let existing of pixels) {
+                for (const existing of pixels) {
                     const dx = px - existing.x;
                     const dy = py - existing.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1010,52 +999,101 @@ class CanvasRenderer {
                 }
                 attempts++;
             }
-            
-            if (validPosition) {
-                const pixelAlpha = 0.75 + Math.random() * 0.25; // 0.75-1.0 (più brillanti)
-                let drawX = px;
-                let drawY = py;
-                if (this.subpixelEnabled) {
-                    drawX = px + (Math.random() - 0.5) * 0.6;
-                    drawY = py + (Math.random() - 0.5) * 0.6;
-                }
-                pixels.push({ x: drawX, y: drawY, alpha: pixelAlpha, r: 255, g: 255, b: 255, isWhite: true });
+
+            if (!validPosition) {
+                continue;
             }
+
+            const dx = px - track.x;
+            const dy = py - track.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const maxDistance = Math.max(1, Math.sqrt(spreadRadiusLong * spreadRadiusLong + spreadRadiusShort * spreadRadiusShort) * 0.5);
+            const distanceFactor = 1 - Math.min(1, distance / maxDistance);
+
+            const exposureK = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
+            const exposureBoost = 1 + (Math.max(0, exposureK - 4.0)) * 0.28;
+
+            const energyMin = this.colorPalette?.minEnergy || 1;
+            const energyMax = this.colorPalette?.maxEnergy || (energyMin * 10);
+            let energyNorm = 0.5;
+            try {
+                const clampedEnergy = Math.min(energyMax, Math.max(energyMin, track.energy || energyMin));
+                const logSpan = Math.log10(energyMax / energyMin) || 1;
+                const baseNorm = Math.log10(clampedEnergy / energyMin) / logSpan;
+                const energyVariation = (Math.random() - 0.5) * 0.3;
+                energyNorm = Math.min(1, Math.max(0, baseNorm + energyVariation));
+            } catch (_) {
+                energyNorm = 0.5;
+            }
+
+            const tone = this.colorPalette.toneMap(energyNorm, exposureK);
+            let colorRGB = this.colorPalette.mapNormalized(energyNorm);
+
+            const brightness = Math.max(0.15, tone * exposureBoost * (0.8 + 0.4 * intensityFactor) * (0.6 + 0.4 * distanceFactor));
+            colorRGB = this.colorPalette.applyBrightnessToRGB(colorRGB, brightness);
+
+            const pixelAlpha = Math.min(0.95, (0.55 + 0.45 * intensityFactor) * Math.pow(Math.max(0, distanceFactor), 0.4));
+
+            let drawX = px;
+            let drawY = py;
+            if (this.subpixelEnabled) {
+                drawX += (Math.random() - 0.5) * 0.6;
+                drawY += (Math.random() - 0.5) * 0.6;
+            }
+
+            const isHotspot = distanceFactor > 0.8 && Math.random() < 0.25;
+            const r = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[0]));
+            const g = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[1]));
+            const b = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[2]));
+
+            pixels.push({
+                x: drawX,
+                y: drawY,
+                alpha: Math.min(1, isHotspot ? pixelAlpha + 0.1 : pixelAlpha),
+                r,
+                g,
+                b,
+                isWhite: isHotspot
+            });
         }
 
-        // Disegna i pixel separati con colori diversi
         pixels.forEach(pixel => {
-            // Cerchio pieno colorato o bianco
             this.ctx.fillStyle = `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.alpha})`;
             this.ctx.beginPath();
             this.ctx.arc(pixel.x, pixel.y, pixelRadius, 0, 2 * Math.PI);
             this.ctx.fill();
-            
-            // Bordo scuro per definizione
+
             this.ctx.strokeStyle = `rgba(50, 50, 50, ${pixel.alpha * 0.5})`;
             this.ctx.lineWidth = pixel.isWhite ? 2 : 1.5;
             this.ctx.stroke();
         });
 
-        // Pixel centrale più brillante (giallo/bianco - massima energia)
-    // Central core color uses tone-mapped palette for consistency
-    const centerEnergyNorm = 0; // max energy mapping index in mapNormalized
-    const centerTone = this.colorPalette.toneMap(centerEnergyNorm, this.exposureK || 4.0);
-    const centerColor = this.colorPalette.mapNormalized(centerEnergyNorm);
-    // Boost central core brightness when exposure is high so it's easier to spot
-    const centerBoost = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.35;
-    const centerRGB = this.colorPalette.applyBrightnessToRGB(centerColor, Math.max(0.5, centerTone * (0.9 + 0.6 * intensityFactor) * centerBoost));
+        const centerNorm = (() => {
+            const energyMin = this.colorPalette?.minEnergy || 1;
+            const energyMax = this.colorPalette?.maxEnergy || (energyMin * 10);
+            const clampedEnergy = Math.min(energyMax, Math.max(energyMin, track.energy || energyMin));
+            const logSpan = Math.log10(energyMax / energyMin) || 1;
+            return Math.log10(clampedEnergy / energyMin) / logSpan;
+        })();
 
-    const cr = Math.min(255, Math.round(centerRGB[0] + 32));
-    const cg = Math.min(255, Math.round(centerRGB[1] + 32));
-    const cb = Math.min(255, Math.round(centerRGB[2] + 32));
+        const centerTone = this.colorPalette.toneMap(centerNorm, this.exposureK || 4.0);
+        const baseCenterColor = this.colorPalette.mapNormalized(centerNorm);
+        const centerBoost = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.35;
+        const centerRGB = this.colorPalette.applyBrightnessToRGB(
+            baseCenterColor,
+            Math.max(0.5, centerTone * (0.9 + 0.6 * intensityFactor) * centerBoost)
+        );
 
-    this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.15)})`;
+        const cr = Math.min(255, Math.round(centerRGB[0] + 32));
+        const cg = Math.min(255, Math.round(centerRGB[1] + 32));
+        const cb = Math.min(255, Math.round(centerRGB[2] + 32));
+
+        this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.15)})`;
         this.ctx.beginPath();
         this.ctx.arc(track.x, track.y, pixelRadius * 1.4, 0, 2 * Math.PI);
         this.ctx.fill();
-        
-        this.ctx.strokeStyle = `rgba(50, 50, 50, 0.7)`;
+
+        this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.7)';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
     }
@@ -1140,10 +1178,32 @@ class CanvasRenderer {
      * Renderizza parametri Hillas su overlay
      */
     renderHillasOverlay(hillasParams) {
-        if (!this.overlayCtx || !hillasParams || !hillasParams.valid) return;
+        if (!this.overlayCtx || !this.overlay) return;
+
+        if (hillasParams && hillasParams.valid) {
+            this.currentHillasParams = hillasParams;
+        } else {
+            this.currentHillasParams = null;
+            this.isHovering = false;
+            this._redrawHillasOverlay();
+            return;
+        }
+
+        if (this.showHillasOnHover) {
+            if (this.mouseX >= 0 && this.mouseY >= 0) {
+                this.isHovering = this._isPointInsideHillas(this.mouseX, this.mouseY, this.currentHillasParams);
+            } else {
+                this.isHovering = false;
+            }
+        }
+
+        this._redrawHillasOverlay();
+    }
+
+    _drawHillasOverlay(hillasParams) {
+        if (!this.overlayCtx || !this.overlay || !hillasParams || !hillasParams.valid) return;
 
         const ctx = this.overlayCtx;
-        ctx.clearRect(0, 0, this.overlay.width, this.overlay.height);
 
         const centerX = hillasParams.cogX;
         const centerY = hillasParams.cogY;
@@ -1151,40 +1211,31 @@ class CanvasRenderer {
 
         console.log(`🎨 Rendering Hillas: CoG(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), Canvas: ${this.overlay.width}×${this.overlay.height}`);
 
-        // Ellisse Hillas - bordeaux scuro per light style, verde per dark style
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);
 
-        // By default use the computed semi-axes
         let displayLengthPx = hillasParams.lengthPx;
         let displayWidthPx = hillasParams.widthPx;
 
-        // For lightStyle the renderer previously enlarged the minor axis for visibility.
-        // If respectExactHillas is true we override that behaviour and use the exact values
-        // computed by the Hillas analyzer to ensure geometric adherence.
         if (!this.respectExactHillas) {
             if (this.lightStyle) {
-                displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);  // Min 20% della lunghezza
+                displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);
             }
         }
 
-        // Colore più scuro e contrastante per light style
-        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';  // Bordeaux scuro per light style
-        ctx.lineWidth = 4; // Aumentato ulteriormente per massima visibilità
+        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, 2 * Math.PI);
         ctx.stroke();
 
-        // Assi
-        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';  // Stesso bordeaux scuro
-        ctx.lineWidth = 2.5; // Aumentato per maggiore visibilità
-        // Asse maggiore
+        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.moveTo(-displayLengthPx, 0);
         ctx.lineTo(displayLengthPx, 0);
         ctx.stroke();
-        // Asse minore
         ctx.beginPath();
         ctx.moveTo(0, -displayWidthPx);
         ctx.lineTo(0, displayWidthPx);
@@ -1192,16 +1243,14 @@ class CanvasRenderer {
 
         ctx.restore();
 
-        // Centro di gravità - più grande e contrastante
-        ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';  // Bordeaux scuro
+        ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);  // Aumentato da 6 a 8
+        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#ffffff';  // Bordo bianco sempre
-        ctx.lineWidth = 3;  // Aumentato da 2
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
         ctx.stroke();
 
-        // Linea Alpha (CoG → Centro camera)
         const cameraCenterX = this.overlay.width / 2;
         const cameraCenterY = this.overlay.height / 2;
         ctx.strokeStyle = this.lightStyle ? '#0066cc' : '#4488ff';
@@ -1213,7 +1262,6 @@ class CanvasRenderer {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Label Alpha
         const midX = (centerX + cameraCenterX) / 2;
         const midY = (centerY + cameraCenterY) / 2;
         ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
@@ -1222,7 +1270,7 @@ class CanvasRenderer {
         ctx.lineWidth = 3;
         ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
         ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
-        // Diagnostic: draw camera center marker and log offset when exact-hillas mode is enabled
+
         try {
             const dx = centerX - cameraCenterX;
             const dy = centerY - cameraCenterY;
@@ -1231,22 +1279,18 @@ class CanvasRenderer {
                 console.log(`🔎 HillasOverlay: CoG(${centerX.toFixed(1)},${centerY.toFixed(1)}), CameraCenter(${cameraCenterX.toFixed(1)},${cameraCenterY.toFixed(1)}), Δ=(${dx.toFixed(1)},${dy.toFixed(1)}) px, r=${dist.toFixed(1)} px, canvas=${this.overlay.width}x${this.overlay.height}`);
             }
 
-            // Draw a prominent marker at camera center for visual inspection
             ctx.save();
-            // Filled circle for high contrast
             ctx.fillStyle = '#ffff66';
             ctx.beginPath();
             ctx.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Outer ring
             ctx.strokeStyle = '#222200';
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
             ctx.stroke();
 
-            // Large cross for visibility
             ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
             ctx.lineWidth = 3;
             const s = 18;
@@ -1257,11 +1301,10 @@ class CanvasRenderer {
             ctx.lineTo(cameraCenterX, cameraCenterY + s);
             ctx.stroke();
             ctx.restore();
-            // --- Also draw camera center and CoG marker on the main canvas for visual comparison ---
+
             try {
                 if (this.ctx) {
                     const main = this.ctx;
-                    // small translucent marker at camera center on main canvas
                     main.save();
                     main.strokeStyle = 'rgba(255, 255, 102, 0.9)';
                     main.fillStyle = 'rgba(255, 255, 102, 0.25)';
@@ -1271,7 +1314,6 @@ class CanvasRenderer {
                     main.fill();
                     main.stroke();
 
-                    // cross
                     main.beginPath();
                     main.moveTo(cameraCenterX - 12, cameraCenterY);
                     main.lineTo(cameraCenterX + 12, cameraCenterY);
@@ -1279,7 +1321,6 @@ class CanvasRenderer {
                     main.lineTo(cameraCenterX, cameraCenterY + 12);
                     main.stroke();
 
-                    // Draw CoG position on main canvas (magenta)
                     main.fillStyle = 'rgba(204, 0, 102, 0.95)';
                     main.strokeStyle = 'rgba(255,255,255,0.9)';
                     main.lineWidth = 2;
@@ -1289,12 +1330,11 @@ class CanvasRenderer {
                     main.stroke();
                     main.restore();
                 }
-            } catch (e) {
-                // ignore
+            } catch (innerErr) {
+                console.warn('Errore disegno CoG main canvas:', innerErr);
             }
-// === FUNZIONI UTILITY ===
-        } catch (e) {
-            console.warn('Errore diagnostico HillasOverlay:', e);
+        } catch (diagErr) {
+            console.warn('Errore diagnostico HillasOverlay:', diagErr);
         }
     }
 
