@@ -275,6 +275,8 @@ class CanvasRenderer {
         // Listen to both canvas and overlay for mouse events
         const listenCanvas = this.overlay || this.canvas;
         
+        console.log('🖱️ Mouse listeners attached to canvas:', listenCanvas.id);
+        
         listenCanvas.addEventListener('mousemove', (e) => {
             const rect = listenCanvas.getBoundingClientRect();
             this.mouseX = e.clientX - rect.left;
@@ -287,6 +289,7 @@ class CanvasRenderer {
                 
                 // Re-render if hover state changed
                 if (wasHovering !== this.isHovering) {
+                    console.log('🎯 Hover changed:', this.isHovering ? 'IN' : 'OUT');
                     this._redrawHillasOverlay();
                 }
             }
