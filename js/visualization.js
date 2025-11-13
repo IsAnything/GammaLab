@@ -795,16 +795,31 @@ class CanvasRenderer {
                 // Aggiungi variazione casuale per più diversità
                 const energyVariation = Math.random() * 0.3; // ±30% variazione
                 const energyNorm = Math.min(1, Math.max(0, (1 - distanceFactor) + energyVariation));
-                const colorRGB = this.colorPalette.mapNormalized(energyNorm);
+                // Apply tone-mapping/exposure to better control dynamic range even in lightStyle
+                const exposureK = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
+                const tone = this.colorPalette.toneMap(energyNorm, exposureK);
+                let colorRGB = this.colorPalette.mapNormalized(energyNorm);
+
+                // Brightness scalar derived from tone and intensity/distance
+                const brightScalar = Math.max(0.06, tone * (0.6 + 0.6 * intensityFactor) * Math.pow(distanceFactor, 0.4));
+                const toned = this.colorPalette.applyBrightnessToRGB(colorRGB, brightScalar);
+
+                // Small saturation/darken tweak (keeps hue while increasing contrast)
+                const darkenFactor = 0.85;
+                const saturationBoost = 1.4;
+                const r = Math.min(255, Math.max(0, Math.round(toned[0] * saturationBoost * darkenFactor)));
+                const g = Math.min(255, Math.max(0, Math.round(toned[1] * saturationBoost * darkenFactor)));
+                const b = Math.min(255, Math.max(0, Math.round(toned[2] * saturationBoost * darkenFactor)));
                 
-                // Colori più scuri e saturi
-                const darkenFactor = 0.7; // Più scuro (era 1.0 implicito)
-                const saturationBoost = 1.8; // Più saturato (era 1.6)
-                const r = Math.min(255, Math.max(0, Math.round(colorRGB[0] * saturationBoost * darkenFactor)));
-                const g = Math.min(255, Math.max(0, Math.round(colorRGB[1] * saturationBoost * darkenFactor)));
-                const b = Math.min(255, Math.max(0, Math.round(colorRGB[2] * saturationBoost * darkenFactor)));
-                
-                pixels.push({ x: px, y: py, alpha: pixelAlpha, r, g, b, isWhite: false });
+                // Apply optional sub-pixel jitter for more natural placement
+                let drawX = px;
+                let drawY = py;
+                if (this.subpixelEnabled) {
+                    drawX = px + (Math.random() - 0.5) * 0.6; // sub-pixel jitter ±0.3px
+                    drawY = py + (Math.random() - 0.5) * 0.6;
+                }
+
+                pixels.push({ x: drawX, y: drawY, alpha: pixelAlpha, r, g, b, isWhite: false });
             }
         }
 
@@ -849,7 +864,13 @@ class CanvasRenderer {
             
             if (validPosition) {
                 const pixelAlpha = 0.75 + Math.random() * 0.25; // 0.75-1.0 (più brillanti)
-                pixels.push({ x: px, y: py, alpha: pixelAlpha, r: 255, g: 255, b: 255, isWhite: true });
+                let drawX = px;
+                let drawY = py;
+                if (this.subpixelEnabled) {
+                    drawX = px + (Math.random() - 0.5) * 0.6;
+                    drawY = py + (Math.random() - 0.5) * 0.6;
+                }
+                pixels.push({ x: drawX, y: drawY, alpha: pixelAlpha, r: 255, g: 255, b: 255, isWhite: true });
             }
         }
 
@@ -868,13 +889,17 @@ class CanvasRenderer {
         });
 
         // Pixel centrale più brillante (giallo/bianco - massima energia)
-        const centerColor = this.colorPalette.mapNormalized(0); // Massima energia
-        const saturationBoost = 1.7;
-        const cr = Math.min(255, Math.round(centerColor[0] * saturationBoost + 50));
-        const cg = Math.min(255, Math.round(centerColor[1] * saturationBoost + 50));
-        const cb = Math.min(255, Math.round(centerColor[2] * saturationBoost + 50));
-        
-        this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.1)})`;
+    // Central core color uses tone-mapped palette for consistency
+    const centerEnergyNorm = 0; // max energy mapping index in mapNormalized
+    const centerTone = this.colorPalette.toneMap(centerEnergyNorm, this.exposureK || 4.0);
+    const centerColor = this.colorPalette.mapNormalized(centerEnergyNorm);
+    const centerRGB = this.colorPalette.applyBrightnessToRGB(centerColor, Math.max(0.6, centerTone * (0.9 + 0.6 * intensityFactor)));
+
+    const cr = Math.min(255, Math.round(centerRGB[0] + 40));
+    const cg = Math.min(255, Math.round(centerRGB[1] + 40));
+    const cb = Math.min(255, Math.round(centerRGB[2] + 40));
+
+    this.ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${Math.min(1, intensityFactor * 1.1)})`;
         this.ctx.beginPath();
         this.ctx.arc(track.x, track.y, pixelRadius * 1.4, 0, 2 * Math.PI);
         this.ctx.fill();
