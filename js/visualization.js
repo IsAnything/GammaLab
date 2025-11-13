@@ -256,7 +256,7 @@ class CanvasRenderer {
         this.showEllipseOnly = false;
         
         // NEW: Mouse hover detection for showing Hillas ellipse on hover
-        this.showHillasOnHover = false; // default: show ellipse always (disable hover mode)
+        this.showHillasOnHover = true; // default: show ellipse only on hover
         this.isHovering = false;
         this.mouseX = -1;
         this.mouseY = -1;
