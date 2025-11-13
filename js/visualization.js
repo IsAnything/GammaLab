@@ -314,9 +314,10 @@ class CanvasRenderer {
     _traceHexPath(ctx, width, height, radius) {
         const centerX = width / 2;
         const centerY = height / 2;
+        const startAngle = -Math.PI / 3; // flat-top orientation (horizontal upper edge)
 
         for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i - Math.PI / 2;
+            const angle = startAngle + i * (Math.PI / 3);
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
             if (i === 0) {
