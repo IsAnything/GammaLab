@@ -334,7 +334,13 @@ class SimulationEngine {
             hotspotFill: 0.0,
             hotspotBoost: 0.8,
             intensityVariance: 0.4,
-            offAxisShear: 0
+            offAxisShear: 0,
+            energyInitialBoost: 1.0,
+            energyTailDrop: 0,
+            energyCoreBoost: 0,
+            energySpineBoost: 0,
+            energyRadialFalloff: 2.0,
+            energyNoise: 0.0
         };
 
         switch (sourceType) {
@@ -344,6 +350,10 @@ class SimulationEngine {
                 profileConfig.alphaNoiseScale = 0.35;
                 profileConfig.centralCoreBoost = true;
                 profileConfig.intensityVariance = 0.2;
+                profileConfig.energyInitialBoost = 1.0;
+                profileConfig.energyCoreBoost = 0.35;
+                profileConfig.energyRadialFalloff = 1.6;
+                profileConfig.energyNoise = 0.05;
                 break;
             case 'blazar':
                 profileConfig.dispersionScaleX = 0.12;
@@ -357,6 +367,11 @@ class SimulationEngine {
                 profileConfig.hotspotFill = 0.3;
                 profileConfig.hotspotBoost = 1.1;
                 profileConfig.intensityVariance = 0.25;
+                profileConfig.energyInitialBoost = 1.25;
+                profileConfig.energyCoreBoost = 0.55;
+                profileConfig.energySpineBoost = 0.6;
+                profileConfig.energyRadialFalloff = 1.4;
+                profileConfig.energyNoise = 0.08;
                 break;
             case 'pevatron':
                 profileConfig.dispersionScaleX = 0.48;
@@ -373,6 +388,9 @@ class SimulationEngine {
                 profileConfig.hotspotBoost = 1.35;
                 profileConfig.intensityVariance = 0.9;
                 profileConfig.offAxisShear = 0.25;
+                profileConfig.energyInitialBoost = 1.4;
+                profileConfig.energyCoreBoost = 0.4;
+                profileConfig.energyNoise = 0.2;
                 break;
             case 'grb':
                 profileConfig.dispersionScaleX = 0.22;
@@ -387,6 +405,11 @@ class SimulationEngine {
                 profileConfig.hotspotFill = 0.25;
                 profileConfig.hotspotBoost = 0.9;
                 profileConfig.intensityVariance = 0.45;
+                profileConfig.energyInitialBoost = 1.35;
+                profileConfig.energyTailDrop = 0.75;
+                profileConfig.energyCoreBoost = 0.25;
+                profileConfig.energyRadialFalloff = 2.2;
+                profileConfig.energyNoise = 0.12;
                 break;
             case 'galactic-center':
                 profileConfig.dispersionScaleX = 0.4;
@@ -402,6 +425,10 @@ class SimulationEngine {
                 profileConfig.hotspotBoost = 0.85;
                 profileConfig.intensityVariance = 1.0;
                 profileConfig.offAxisShear = 0.4;
+                profileConfig.energyInitialBoost = 1.2;
+                profileConfig.energyCoreBoost = 0.3;
+                profileConfig.energyTailDrop = 0.35;
+                profileConfig.energyNoise = 0.18;
                 break;
             default:
                 break;
@@ -575,7 +602,37 @@ class SimulationEngine {
                 continue;
             }
 
-            const photonEnergy = this._samplePhotonEnergy(energy);
+            let energyScale = profileConfig.energyInitialBoost || 1.0;
+
+            if (profileConfig.energyTailDrop > 0) {
+                const tailFactor = Math.max(0.2, 1 - profileConfig.energyTailDrop * progress);
+                energyScale *= tailFactor;
+            }
+
+            if (profileConfig.energyCoreBoost > 0) {
+                const radial = Math.hypot(x - centerX, y - centerY);
+                const coreRadius = Math.max(widthPx * 1.1, lengthPx * 0.18);
+                const radialFactor = Math.max(0, 1 - radial / (coreRadius * profileConfig.energyRadialFalloff));
+                energyScale *= 1 + profileConfig.energyCoreBoost * radialFactor;
+            }
+
+            if (profileConfig.energySpineBoost > 0) {
+                const axisRatio = Math.min(1, Math.abs(rotY) / Math.max(1, Math.abs(rotX)));
+                const spineFactor = 1 - axisRatio; // vicino all'asse maggiore → valore alto
+                energyScale *= 1 + profileConfig.energySpineBoost * spineFactor;
+            }
+
+            if (profileConfig.energyNoise > 0) {
+                energyScale *= 1 + this._randomGaussian(0, profileConfig.energyNoise);
+            }
+
+            energyScale = Math.max(0.25, Math.min(4.0, energyScale));
+
+            const photonEnergy = Math.max(
+                PHOTON_ENERGY_MIN,
+                Math.min(PHOTON_ENERGY_MAX, this._samplePhotonEnergy(energy) * energyScale)
+            );
+
             let intensity = this._energyToIntensity(photonEnergy);
 
             if (profileConfig.intensityVariance) {
@@ -604,7 +661,7 @@ class SimulationEngine {
                 x,
                 y,
                 energy: photonEnergy,
-                intensity: intensity
+                intensity: intensity * Math.pow(energyScale, 0.35)
             });
         }
 
