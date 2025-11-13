@@ -378,9 +378,10 @@ class SimulationEngine {
             }
             
             // Scala con Length/Width - tracce ESTREMAMENTE allungate (gamma-like)
-            // Tuned multipliers: reduce dx and increase dy to better match documented Hillas L/W
-            let dx = gx * lengthPx * 1.8;  // reduced from 2.5 -> 1.8
-            let dy = gy * widthPx * 0.8;   // increased from 0.3 -> 0.8
+            // Tuned multipliers (from diagnostics): adjust dx/dy to match target Length/Width
+            // Diagnostics suggested new multipliers based on measured means.
+            let dx = gx * lengthPx * 1.331;  // tuned
+            let dy = gy * widthPx * 1.338;   // tuned
             
             // Validazione dx/dy
             if (!isFinite(dx) || !isFinite(dy)) {
@@ -524,6 +525,28 @@ class SimulationEngine {
             });
         }
         
+        // Scale photon intensities so that the total event intensity matches
+        // the requested Hillas 'size' in the source profile. The HillasAnalyzer
+        // computes `size = cog.totalIntensity / 10`, so to make that value
+        // roughly equal to params.size we aim for totalIntensity ~= params.size * 10.
+        try {
+            const totalIntensity = tracks.reduce((s, t) => s + (t.intensity || 0), 0);
+            if (isFinite(totalIntensity) && totalIntensity > 0) {
+                const desiredTotal = Math.max(1, params.size * 10);
+                let scaleFactor = desiredTotal / totalIntensity;
+                // Prevent extreme scaling
+                scaleFactor = Math.min(Math.max(scaleFactor, 0.2), 5.0);
+                if (Math.abs(scaleFactor - 1.0) > 0.001) {
+                    for (let t of tracks) {
+                        t.intensity = (t.intensity || 0) * scaleFactor;
+                    }
+                }
+            }
+        } catch (e) {
+            // If anything goes wrong, return unscaled tracks
+            console.warn('Intensity scaling failed:', e);
+        }
+
         return tracks;
     }
 
