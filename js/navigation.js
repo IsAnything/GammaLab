@@ -93,6 +93,35 @@ window.addExposureControls = function(renderers, generateBtn) {
             console.log('🔧 showEllipseOnly set to', enabled);
         });
 
+        // NEW: Hillas on hover checkbox
+        const hoverLabel = document.createElement('label');
+        hoverLabel.style.color = '#ffffff';
+        hoverLabel.style.fontFamily = '"Courier New", monospace';
+        hoverLabel.style.fontSize = '13px';
+        hoverLabel.style.marginLeft = '12px';
+        hoverLabel.textContent = 'Hillas su Hover:';
+
+        const hoverCheckbox = document.createElement('input');
+        hoverCheckbox.type = 'checkbox';
+        hoverCheckbox.checked = (renderers[0] && !!renderers[0].showHillasOnHover);
+        hoverCheckbox.style.marginLeft = '6px';
+        hoverCheckbox.addEventListener('change', (ev) => {
+            const enabled = !!ev.target.checked;
+            renderers.forEach(r => { 
+                r.showHillasOnHover = enabled; 
+                if (!enabled) {
+                    // If disabling hover mode, show ellipse immediately
+                    r.isHovering = false;
+                    try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
+                } else {
+                    // If enabling hover mode, hide ellipse until hover
+                    r.isHovering = false;
+                    try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
+                }
+            });
+            console.log('🔧 showHillasOnHover set to', enabled);
+        });
+
         const left = document.createElement('div');
         left.style.display = 'flex';
         left.style.alignItems = 'center';
@@ -107,6 +136,8 @@ window.addExposureControls = function(renderers, generateBtn) {
         right.appendChild(spCheckbox);
         right.appendChild(ellLabel);
         right.appendChild(ellCheckbox);
+        right.appendChild(hoverLabel);
+        right.appendChild(hoverCheckbox);
 
     controlsContainer.appendChild(left);
     controlsContainer.appendChild(right);

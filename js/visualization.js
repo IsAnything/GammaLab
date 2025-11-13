@@ -254,6 +254,94 @@ class CanvasRenderer {
         this.exposureK = 4.0;
         // NEW: If true, render only the Hillas ellipse outline (no photons) for didactic clarity
         this.showEllipseOnly = false;
+        
+        // NEW: Mouse hover detection for showing Hillas ellipse on hover
+        this.showHillasOnHover = true; // default: show ellipse only on hover
+        this.isHovering = false;
+        this.mouseX = -1;
+        this.mouseY = -1;
+        this.currentHillasParams = null; // store last Hillas params for hover check
+        
+        // Setup mouse listeners for hover detection
+        this._setupMouseListeners();
+    }
+    
+    /**
+     * Setup mouse event listeners for hover detection
+     */
+    _setupMouseListeners() {
+        if (!this.canvas) return;
+        
+        this.canvas.addEventListener('mousemove', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouseX = e.clientX - rect.left;
+            this.mouseY = e.clientY - rect.top;
+            
+            // Check if hovering over trace (if we have Hillas params)
+            if (this.currentHillasParams && this.showHillasOnHover) {
+                const wasHovering = this.isHovering;
+                this.isHovering = this._isMouseOverTrace(this.mouseX, this.mouseY, this.currentHillasParams);
+                
+                // Re-render if hover state changed
+                if (wasHovering !== this.isHovering) {
+                    this._redrawHillasOverlay();
+                }
+            }
+        });
+        
+        this.canvas.addEventListener('mouseleave', () => {
+            if (this.isHovering) {
+                this.isHovering = false;
+                this._redrawHillasOverlay();
+            }
+            this.mouseX = -1;
+            this.mouseY = -1;
+        });
+    }
+    
+    /**
+     * Check if mouse is over the trace (within ellipse bounds + buffer)
+     */
+    _isMouseOverTrace(mx, my, hillas) {
+        if (!hillas || !hillas.valid) return false;
+        
+        const cx = hillas.cogX;
+        const cy = hillas.cogY;
+        const a = hillas.lengthPx * 1.5; // Add 50% buffer
+        const b = hillas.widthPx * 1.5;
+        const theta = (hillas.theta || 0) * Math.PI / 180;
+        
+        // Rotate mouse position to ellipse frame
+        const dx = mx - cx;
+        const dy = my - cy;
+        const cosT = Math.cos(-theta);
+        const sinT = Math.sin(-theta);
+        const rotX = dx * cosT - dy * sinT;
+        const rotY = dx * sinT + dy * cosT;
+        
+        // Check if inside ellipse
+        const normalized = (rotX * rotX) / (a * a) + (rotY * rotY) / (b * b);
+        return normalized <= 1.0;
+    }
+    
+    /**
+     * Redraw only the Hillas overlay (if overlay canvas exists)
+     */
+    _redrawHillasOverlay() {
+        if (!this.overlay || !this.overlayCtx || !this.currentHillasParams) return;
+        
+        // Clear overlay
+        this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+        
+        // Draw Hillas only if hovering (when showHillasOnHover is true)
+        if (this.showHillasOnHover) {
+            if (this.isHovering) {
+                this.renderHillasOverlay(this.currentHillasParams);
+            }
+        } else {
+            // Always show if showHillasOnHover is false
+            this.renderHillasOverlay(this.currentHillasParams);
+        }
     }
 
     /**
@@ -1136,6 +1224,15 @@ class CanvasRenderer {
     renderHillasOverlay(hillasParams) {
         if (!this.overlayCtx || !hillasParams || !hillasParams.valid) return;
 
+        // Store current Hillas params for hover detection
+        this.currentHillasParams = hillasParams;
+        
+        // If showHillasOnHover is enabled, only draw when hovering
+        if (this.showHillasOnHover && !this.isHovering) {
+            this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+            return;
+        }
+
         const ctx = this.overlayCtx;
         ctx.clearRect(0, 0, this.overlay.width, this.overlay.height);
 
@@ -1630,6 +1727,33 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
                 console.log('🔧 showEllipseOnly set to', enabled);
             });
 
+            // NEW: Hillas on hover checkbox
+            const hoverLabel = document.createElement('label');
+            hoverLabel.style.color = '#ffffff';
+            hoverLabel.style.fontFamily = '"Courier New", monospace';
+            hoverLabel.style.fontSize = '13px';
+            hoverLabel.style.marginLeft = '12px';
+            hoverLabel.textContent = 'Hillas su Hover:';
+
+            const hoverCheckbox = document.createElement('input');
+            hoverCheckbox.type = 'checkbox';
+            hoverCheckbox.checked = (renderers[0] && !!renderers[0].showHillasOnHover);
+            hoverCheckbox.style.marginLeft = '6px';
+            hoverCheckbox.addEventListener('change', (ev) => {
+                const enabled = !!ev.target.checked;
+                renderers.forEach(r => { 
+                    r.showHillasOnHover = enabled; 
+                    if (!enabled) {
+                        r.isHovering = false;
+                        try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
+                    } else {
+                        r.isHovering = false;
+                        try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
+                    }
+                });
+                console.log('🔧 showHillasOnHover set to', enabled);
+            });
+
             const left = document.createElement('div');
             left.style.display = 'flex';
             left.style.alignItems = 'center';
@@ -1644,6 +1768,8 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
             right.appendChild(spCheckbox);
             right.appendChild(ellLabel);
             right.appendChild(ellCheckbox);
+            right.appendChild(hoverLabel);
+            right.appendChild(hoverCheckbox);
 
             controlsContainer.appendChild(left);
             controlsContainer.appendChild(right);
