@@ -378,8 +378,9 @@ class SimulationEngine {
             }
             
             // Scala con Length/Width - tracce ESTREMAMENTE allungate (gamma-like)
-            let dx = gx * lengthPx * 2.5;  // Era 1.8, ora 2.5 per ellissi molto pronunciate
-            let dy = gy * widthPx * 0.3;   // Era 0.4, ora 0.3 per mantenere molto strette (rapporto ~8:1)
+            // Tuned multipliers: reduce dx and increase dy to better match documented Hillas L/W
+            let dx = gx * lengthPx * 1.8;  // reduced from 2.5 -> 1.8
+            let dy = gy * widthPx * 0.8;   // increased from 0.3 -> 0.8
             
             // Validazione dx/dy
             if (!isFinite(dx) || !isFinite(dy)) {

@@ -26,7 +26,7 @@
       <option value="hadron">Hadron-only</option>
     </select>
     <label for="iterations">Iterations:</label>
-    <input id="iterations" type="number" value="40" min="1" style="width:80px">
+    <input id="iterations" type="number" value="500" min="1" style="width:80px">
     <button id="runBtn">Run Test</button>
     <button id="clearBtn">Clear</button>
   </div>
@@ -115,7 +115,7 @@
       }
 
       async function runTest() {
-        const iters = parseInt(iterationsInput.value, 10) || 20;
+        const iters = parseInt(iterationsInput.value, 10) || 500;
         const mode = modeSel.value;
         resultsEl.textContent = 'Running...';
 
@@ -130,7 +130,19 @@
 
         const canvasSize = { width: 600, height: 600 };
 
-        const stats = { total: 0, within12px: 0, distances: [] };
+        const stats = {
+          total: 0,
+          within12px: 0,
+          distances: [],
+          length_px: [],
+          width_px: [],
+          length_deg: [],
+          width_deg: [],
+          size_pe: [],
+          elongation: [],
+          alpha: [],
+          numPhotons: []
+        };
 
         for (let i = 0; i < iters; i++) {
           // Choose profile based on mode
@@ -156,32 +168,84 @@
           const hillas = engine.hillasAnalyzer.analyze(event);
 
           // Render into the first renderer so you can visually inspect
-          engine.renderers[0].renderEvent(event, true);
-          if (hillas && hillas.valid) engine.renderers[0].renderHillasOverlay(hillas);
+          try {
+            engine.renderers[0].renderEvent(event, true);
+            if (hillas && hillas.valid) engine.renderers[0].renderHillasOverlay(hillas);
+          } catch (e) {
+            // ignore rendering errors in diagnostics
+            console.warn('Rendering error (ignored):', e);
+          }
 
           if (hillas && hillas.valid) {
             const d = cogDistancePx(hillas, canvasSize);
             stats.total++;
             stats.distances.push(d);
             if (d <= 12) stats.within12px++;
+
+            stats.length_px.push(hillas.lengthPx);
+            stats.width_px.push(hillas.widthPx);
+            stats.length_deg.push(hillas.length);
+            stats.width_deg.push(hillas.width);
+            stats.size_pe.push(hillas.size);
+            stats.elongation.push(hillas.elongation);
+            stats.alpha.push(hillas.alpha);
+            stats.numPhotons.push(hillas.numPhotons);
+
             console.log(`Test iter ${i+1}/${iters} — profile=${profile.type}, CoG dist = ${d.toFixed(2)} px`);
           } else {
             console.log(`Test iter ${i+1}/${iters} — no valid Hillas`);
           }
 
           // small delay to allow canvas updates
-          await new Promise(resolve => setTimeout(resolve, 60));
+          await new Promise(resolve => setTimeout(resolve, 8));
         }
 
-        // Summarize
-        const avg = stats.distances.reduce((a,b) => a+b, 0) / (stats.distances.length || 1);
-        const pct = ((stats.within12px / (stats.total || 1)) * 100).toFixed(1);
+        // Helper stats
+        function computeStats(arr) {
+          if (!arr || arr.length === 0) return null;
+          const n = arr.length;
+          const mean = arr.reduce((s, v) => s + v, 0) / n;
+          const variance = arr.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / n;
+          return { n, mean, std: Math.sqrt(variance) };
+        }
 
-        resultsEl.textContent = `Mode: ${mode}\nIterations: ${iters}\nValid Hillas: ${stats.total}\nWithin 12px: ${stats.within12px} (${pct}%)\nAverage distance: ${avg.toFixed(2)} px`;
+        const out = {
+          mode,
+          iterations: iters,
+          valid: stats.total,
+          within12px: stats.within12px,
+          pctWithin12px: ((stats.within12px / (stats.total || 1)) * 100).toFixed(1),
+          distance_px: computeStats(stats.distances),
+          length_px: computeStats(stats.length_px),
+          width_px: computeStats(stats.width_px),
+          length_deg: computeStats(stats.length_deg),
+          width_deg: computeStats(stats.width_deg),
+          size_pe: computeStats(stats.size_pe),
+          elongation: computeStats(stats.elongation),
+          alpha: computeStats(stats.alpha),
+          numPhotons: computeStats(stats.numPhotons)
+        };
+
+        // Suggest dx/dy adjustments based on current mean values
+        const target_length_px = 25;
+        const target_width_px = 8;
+        const curr_dx = 1.8; // current in core-simulation.js
+        const curr_dy = 0.8;
+
+        let suggested_dx = null, suggested_dy = null;
+        if (out.length_px && out.length_px.mean > 0) {
+          suggested_dx = (curr_dx * (target_length_px / out.length_px.mean)).toFixed(3);
+        }
+        if (out.width_px && out.width_px.mean > 0) {
+          suggested_dy = (curr_dy * (target_width_px / out.width_px.mean)).toFixed(3);
+        }
+
+        resultsEl.textContent = JSON.stringify(out, null, 2) + '\n\nSuggested dx multiplier: ' + (suggested_dx || 'n/a') + '\nSuggested dy multiplier: ' + (suggested_dy || 'n/a');
       }
 
       runBtn.addEventListener('click', () => {
         runBtn.disabled = true;
+        resultsEl.textContent = 'Running...';
         runTest().then(() => runBtn.disabled = false).catch(e => { runBtn.disabled = false; console.error(e); resultsEl.textContent = 'ERROR: ' + e; });
       });
 
@@ -189,6 +253,18 @@
         resultsEl.textContent = '';
         const cvs = [document.getElementById('c1'), document.getElementById('c2'), document.getElementById('c3')];
         cvs.forEach(c => c.getContext('2d').clearRect(0,0,c.width,c.height));
+      });
+
+      // Auto-run once on load (since this page is a diagnostics runner)
+      window.addEventListener('load', () => {
+        // small delay to allow scripts to initialize
+        setTimeout(() => {
+          try {
+            runBtn.click();
+          } catch (e) {
+            console.warn('Auto-run failed:', e);
+          }
+        }, 600);
       });
 
     })();
