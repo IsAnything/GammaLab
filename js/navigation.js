@@ -91,68 +91,17 @@ window.addExposureControls = function(renderers, generateBtn) {
     controlsContainer.appendChild(left);
     controlsContainer.appendChild(right);
 
-        // Small help icon + accessible tooltip explaining the Exposure slider
+        // Compact explanatory label (less intrusive than icon tooltip)
         (function() {
-            const tipId = 'exp-tip-' + Math.random().toString(36).slice(2, 9);
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'icon-help';
-            btn.style.border = 'none';
-            btn.style.background = 'transparent';
-            btn.style.color = '#e6f0ff';
-            btn.style.fontFamily = '"Courier New", monospace';
-            btn.style.fontSize = '16px';
-            btn.style.cursor = 'pointer';
-            btn.style.padding = '4px';
-            btn.style.marginLeft = '6px';
-            btn.tabIndex = 0;
-            btn.innerText = 'ⓘ';
-            btn.setAttribute('aria-describedby', tipId);
-            btn.setAttribute('aria-label', 'Aiuto Exposure');
-
-            const tip = document.createElement('div');
-            tip.id = tipId;
-            tip.role = 'tooltip';
-            tip.style.position = 'absolute';
-            tip.style.background = 'rgba(16,24,40,0.96)';
-            tip.style.color = '#f0f8ff';
-            tip.style.padding = '8px 10px';
-            tip.style.borderRadius = '6px';
-            tip.style.fontSize = '12px';
-            tip.style.boxShadow = '0 6px 18px rgba(0,0,0,0.5)';
-            tip.style.display = 'none';
-            tip.style.zIndex = '9999';
-            tip.style.maxWidth = '360px';
-            tip.textContent = 'Regola la risposta fotografica: valori maggiori → fotoni più brillanti e alone più ampio. Range consigliato: 2–6. Sub-pixel attiva un leggero jitter per migliorare la texture.';
-
-            // Positioning container for absolute tooltip placement
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'relative';
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-
-            wrapper.appendChild(btn);
-            wrapper.appendChild(tip);
-            controlsContainer.appendChild(wrapper);
-
-            // show/hide handlers (hover, focus, click/tap)
-            function showTip() { tip.style.display = 'block';
-                // place tooltip above the button
-                tip.style.left = (btn.offsetLeft - tip.offsetWidth + btn.offsetWidth + 6) + 'px';
-                tip.style.top = (btn.offsetTop - tip.offsetHeight - 8) + 'px'; }
-            function hideTip() { tip.style.display = 'none'; }
-
-            btn.addEventListener('mouseenter', showTip);
-            btn.addEventListener('mouseleave', hideTip);
-            btn.addEventListener('focus', showTip);
-            btn.addEventListener('blur', hideTip);
-            // Toggle on click (useful for touch)
-            btn.addEventListener('click', (e) => { e.preventDefault(); tip.style.display = (tip.style.display === 'block') ? 'none' : 'block'; });
-
-            // Hide if clicking outside
-            document.addEventListener('click', (e) => {
-                if (!wrapper.contains(e.target)) hideTip();
-            });
+            const help = document.createElement('span');
+            help.style.fontFamily = '"Courier New", monospace';
+            help.style.fontSize = '12px';
+            help.style.color = '#dfe9ff';
+            help.style.marginLeft = '8px';
+            help.style.maxWidth = '420px';
+            help.textContent = 'Exposure: regola luminosità e glow (consigliato 2–6).';
+            help.title = 'Exposure: regola luminosità e dimensione del glow attorno ai fotoni. Sub-pixel attiva un leggero jitter per migliorare la texture.';
+            controlsContainer.appendChild(help);
         })();
 
         if (generateBtn && generateBtn.parentNode) {
