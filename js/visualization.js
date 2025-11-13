@@ -311,6 +311,70 @@ class CanvasRenderer {
         });
     }
 
+    _traceHexPath(ctx, width, height, radius) {
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+    }
+
+    _getHexRadius(width, height, inset = 0) {
+        const base = Math.min(width, height) / 2 - 5;
+        return Math.max(0, base - inset);
+    }
+
+    _withHexClip(callback, inset = 3) {
+        if (!this.ctx || typeof callback !== 'function') return;
+        const radius = this._getHexRadius(this.canvas.width, this.canvas.height, inset);
+        if (radius <= 0) {
+            callback();
+            return;
+        }
+
+        this.ctx.save();
+        this.ctx.beginPath();
+        this._traceHexPath(this.ctx, this.canvas.width, this.canvas.height, radius);
+        this.ctx.clip();
+        try {
+            callback();
+        } finally {
+            this.ctx.restore();
+        }
+    }
+
+    _withOverlayHexClip(callback, inset = 3) {
+        if (!this.overlayCtx || !this.overlay || typeof callback !== 'function') {
+            if (typeof callback === 'function') callback();
+            return;
+        }
+
+        const radius = this._getHexRadius(this.overlay.width, this.overlay.height, inset);
+        if (radius <= 0) {
+            callback();
+            return;
+        }
+
+        this.overlayCtx.save();
+        this.overlayCtx.beginPath();
+        this._traceHexPath(this.overlayCtx, this.overlay.width, this.overlay.height, radius);
+        this.overlayCtx.clip();
+        try {
+            callback();
+        } finally {
+            this.overlayCtx.restore();
+        }
+    }
+
     _isPointInsideHillas(x, y, hillas) {
         if (!hillas || !hillas.valid) return false;
 
@@ -445,48 +509,54 @@ class CanvasRenderer {
             }
         }
 
-        // Disegna il riempimento dietro i fotoni
-        this.ctx.save();
-    // Disegnamo il fill sopra lo sfondo (ma prima dei fotoni), normale compositing
-    this.ctx.globalCompositeOperation = 'source-over';
+        this._withHexClip(() => {
+            this.ctx.save();
+            this.ctx.globalCompositeOperation = 'source-over';
 
-        // Crea gradiente radiale più visibile per riempire l'ellisse
-        const gradRadius = Math.max(a, b) * 1.8;
-        const grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, gradRadius);
-        // Aumentiamo significativamente l'alpha per rendere il riempimento ben visibile
-        const rgbaCenter = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.55)`;
-        const rgbaMid = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.28)`;
-        const rgbaEdge = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.08)`;
-        grad.addColorStop(0, rgbaCenter);
-        grad.addColorStop(0.35, rgbaMid);
-        grad.addColorStop(0.7, rgbaEdge);
-        grad.addColorStop(1, 'rgba(0,0,0,0)');        // Trasforma contesto per ruotare l'ellisse
-        this.ctx.translate(cx, cy);
-        this.ctx.rotate(theta);
+            const gradRadius = Math.max(a, b) * 1.8;
+            const grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, gradRadius);
+            const rgbaCenter = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.55)`;
+            const rgbaMid = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.28)`;
+            const rgbaEdge = `rgba(${avgColor[0]}, ${avgColor[1]}, ${avgColor[2]}, 0.08)`;
+            grad.addColorStop(0, rgbaCenter);
+            grad.addColorStop(0.35, rgbaMid);
+            grad.addColorStop(0.7, rgbaEdge);
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
 
-        this.ctx.fillStyle = grad;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
+            this.ctx.translate(cx, cy);
+            this.ctx.rotate(theta);
 
-    // Ripristina trasformazioni e compositing
-    this.ctx.restore();
-    this.ctx.globalCompositeOperation = 'source-over';
+            this.ctx.fillStyle = grad;
+            this.ctx.beginPath();
+            this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+
+            this.ctx.restore();
+        }, 8);
+
+        this.ctx.globalCompositeOperation = 'source-over';
     }
 
     /**
      * Pulisce entrambi i canvas
      */
     clear() {
-        // Background: light gray for light style, dark blue for dark style
-        this.ctx.fillStyle = this.lightStyle ? '#e0e0e0' : '#000814';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Disegna griglia esagonale (honeycomb) solo per light style
-        if (this.lightStyle) {
-            this.drawHexagonalGrid();
-        }
-        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this._withHexClip(() => {
+            // Background: light gray for light style, dark blue for dark style
+            this.ctx.fillStyle = this.lightStyle ? '#e0e0e0' : '#000814';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Disegna griglia esagonale (honeycomb) solo per light style
+            if (this.lightStyle) {
+                this.drawHexagonalGrid();
+            }
+        });
+
+        // Bordo esagonale sempre visibile
+        this.drawCameraBorder();
+
         if (this.overlayCtx) {
             this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
         }
@@ -510,39 +580,26 @@ class CanvasRenderer {
             for (let col = 0; col < Math.ceil(this.canvas.width / horizDist) + 2; col++) {
                 const x = col * horizDist;
                 const y = row * vertDist + (col % 2 === 1 ? vertDist / 2 : 0);
-                
+
                 this.drawHexagon(x, y, hexRadius);
             }
         }
-        
-        // Disegna bordo esagonale della camera
-        this.drawCameraBorder();
     }
 
     /**
      * Disegna bordo esagonale della camera
      */
     drawCameraBorder() {
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const radius = Math.min(this.canvas.width, this.canvas.height) / 2 - 5;
-        
-        this.ctx.strokeStyle = '#999999'; // Grigio medio
+        const radius = this._getHexRadius(this.canvas.width, this.canvas.height, 0);
+        if (radius <= 0) return;
+
+        this.ctx.save();
+        this.ctx.strokeStyle = '#999999';
         this.ctx.lineWidth = 4;
         this.ctx.beginPath();
-        
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i - Math.PI / 2; // Ruotato per avere flat-top
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            if (i === 0) {
-                this.ctx.moveTo(x, y);
-            } else {
-                this.ctx.lineTo(x, y);
-            }
-        }
-        this.ctx.closePath();
+        this._traceHexPath(this.ctx, this.canvas.width, this.canvas.height, radius);
         this.ctx.stroke();
+        this.ctx.restore();
     }
 
     /**
@@ -573,40 +630,38 @@ class CanvasRenderer {
 
         this.clear();
 
-        // Se showEllipseOnly è attivo, disegna solo l'ellisse Hillas senza fotoni
         if (this.showEllipseOnly) {
-            this.renderEllipseOnlyMode(event, showLegend);
+            this._withHexClip(() => {
+                this.renderEllipseOnlyMode(event, showLegend, { clipProvided: true });
+            });
+            this.drawCameraBorder();
             return;
         }
 
-        // Ordina tracce per intensità (prima i deboli, poi i brillanti)
-        const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
+        this._withHexClip(() => {
+            const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
 
-        // Render fotoni
-        sortedTracks.forEach(track => {
-            this.renderPhoton(track);
+            sortedTracks.forEach(track => {
+                this.renderPhoton(track);
+            });
+
+            if (this.lightStyle && !this.suppressNoise) {
+                this.renderBackgroundNoise();
+            }
+
+            if (event.showGrid) {
+                this.drawGrid();
+            }
+
+            if (showLegend) {
+                this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+            }
+
+            this.drawCameraInfo(event);
         });
 
-        // Aggiungi rumore di background (solo light style)
-        if (this.lightStyle && !this.suppressNoise) {
-            this.renderBackgroundNoise();
-        }
-
-        // Se disponibile, possiamo applicare un leggero riempimento diffuso sotto i fotoni
-        // chiamando fillEllipseBackground separatamente da navigation.js quando abbiamo i parametri Hillas.
-
-        // Griglia (opzionale)
-        if (event.showGrid) {
-            this.drawGrid();
-        }
-
-        // Legenda (spostata in alto a destra per non coprire i fotoni)
-        if (showLegend) {
-            this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
-        }
-
-        // Info camera
-        this.drawCameraInfo(event);
+        // Bordo in primo piano
+        this.drawCameraBorder();
     }
 
     /**
@@ -633,9 +688,11 @@ class CanvasRenderer {
 
         const renderBatch = () => {
             const batch = sortedTracks.slice(currentIndex, currentIndex + batchSize);
-            
-            batch.forEach(track => {
-                this.renderPhoton(track);
+
+            this._withHexClip(() => {
+                batch.forEach(track => {
+                    this.renderPhoton(track);
+                });
             });
 
             currentIndex += batchSize;
@@ -645,13 +702,17 @@ class CanvasRenderer {
             } else {
                 // Animazione completata
                 if (this.lightStyle) {
-                    if (!this.suppressNoise) this.renderBackgroundNoise();
+                    if (!this.suppressNoise) {
+                        this._withHexClip(() => this.renderBackgroundNoise());
+                    }
                 }
                 if (showLegend) {
-                    this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+                    this._withHexClip(() => this.colorPalette.drawEnergyLegend(this.canvas, 'top-right'));
                 }
-                this.drawCameraInfo(event);
+                this._withHexClip(() => this.drawCameraInfo(event));
             }
+
+            this.drawCameraBorder();
         };
 
         // Inizia animazione
@@ -678,104 +739,99 @@ class CanvasRenderer {
      * Modalità didattica: renderizza solo ellisse Hillas (no fotoni)
      * Calcola i parametri Hillas dall'evento e disegna l'ellisse teorica
      */
-    renderEllipseOnlyMode(event, showLegend = true) {
-        // Sfondo nero
-        this.ctx.fillStyle = '#000814';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    renderEllipseOnlyMode(event, showLegend = true, options = {}) {
+        const clipProvided = options && options.clipProvided === true;
 
-        // Calcola Hillas dall'evento (richiede HillasAnalyzer)
-        let hillasParams = null;
-        try {
-            // Se disponibile usa HillasAnalyzer globale
-            if (typeof HillasAnalyzer !== 'undefined') {
-                const analyzer = new HillasAnalyzer();
-                hillasParams = analyzer.analyze(event);
+        const drawContent = () => {
+            let hillasParams = null;
+            try {
+                if (typeof HillasAnalyzer !== 'undefined') {
+                    const analyzer = new HillasAnalyzer();
+                    hillasParams = analyzer.analyze(event);
+                }
+            } catch (e) {
+                console.warn('HillasAnalyzer not available:', e);
             }
-        } catch (e) {
-            console.warn('HillasAnalyzer not available:', e);
-        }
 
-        if (!hillasParams || !hillasParams.valid) {
-            // Fallback: disegna messaggio
+            if (!hillasParams || !hillasParams.valid) {
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.font = '16px system-ui';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('Modalità Ellisse: Hillas non disponibile', this.canvas.width / 2, this.canvas.height / 2);
+                return;
+            }
+
+            const cx = hillasParams.cogX;
+            const cy = hillasParams.cogY;
+            const a = hillasParams.lengthPx;
+            const b = hillasParams.widthPx;
+            const theta = (hillasParams.theta * Math.PI / 180);
+
+            this.ctx.save();
+            this.ctx.translate(cx, cy);
+            this.ctx.rotate(theta);
+
+            this.ctx.fillStyle = 'rgba(0, 200, 255, 0.15)';
+            this.ctx.beginPath();
+            this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+
+            this.ctx.strokeStyle = '#00ff88';
+            this.ctx.lineWidth = 3;
+            this.ctx.beginPath();
+            this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
+            this.ctx.stroke();
+
+            this.ctx.strokeStyle = '#ffaa00';
+            this.ctx.lineWidth = 2;
+            this.ctx.setLineDash([5, 3]);
+            this.ctx.beginPath();
+            this.ctx.moveTo(-a, 0);
+            this.ctx.lineTo(a, 0);
+            this.ctx.stroke();
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, -b);
+            this.ctx.lineTo(0, b);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
+
+            this.ctx.restore();
+
+            this.ctx.fillStyle = '#ff0055';
+            this.ctx.beginPath();
+            this.ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+            this.ctx.fill();
+
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '16px system-ui';
+            this.ctx.font = '14px monospace';
+            this.ctx.textAlign = 'left';
+            const infoX = Math.max(60, this.canvas.width * 0.18);
+            let infoY = Math.max(40, this.canvas.height * 0.12);
+            this.ctx.fillText(`Length: ${hillasParams.length.toFixed(3)}° (${hillasParams.lengthPx.toFixed(1)} px)`, infoX, infoY);
+            infoY += 20;
+            this.ctx.fillText(`Width: ${hillasParams.width.toFixed(3)}° (${hillasParams.widthPx.toFixed(1)} px)`, infoX, infoY);
+            infoY += 20;
+            this.ctx.fillText(`L/W Ratio: ${hillasParams.elongation.toFixed(2)}`, infoX, infoY);
+            infoY += 20;
+            this.ctx.fillText(`Size: ${hillasParams.size.toFixed(0)} p.e.`, infoX, infoY);
+            infoY += 20;
+            this.ctx.fillText(`Alpha: ${hillasParams.alpha.toFixed(1)}°`, infoX, infoY);
+
+            this.ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
+            this.ctx.font = 'bold 16px system-ui';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('Modalità Ellisse: Hillas non disponibile', this.canvas.width / 2, this.canvas.height / 2);
-            return;
-        }
+            this.ctx.fillText('Modalità Ellisse (solo outline)', this.canvas.width / 2, this.canvas.height - 20);
 
-        // Disegna ellisse Hillas
-        const cx = hillasParams.cogX;
-        const cy = hillasParams.cogY;
-        const a = hillasParams.lengthPx;
-        const b = hillasParams.widthPx;
-        const theta = (hillasParams.theta * Math.PI / 180);
+            if (showLegend) {
+                this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+            }
+        };
 
-        this.ctx.save();
-        this.ctx.translate(cx, cy);
-        this.ctx.rotate(theta);
-
-        // Ellisse riempita (semi-trasparente)
-        this.ctx.fillStyle = 'rgba(0, 200, 255, 0.15)';
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-
-        // Ellisse outline (brillante)
-        this.ctx.strokeStyle = '#00ff88';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, 0, a, b, 0, 0, 2 * Math.PI);
-        this.ctx.stroke();
-
-        // Assi principali
-        this.ctx.strokeStyle = '#ffaa00';
-        this.ctx.lineWidth = 2;
-        this.ctx.setLineDash([5, 3]);
-        // Asse maggiore
-        this.ctx.beginPath();
-        this.ctx.moveTo(-a, 0);
-        this.ctx.lineTo(a, 0);
-        this.ctx.stroke();
-        // Asse minore
-        this.ctx.beginPath();
-        this.ctx.moveTo(0, -b);
-        this.ctx.lineTo(0, b);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-
-        this.ctx.restore();
-
-        // Centro di gravità
-        this.ctx.fillStyle = '#ff0055';
-        this.ctx.beginPath();
-        this.ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
-        this.ctx.fill();
-
-        // Annotazioni parametri
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = '14px monospace';
-        this.ctx.textAlign = 'left';
-        const infoX = 20;
-        let infoY = 30;
-        this.ctx.fillText(`Length: ${hillasParams.length.toFixed(3)}° (${hillasParams.lengthPx.toFixed(1)} px)`, infoX, infoY);
-        infoY += 20;
-        this.ctx.fillText(`Width: ${hillasParams.width.toFixed(3)}° (${hillasParams.widthPx.toFixed(1)} px)`, infoX, infoY);
-        infoY += 20;
-        this.ctx.fillText(`L/W Ratio: ${hillasParams.elongation.toFixed(2)}`, infoX, infoY);
-        infoY += 20;
-        this.ctx.fillText(`Size: ${hillasParams.size.toFixed(0)} p.e.`, infoX, infoY);
-        infoY += 20;
-        this.ctx.fillText(`Alpha: ${hillasParams.alpha.toFixed(1)}°`, infoX, infoY);
-
-        // Label modalità
-        this.ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
-        this.ctx.font = 'bold 16px system-ui';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Modalità Ellisse (solo outline)', this.canvas.width / 2, this.canvas.height - 20);
-
-        if (showLegend) {
-            this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+        if (clipProvided) {
+            drawContent();
+        } else {
+            this._withHexClip(drawContent);
+            this.drawCameraBorder();
         }
     }
 
@@ -1158,21 +1214,28 @@ class CanvasRenderer {
     drawCameraInfo(event) {
         if (!event.cameraId) return;
 
+        const baseX = Math.max(60, this.canvas.width * 0.18);
+        let lineY = Math.max(40, this.canvas.height * 0.12);
+
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         this.ctx.font = 'bold 16px "Courier New", monospace';
-        this.ctx.fillText(`Camera ${event.cameraId}`, 20, 30);
+        this.ctx.fillText(`Camera ${event.cameraId}`, baseX, lineY);
 
         this.ctx.font = '12px "Courier New", monospace';
-        this.ctx.fillText(`Energia: ${(event.energy / 1000).toFixed(1)} TeV`, 20, 50);
-        this.ctx.fillText(`Fotoni: ${event.tracks.length}`, 20, 65);
+        lineY += 20;
+        this.ctx.fillText(`Energia: ${(event.energy / 1000).toFixed(1)} TeV`, baseX, lineY);
+        lineY += 15;
+        this.ctx.fillText(`Fotoni: ${event.tracks.length}`, baseX, lineY);
         // Show current exposure and subpixel settings for immediate feedback
         try {
             const exp = (typeof this.exposureK === 'number') ? this.exposureK.toFixed(1) : '4.0';
             const sp = !!this.subpixelEnabled ? 'ON' : 'OFF';
             this.ctx.fillStyle = 'rgba(255, 230, 180, 0.95)';
             this.ctx.font = '12px "Courier New", monospace';
-            this.ctx.fillText(`Exposure: ${exp}`, 20, 82);
-            this.ctx.fillText(`Sub-pixel: ${sp}`, 20, 98);
+            lineY += 17;
+            this.ctx.fillText(`Exposure: ${exp}`, baseX, lineY);
+            lineY += 16;
+            this.ctx.fillText(`Sub-pixel: ${sp}`, baseX, lineY);
         } catch (e) {
             // ignore drawing errors
         }
@@ -1208,142 +1271,143 @@ class CanvasRenderer {
         if (!this.overlayCtx || !this.overlay || !hillasParams || !hillasParams.valid) return;
 
         const ctx = this.overlayCtx;
+        this._withOverlayHexClip(() => {
+            const centerX = hillasParams.cogX;
+            const centerY = hillasParams.cogY;
+            const theta = hillasParams.theta * Math.PI / 180;
 
-        const centerX = hillasParams.cogX;
-        const centerY = hillasParams.cogY;
-        const theta = hillasParams.theta * Math.PI / 180;
-
-        console.log(`🎨 Rendering Hillas: CoG(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), Canvas: ${this.overlay.width}×${this.overlay.height}`);
-
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(theta);
-
-        let displayLengthPx = hillasParams.lengthPx;
-        let displayWidthPx = hillasParams.widthPx;
-
-        if (!this.respectExactHillas) {
-            if (this.lightStyle) {
-                displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);
-            }
-
-            const visibilityScale = 1.12; // enlarge outline slightly for hover visibility
-            displayLengthPx *= visibilityScale;
-            displayWidthPx *= visibilityScale;
-        }
-
-        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, 2 * Math.PI);
-        ctx.stroke();
-
-        ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(-displayLengthPx, 0);
-        ctx.lineTo(displayLengthPx, 0);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, -displayWidthPx);
-        ctx.lineTo(0, displayWidthPx);
-        ctx.stroke();
-
-        ctx.restore();
-
-        ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        const cameraCenterX = this.overlay.width / 2;
-        const cameraCenterY = this.overlay.height / 2;
-        ctx.strokeStyle = this.lightStyle ? '#0066cc' : '#4488ff';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([8, 5]);
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.lineTo(cameraCenterX, cameraCenterY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        const midX = (centerX + cameraCenterX) / 2;
-        const midY = (centerY + cameraCenterY) / 2;
-        ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
-        ctx.font = 'bold 14px "Courier New", monospace';
-        ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#000000';
-        ctx.lineWidth = 3;
-        ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
-        ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
-
-        try {
-            const dx = centerX - cameraCenterX;
-            const dy = centerY - cameraCenterY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (this.respectExactHillas) {
-                console.log(`🔎 HillasOverlay: CoG(${centerX.toFixed(1)},${centerY.toFixed(1)}), CameraCenter(${cameraCenterX.toFixed(1)},${cameraCenterY.toFixed(1)}), Δ=(${dx.toFixed(1)},${dy.toFixed(1)}) px, r=${dist.toFixed(1)} px, canvas=${this.overlay.width}x${this.overlay.height}`);
-            }
+            console.log(`🎨 Rendering Hillas: CoG(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), Canvas: ${this.overlay.width}×${this.overlay.height}`);
 
             ctx.save();
-            ctx.fillStyle = '#ffff66';
-            ctx.beginPath();
-            ctx.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
-            ctx.fill();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(theta);
 
-            ctx.strokeStyle = '#222200';
-            ctx.lineWidth = 3;
+            let displayLengthPx = hillasParams.lengthPx;
+            let displayWidthPx = hillasParams.widthPx;
+
+            if (!this.respectExactHillas) {
+                if (this.lightStyle) {
+                    displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);
+                }
+
+                const visibilityScale = 1.12; // enlarge outline slightly for hover visibility
+                displayLengthPx *= visibilityScale;
+                displayWidthPx *= visibilityScale;
+            }
+
+            ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
+            ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, 2 * Math.PI);
             ctx.stroke();
 
-            ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
-            ctx.lineWidth = 3;
-            const s = 18;
+            ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(cameraCenterX - s, cameraCenterY);
-            ctx.lineTo(cameraCenterX + s, cameraCenterY);
-            ctx.moveTo(cameraCenterX, cameraCenterY - s);
-            ctx.lineTo(cameraCenterX, cameraCenterY + s);
+            ctx.moveTo(-displayLengthPx, 0);
+            ctx.lineTo(displayLengthPx, 0);
             ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, -displayWidthPx);
+            ctx.lineTo(0, displayWidthPx);
+            ctx.stroke();
+
             ctx.restore();
 
+            ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            const cameraCenterX = this.overlay.width / 2;
+            const cameraCenterY = this.overlay.height / 2;
+            ctx.strokeStyle = this.lightStyle ? '#0066cc' : '#4488ff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 5]);
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(cameraCenterX, cameraCenterY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const midX = (centerX + cameraCenterX) / 2;
+            const midY = (centerY + cameraCenterY) / 2;
+            ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
+            ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
+            ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
+
             try {
-                if (this.ctx) {
-                    const main = this.ctx;
-                    main.save();
-                    main.strokeStyle = 'rgba(255, 255, 102, 0.9)';
-                    main.fillStyle = 'rgba(255, 255, 102, 0.25)';
-                    main.lineWidth = 2;
-                    main.beginPath();
-                    main.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
-                    main.fill();
-                    main.stroke();
-
-                    main.beginPath();
-                    main.moveTo(cameraCenterX - 12, cameraCenterY);
-                    main.lineTo(cameraCenterX + 12, cameraCenterY);
-                    main.moveTo(cameraCenterX, cameraCenterY - 12);
-                    main.lineTo(cameraCenterX, cameraCenterY + 12);
-                    main.stroke();
-
-                    main.fillStyle = 'rgba(204, 0, 102, 0.95)';
-                    main.strokeStyle = 'rgba(255,255,255,0.9)';
-                    main.lineWidth = 2;
-                    main.beginPath();
-                    main.arc(centerX, centerY, 6, 0, 2 * Math.PI);
-                    main.fill();
-                    main.stroke();
-                    main.restore();
+                const dx = centerX - cameraCenterX;
+                const dy = centerY - cameraCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (this.respectExactHillas) {
+                    console.log(`🔎 HillasOverlay: CoG(${centerX.toFixed(1)},${centerY.toFixed(1)}), CameraCenter(${cameraCenterX.toFixed(1)},${cameraCenterY.toFixed(1)}), Δ=(${dx.toFixed(1)},${dy.toFixed(1)}) px, r=${dist.toFixed(1)} px, canvas=${this.overlay.width}x${this.overlay.height}`);
                 }
-            } catch (innerErr) {
-                console.warn('Errore disegno CoG main canvas:', innerErr);
+
+                ctx.save();
+                ctx.fillStyle = '#ffff66';
+                ctx.beginPath();
+                ctx.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.strokeStyle = '#222200';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
+                ctx.lineWidth = 3;
+                const s = 18;
+                ctx.beginPath();
+                ctx.moveTo(cameraCenterX - s, cameraCenterY);
+                ctx.lineTo(cameraCenterX + s, cameraCenterY);
+                ctx.moveTo(cameraCenterX, cameraCenterY - s);
+                ctx.lineTo(cameraCenterX, cameraCenterY + s);
+                ctx.stroke();
+                ctx.restore();
+
+                try {
+                    if (this.ctx) {
+                        const main = this.ctx;
+                        main.save();
+                        main.strokeStyle = 'rgba(255, 255, 102, 0.9)';
+                        main.fillStyle = 'rgba(255, 255, 102, 0.25)';
+                        main.lineWidth = 2;
+                        main.beginPath();
+                        main.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+                        main.fill();
+                        main.stroke();
+
+                        main.beginPath();
+                        main.moveTo(cameraCenterX - 12, cameraCenterY);
+                        main.lineTo(cameraCenterX + 12, cameraCenterY);
+                        main.moveTo(cameraCenterX, cameraCenterY - 12);
+                        main.lineTo(cameraCenterX, cameraCenterY + 12);
+                        main.stroke();
+
+                        main.fillStyle = 'rgba(204, 0, 102, 0.95)';
+                        main.strokeStyle = 'rgba(255,255,255,0.9)';
+                        main.lineWidth = 2;
+                        main.beginPath();
+                        main.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+                        main.fill();
+                        main.stroke();
+                        main.restore();
+                    }
+                } catch (innerErr) {
+                    console.warn('Errore disegno CoG main canvas:', innerErr);
+                }
+            } catch (diagErr) {
+                console.warn('Errore diagnostico HillasOverlay:', diagErr);
             }
-        } catch (diagErr) {
-            console.warn('Errore diagnostico HillasOverlay:', diagErr);
-        }
+        }, 4);
     }
 
 }
