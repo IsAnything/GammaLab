@@ -32,6 +32,19 @@ const CRAB_NEBULA_PROFILE = {
     // Caratteristiche morfologiche
     elongation: 0.25,  // Length/Width ratio ~ 3
     asymmetry: { mean: 0.05, std: 0.03 },  // Molto simmetrico
+
+    // Firma visiva per la generazione delle tracce
+    visualSignature: {
+        dispersionScaleX: 0.16,
+        dispersionScaleY: 0.16,
+        alphaNoiseScale: 0.35,
+        centralCoreBoost: true,
+        intensityVariance: 0.2,
+        energyInitialBoost: 1.0,
+        energyCoreBoost: 0.35,
+        energyRadialFalloff: 1.6,
+        energyNoise: 0.05
+    },
     
     // Parametri energetici
     energyRange: {
@@ -73,6 +86,26 @@ const PEVATRON_PROFILE = {
     
     elongation: 0.35,
     asymmetry: { mean: 0.15, std: 0.08 },  // Più irregolare
+
+    visualSignature: {
+        dispersionScaleX: 0.48,
+        dispersionScaleY: 0.48,
+        centerBiasX: 0.12,
+        lengthScale: 1.18,
+        widthScale: 1.22,
+        alphaNoiseScale: 1.4,
+        ringProbability: 0.38,
+        ringThickness: 0.55,
+        hotspotCount: 4,
+        hotspotSpread: 0.85,
+        hotspotFill: 0.55,
+        hotspotBoost: 1.35,
+        intensityVariance: 0.9,
+        offAxisShear: 0.25,
+        energyInitialBoost: 1.4,
+        energyCoreBoost: 0.4,
+        energyNoise: 0.2
+    },
     
     energyRange: {
         min: 500,       // GeV
@@ -111,6 +144,25 @@ const BLAZAR_PROFILE = {
     
     elongation: 0.20,  // L/W ratio ~ 3-4 (alto)
     asymmetry: { mean: 0.08, std: 0.05 },
+
+    visualSignature: {
+        dispersionScaleX: 0.12,
+        dispersionScaleY: 0.12,
+        widthScale: 0.7,
+        alphaNoiseScale: 0.25,
+        spineTightening: 0.45,
+        centralCoreBoost: true,
+        hotspotCount: 2,
+        hotspotSpread: 0.25,
+        hotspotFill: 0.3,
+        hotspotBoost: 1.1,
+        intensityVariance: 0.25,
+        energyInitialBoost: 1.25,
+        energyCoreBoost: 0.55,
+        energySpineBoost: 0.6,
+        energyRadialFalloff: 1.4,
+        energyNoise: 0.08
+    },
     
     energyRange: {
         min: 100,
@@ -150,6 +202,26 @@ const GRB_PROFILE = {
     
     elongation: 0.45,  // L/W ~ 1.9 - FIRMA CHIAVE (più basso)
     asymmetry: { mean: 0.12, std: 0.06 },
+
+    visualSignature: {
+        dispersionScaleX: 0.22,
+        dispersionScaleY: 0.22,
+        lengthScale: 1.08,
+        widthScale: 0.95,
+        alphaNoiseScale: 0.55,
+        tailStrength: 0.45,
+        tailDecay: 0.65,
+        hotspotCount: 1,
+        hotspotSpread: 0.35,
+        hotspotFill: 0.25,
+        hotspotBoost: 0.9,
+        intensityVariance: 0.45,
+        energyInitialBoost: 1.35,
+        energyTailDrop: 0.75,
+        energyCoreBoost: 0.25,
+        energyRadialFalloff: 2.2,
+        energyNoise: 0.12
+    },
     
     energyRange: {
         min: 200,
@@ -195,6 +267,26 @@ const GALACTIC_CENTER_PROFILE = {
     
     elongation: 0.40,  // L/W ~ 2
     asymmetry: { mean: 0.18, std: 0.10 },  // Irregolare
+
+    visualSignature: {
+        dispersionScaleX: 0.4,
+        dispersionScaleY: 0.36,
+        centerBiasX: 0.18,
+        centerBiasY: 0.1,
+        lengthScale: 1.1,
+        widthScale: 1.2,
+        alphaNoiseScale: 1.6,
+        hotspotCount: 3,
+        hotspotSpread: 0.65,
+        hotspotFill: 0.65,
+        hotspotBoost: 0.85,
+        intensityVariance: 1.0,
+        offAxisShear: 0.4,
+        energyInitialBoost: 1.2,
+        energyCoreBoost: 0.3,
+        energyTailDrop: 0.35,
+        energyNoise: 0.18
+    },
     
     energyRange: {
         min: 200,
@@ -233,6 +325,19 @@ const HADRON_BACKGROUND_PROFILE = {
     
     elongation: 0.55,  // L/W ~ 1.6 - PIÙ BASSO
     asymmetry: { mean: 0.45, std: 0.20 },  // MOLTO asimmetrico
+
+    visualSignature: {
+        dispersionScaleX: 0.5,
+        dispersionScaleY: 0.5,
+        hotspotCount: 3,
+        hotspotSpread: 1.0,
+        hotspotFill: 0.7,
+        hotspotBoost: 0.5,
+        intensityVariance: 1.2,
+        energyInitialBoost: 1.05,
+        energyNoise: 0.3,
+        offAxisShear: 0.2
+    },
     
     energyRange: {
         min: 50,

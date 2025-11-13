@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>GammaLab Diagnostica - Firme delle Sorgenti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 32px;
+            background: #030615;
+            color: #f1f5ff;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+        p.lead {
+            max-width: 800px;
+            color: #c8d6ff;
+            line-height: 1.5;
+        }
+        .controls {
+            margin: 24px 0 32px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #1b3de0;
+            color: #f8fbff;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        button:hover {
+            background: #254bff;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 28px;
+        }
+        .panel {
+            background: rgba(8, 20, 46, 0.88);
+            border: 1px solid rgba(91, 126, 220, 0.4);
+            border-radius: 12px;
+            padding: 18px 18px 24px;
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.35);
+        }
+        .panel h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+        .canvas-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3 / 2;
+            background: #000814;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(120, 160, 240, 0.25);
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        canvas.overlay {
+            pointer-events: none;
+        }
+        .meta {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #9bb7ff;
+            letter-spacing: 0.2px;
+        }
+        .legend {
+            margin-top: 12px;
+            font-size: 11px;
+            color: #7ea3ff;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Diagnostica Firme Visive</h1>
+    <p class="lead">
+        Confronto diretto tra le principali tipologie di sorgente con seed fissato. Ogni canvas utilizza le
+        stesse impostazioni di esposizione e consente di verificare rapidamente che le firme morfologiche ed
+        energetiche (core brillante, coda verde dei GRB, filamenti PeVatron) rimangano coerenti dopo gli
+        aggiornamenti del motore di simulazione.
+    </p>
+
+    <div class="controls">
+        <button id="regen-btn" type="button">Rigenera con seed fisso</button>
+    </div>
+
+    <div class="grid">
+        <section class="panel">
+            <h2>Crab Nebula</h2>
+            <div class="canvas-wrap">
+                <canvas id="diag-crab" width="900" height="600"></canvas>
+                <canvas id="diag-crab-overlay" class="overlay" width="900" height="600"></canvas>
+            </div>
+            <p class="meta" id="meta-crab">–</p>
+            <p class="legend">Core compatto, distribuzione termica: firma di riferimento per sciami gamma stabili.</p>
+        </section>
+        <section class="panel">
+            <h2>Blazar (AGN)</h2>
+            <div class="canvas-wrap">
+                <canvas id="diag-blazar" width="900" height="600"></canvas>
+                <canvas id="diag-blazar-overlay" class="overlay" width="900" height="600"></canvas>
+            </div>
+            <p class="meta" id="meta-blazar">–</p>
+            <p class="legend">Asse brillante con viraggio al verde oltre 10&nbsp;TeV, hotspot compatti sul getto relativistico.</p>
+        </section>
+        <section class="panel">
+            <h2>GRB Afterglow</h2>
+            <div class="canvas-wrap">
+                <canvas id="diag-grb" width="900" height="600"></canvas>
+                <canvas id="diag-grb-overlay" class="overlay" width="900" height="600"></canvas>
+            </div>
+            <p class="meta" id="meta-grb">–</p>
+            <p class="legend">Coda più tenue e verdognola in raffreddamento, ampiezza intermedia ma con decadenza energetica.</p>
+        </section>
+    </div>
+
+    <script src="../js/source-profiles.js"></script>
+    <script src="../js/core-simulation.js"></script>
+    <script src="../js/hillas-analysis.js"></script>
+    <script src="../js/visualization.js"></script>
+    <script>
+        (function() {
+            const SEEDS = {
+                crab: 'crab-signature-seed',
+                blazar: 'blazar-signature-seed',
+                grb: 'grb-signature-seed'
+            };
+
+            function withSeed(seed, fn) {
+                const originalRandom = Math.random;
+                let state = 0;
+                for (let i = 0; i < seed.length; i++) {
+                    state = (state * 31 + seed.charCodeAt(i)) >>> 0;
+                }
+
+                Math.random = function seededRandom() {
+                    state = (state * 1664525 + 1013904223) >>> 0;
+                    return state / 0x100000000;
+                };
+
+                try {
+                    fn();
+                } finally {
+                    Math.random = originalRandom;
+                }
+            }
+
+            const engine = new SimulationEngine();
+            const analyzer = new HillasAnalyzer();
+            const renderers = {
+                crab: new CanvasRenderer('diag-crab', 'diag-crab-overlay'),
+                blazar: new CanvasRenderer('diag-blazar', 'diag-blazar-overlay'),
+                grb: new CanvasRenderer('diag-grb', 'diag-grb-overlay')
+            };
+
+            Object.values(renderers).forEach(renderer => {
+                renderer.exposureK = 4.0;
+                renderer.subpixelEnabled = false;
+                renderer.respectExactHillas = true;
+                renderer.showHillasOnHover = false;
+            });
+
+            const profiles = [
+                { key: 'crab', label: 'Crab Nebula', canvas: 'diag-crab', meta: 'meta-crab' },
+                { key: 'blazar', label: 'Blazar (AGN)', canvas: 'diag-blazar', meta: 'meta-blazar' },
+                { key: 'grb', label: 'GRB Afterglow', canvas: 'diag-grb', meta: 'meta-grb' }
+            ];
+
+            function formatMeta(event, tracks) {
+                const energyTeV = event.energy ? (event.energy / 1000).toFixed(2) : '—';
+                const photonCount = tracks.length;
+                const alpha = (event.params && event.params.alpha) ? event.params.alpha.toFixed(1) : '—';
+                return `E = ${energyTeV} TeV • Fotoni = ${photonCount} • Alpha = ${alpha}°`;
+            }
+
+            function renderProfile(profile) {
+                const renderer = renderers[profile.key];
+                const metaTarget = document.getElementById(profile.meta);
+
+                withSeed(SEEDS[profile.key], () => {
+                    const sourceProfile = getSourceProfile(profile.key);
+                    const canvas = document.getElementById(profile.canvas);
+                    const canvasSize = { width: canvas.width, height: canvas.height };
+                    const event = engine.generateEvent(sourceProfile, 1, canvasSize, { forceCenter: true });
+
+                    renderer.renderEvent(event, true);
+
+                    const hillas = analyzer.analyze(event);
+                    if (hillas && hillas.valid) {
+                        renderer.renderHillasOverlay(hillas);
+                    }
+
+                    if (metaTarget) {
+                        metaTarget.textContent = formatMeta(event, event.tracks);
+                    }
+                });
+            }
+
+            function renderAll() {
+                profiles.forEach(renderProfile);
+            }
+
+            document.getElementById('regen-btn').addEventListener('click', renderAll);
+
+            // Prima renderizzazione
+            renderAll();
+        })();
+    </script>
+</body>
+</html>

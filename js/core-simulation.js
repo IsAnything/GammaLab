@@ -105,13 +105,27 @@ class SimulationEngine {
         const hadronEnergy = (customParams && customParams.energy) || this._randomInRange(100, 10000);
         
         // Parametri tipici adronici (molto diversi dai gamma)
+        let hadronSignature = null;
+        try {
+            if (typeof getSourceProfile === 'function') {
+                const profile = getSourceProfile('hadron');
+                if (profile && profile.visualSignature) {
+                    hadronSignature = { ...profile.visualSignature };
+                }
+            }
+        } catch (e) {
+            hadronSignature = null;
+        }
+
         const params = {
             length: this._randomInRange(0.15, 0.35),  // Più variabile
             width: this._randomInRange(0.08, 0.18),   // Molto più largo (rapporto ~2-3)
             size: this._randomInRange(800, 2500),     // Tanti fotoni
             alpha: this._randomInRange(5, 40),        // Angoli alpha più grandi
             elongation: this._randomInRange(0.15, 0.35),  // Meno allungato
-            asymmetry: { mean: 0.25, std: 0.15 }      // Più asimmetrico
+            asymmetry: { mean: 0.25, std: 0.15 },     // Più asimmetrico
+            sourceType: 'hadron',
+            visualSignature: hadronSignature
         };
         
         // Angolo zenitale random
@@ -161,7 +175,9 @@ class SimulationEngine {
             size: this._randomInRange(200, 600),      // Pochi fotoni
             alpha: this._randomInRange(0, 15),        // Angolo alpha piccolo
             elongation: 0.95,                         // Quasi perfettamente lineare
-            asymmetry: { mean: 0.05, std: 0.02 }      // Molto simmetrico
+            asymmetry: { mean: 0.05, std: 0.02 },     // Molto simmetrico
+            sourceType: 'muon',
+            visualSignature: null
         };
         
         // Genera tracce muoniche
@@ -213,7 +229,9 @@ class SimulationEngine {
             size: this._randomInRange(profile.size.min, profile.size.max),
             alpha: this._randomFromDistribution(profile.alpha),
             elongation: profile.elongation || 0.3,
-            asymmetry: profile.asymmetry || { mean: 0.1, std: 0.05 }
+            asymmetry: profile.asymmetry || { mean: 0.1, std: 0.05 },
+            sourceType: profile.type,
+            visualSignature: profile.visualSignature ? { ...profile.visualSignature } : null
         };
     }
 
@@ -231,7 +249,8 @@ class SimulationEngine {
             alpha: params.alpha + (Math.random() - 0.5) * variance * 10,
             elongation: params.elongation,
             asymmetry: params.asymmetry,
-            sourceType: params.sourceType
+            sourceType: params.sourceType,
+            visualSignature: params.visualSignature ? { ...params.visualSignature } : null
         };
     }
 
@@ -343,95 +362,27 @@ class SimulationEngine {
             energyNoise: 0.0
         };
 
-        switch (sourceType) {
-            case 'crab':
-                profileConfig.dispersionScaleX = 0.16;
-                profileConfig.dispersionScaleY = 0.16;
-                profileConfig.alphaNoiseScale = 0.35;
-                profileConfig.centralCoreBoost = true;
-                profileConfig.intensityVariance = 0.2;
-                profileConfig.energyInitialBoost = 1.0;
-                profileConfig.energyCoreBoost = 0.35;
-                profileConfig.energyRadialFalloff = 1.6;
-                profileConfig.energyNoise = 0.05;
-                break;
-            case 'blazar':
-                profileConfig.dispersionScaleX = 0.12;
-                profileConfig.dispersionScaleY = 0.12;
-                profileConfig.widthScale = 0.7;
-                profileConfig.alphaNoiseScale = 0.25;
-                profileConfig.spineTightening = 0.45;
-                profileConfig.centralCoreBoost = true;
-                profileConfig.hotspotCount = 2;
-                profileConfig.hotspotSpread = 0.25;
-                profileConfig.hotspotFill = 0.3;
-                profileConfig.hotspotBoost = 1.1;
-                profileConfig.intensityVariance = 0.25;
-                profileConfig.energyInitialBoost = 1.25;
-                profileConfig.energyCoreBoost = 0.55;
-                profileConfig.energySpineBoost = 0.6;
-                profileConfig.energyRadialFalloff = 1.4;
-                profileConfig.energyNoise = 0.08;
-                break;
-            case 'pevatron':
-                profileConfig.dispersionScaleX = 0.48;
-                profileConfig.dispersionScaleY = 0.48;
-                profileConfig.centerBiasX = 0.12;
-                profileConfig.lengthScale = 1.18;
-                profileConfig.widthScale = 1.22;
-                profileConfig.alphaNoiseScale = 1.4;
-                profileConfig.ringProbability = 0.38;
-                profileConfig.ringThickness = 0.55;
-                profileConfig.hotspotCount = 4;
-                profileConfig.hotspotSpread = 0.85;
-                profileConfig.hotspotFill = 0.55;
-                profileConfig.hotspotBoost = 1.35;
-                profileConfig.intensityVariance = 0.9;
-                profileConfig.offAxisShear = 0.25;
-                profileConfig.energyInitialBoost = 1.4;
-                profileConfig.energyCoreBoost = 0.4;
-                profileConfig.energyNoise = 0.2;
-                break;
-            case 'grb':
-                profileConfig.dispersionScaleX = 0.22;
-                profileConfig.dispersionScaleY = 0.22;
-                profileConfig.lengthScale = 1.08;
-                profileConfig.widthScale = 0.95;
-                profileConfig.alphaNoiseScale = 0.55;
-                profileConfig.tailStrength = 0.45;
-                profileConfig.tailDecay = 0.65;
-                profileConfig.hotspotCount = 1;
-                profileConfig.hotspotSpread = 0.35;
-                profileConfig.hotspotFill = 0.25;
-                profileConfig.hotspotBoost = 0.9;
-                profileConfig.intensityVariance = 0.45;
-                profileConfig.energyInitialBoost = 1.35;
-                profileConfig.energyTailDrop = 0.75;
-                profileConfig.energyCoreBoost = 0.25;
-                profileConfig.energyRadialFalloff = 2.2;
-                profileConfig.energyNoise = 0.12;
-                break;
-            case 'galactic-center':
-                profileConfig.dispersionScaleX = 0.4;
-                profileConfig.dispersionScaleY = 0.36;
-                profileConfig.centerBiasX = 0.18;
-                profileConfig.centerBiasY = 0.1;
-                profileConfig.lengthScale = 1.1;
-                profileConfig.widthScale = 1.2;
-                profileConfig.alphaNoiseScale = 1.6;
-                profileConfig.hotspotCount = 3;
-                profileConfig.hotspotSpread = 0.65;
-                profileConfig.hotspotFill = 0.65;
-                profileConfig.hotspotBoost = 0.85;
-                profileConfig.intensityVariance = 1.0;
-                profileConfig.offAxisShear = 0.4;
-                profileConfig.energyInitialBoost = 1.2;
-                profileConfig.energyCoreBoost = 0.3;
-                profileConfig.energyTailDrop = 0.35;
-                profileConfig.energyNoise = 0.18;
-                break;
-            default:
-                break;
+        const signatureOverride = params.visualSignature || options.visualSignature || null;
+        if (signatureOverride && typeof signatureOverride === 'object') {
+            Object.assign(profileConfig, signatureOverride);
+        } else if (!signatureOverride) {
+            // Fallback to legacy heuristics for sources senza visualSignature
+            switch (sourceType) {
+                case 'blazar':
+                    profileConfig.widthScale = 0.7;
+                    profileConfig.spineTightening = 0.5;
+                    profileConfig.centralCoreBoost = true;
+                    break;
+                case 'pevatron':
+                    profileConfig.dispersionScaleX = 0.5;
+                    profileConfig.dispersionScaleY = 0.5;
+                    profileConfig.hotspotCount = 3;
+                    profileConfig.hotspotSpread = 0.8;
+                    profileConfig.intensityVariance = 0.9;
+                    break;
+                default:
+                    break;
+            }
         }
 
         // Centro della traccia con variazione legata al tipo sorgente
@@ -661,7 +612,8 @@ class SimulationEngine {
                 x,
                 y,
                 energy: photonEnergy,
-                intensity: intensity * Math.pow(energyScale, 0.35)
+                intensity: intensity * Math.pow(energyScale, 0.35),
+                sourceType: sourceType
             });
         }
 

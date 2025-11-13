@@ -194,7 +194,7 @@ class EnergyColorPalette {
 
         // Sfondo
         ctx.fillStyle = 'rgba(0, 8, 20, 0.8)';
-        ctx.fillRect(x - 5, y - 25, width + 10, height + 55);
+        ctx.fillRect(x - 5, y - 25, width + 10, height + 85);
 
         // Label
         ctx.fillStyle = '#ffffff';
@@ -217,6 +217,11 @@ class EnergyColorPalette {
         ctx.fillText('1 TeV', x + width / 3, y + height + 15);
         ctx.fillText('10 TeV', x + 2 * width / 3, y + height + 15);
         ctx.fillText('50 TeV', x + width - 35, y + height + 15);
+
+        ctx.fillStyle = '#dfe9ff';
+        ctx.font = '9px "Courier New", monospace';
+        ctx.fillText('Core brillante = fotoni ad alta energia', x, y + height + 30);
+        ctx.fillText('Code verdi lunghe ⇒ GRB in raffreddamento', x, y + height + 42);
     }
 }
 
@@ -239,6 +244,7 @@ class CanvasRenderer {
         this.overlayCtx = this.overlay ? this.overlay.getContext('2d') : null;
         
         this.colorPalette = new EnergyColorPalette();
+        this.sourceType = null;
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
@@ -628,6 +634,7 @@ class CanvasRenderer {
     renderEvent(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
+        this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
 
         this.clear();
 
@@ -658,6 +665,7 @@ class CanvasRenderer {
                 this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
             }
 
+            this.renderEnergyHistogram(event);
             this.drawCameraInfo(event);
         });
 
@@ -672,6 +680,7 @@ class CanvasRenderer {
     renderEventAnimated(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
+        this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
 
         this.clear();
         
@@ -702,15 +711,16 @@ class CanvasRenderer {
                 requestAnimationFrame(renderBatch);
             } else {
                 // Animazione completata
-                if (this.lightStyle) {
-                    if (!this.suppressNoise) {
-                        this._withHexClip(() => this.renderBackgroundNoise());
+                this._withHexClip(() => {
+                    if (this.lightStyle && !this.suppressNoise) {
+                        this.renderBackgroundNoise();
                     }
-                }
-                if (showLegend) {
-                    this._withHexClip(() => this.colorPalette.drawEnergyLegend(this.canvas, 'top-right'));
-                }
-                this._withHexClip(() => this.drawCameraInfo(event));
+                    if (showLegend) {
+                        this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+                    }
+                    this.renderEnergyHistogram(event);
+                    this.drawCameraInfo(event);
+                });
             }
 
             this.drawCameraBorder();
@@ -836,6 +846,44 @@ class CanvasRenderer {
         }
     }
 
+    _mixRGBTowards(baseRGB, targetRGB, factor) {
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+        const t = clamp(isFinite(factor) ? factor : 0, 0, 1);
+        return [
+            Math.round(baseRGB[0] + (targetRGB[0] - baseRGB[0]) * t),
+            Math.round(baseRGB[1] + (targetRGB[1] - baseRGB[1]) * t),
+            Math.round(baseRGB[2] + (targetRGB[2] - baseRGB[2]) * t)
+        ];
+    }
+
+    _applyHighEnergyTint(baseRGB, track) {
+        if (!track || !track.energy || !isFinite(track.energy)) {
+            return baseRGB;
+        }
+
+        const sourceTag = track.sourceType || this.sourceType;
+        if (sourceTag !== 'blazar' && sourceTag !== 'grb') {
+            return baseRGB;
+        }
+
+        const energyTeV = (track.energy || 0) / 1000;
+        if (energyTeV < 10) {
+            return baseRGB;
+        }
+
+        const overThreshold = Math.max(0, energyTeV - 10);
+        const tintStrength = Math.min(0.5, 0.15 + 0.04 * overThreshold);
+        if (tintStrength <= 0) {
+            return baseRGB;
+        }
+
+        const target = sourceTag === 'blazar'
+            ? [90, 255, 170]
+            : [60, 235, 210];
+
+        return this._mixRGBTowards(baseRGB, target, tintStrength);
+    }
+
     /**
      * Renderizza singolo fotone
      */
@@ -865,6 +913,7 @@ class CanvasRenderer {
                               Math.log10(this.colorPalette.maxEnergy / this.colorPalette.minEnergy);
             const colorT = (intensityFactor * 0.7 + energyNorm * 0.3);
             baseRGB = this.colorPalette.mapNormalized(colorT);
+            baseRGB = this._applyHighEnergyTint(baseRGB, track);
 
             // Exposure / tone-mapping -> brightness scalar in 0..1
             const exposureK = this.exposureK || 4.0; // use renderer property if available
@@ -929,6 +978,91 @@ class CanvasRenderer {
         this.ctx.beginPath();
         this.ctx.arc(drawX, drawY, radius * 0.5, 0, 2 * Math.PI);
         this.ctx.fill();
+    }
+
+    renderEnergyHistogram(event) {
+        if (!this.ctx || !event || !Array.isArray(event.tracks) || event.tracks.length === 0) {
+            return;
+        }
+
+        const bins = [
+            { label: '<1 TeV', min: 0, max: 1000, sample: 500 },
+            { label: '1-3 TeV', min: 1000, max: 3000, sample: 2000 },
+            { label: '3-10 TeV', min: 3000, max: 10000, sample: 6000 },
+            { label: '>10 TeV', min: 10000, max: Infinity, sample: 20000 }
+        ];
+
+        const counts = bins.map(() => 0);
+        let maxCount = 0;
+
+        event.tracks.forEach(track => {
+            const energy = track && track.energy;
+            if (!energy || !isFinite(energy)) return;
+
+            for (let i = 0; i < bins.length; i++) {
+                const bin = bins[i];
+                if (energy >= bin.min && energy < bin.max) {
+                    counts[i]++;
+                    if (counts[i] > maxCount) maxCount = counts[i];
+                    break;
+                }
+            }
+        });
+
+        if (maxCount === 0) {
+            return;
+        }
+
+        const panelWidth = 164;
+        const panelHeight = 96;
+        const margin = 18;
+        const baseX = margin;
+        const baseY = this.canvas.height - panelHeight - margin;
+
+        const bgColor = this.lightStyle ? 'rgba(245, 248, 255, 0.88)' : 'rgba(0, 8, 20, 0.82)';
+        const borderColor = this.lightStyle ? 'rgba(40, 70, 110, 0.55)' : 'rgba(180, 220, 255, 0.4)';
+        const textColor = this.lightStyle ? '#0f2b46' : '#dfe9ff';
+
+        this.ctx.save();
+        this.ctx.fillStyle = bgColor;
+        this.ctx.fillRect(baseX, baseY, panelWidth, panelHeight);
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(baseX, baseY, panelWidth, panelHeight);
+
+        this.ctx.fillStyle = textColor;
+        this.ctx.font = '10px "Courier New", monospace';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText('Distribuzione energia', baseX + 8, baseY + 14);
+
+        const graphTop = baseY + 24;
+        const graphHeight = panelHeight - 40;
+        const gap = 6;
+        const usableWidth = panelWidth - gap * (bins.length + 1);
+        const barWidth = Math.max(12, usableWidth / bins.length);
+
+        for (let i = 0; i < bins.length; i++) {
+            const count = counts[i];
+            const bin = bins[i];
+            const barX = baseX + gap + i * (barWidth + gap);
+            const norm = count / maxCount;
+            const barH = Math.max(2, norm * graphHeight);
+            const barY = graphTop + (graphHeight - barH);
+
+            const rgb = this.colorPalette.getColorRGB(bin.sample);
+            this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${this.lightStyle ? 0.75 : 0.9})`;
+            this.ctx.fillRect(barX, barY, barWidth, barH);
+
+            this.ctx.fillStyle = textColor;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(bin.label, barX + barWidth / 2, graphTop + graphHeight + 12);
+
+            if (count > 0) {
+                this.ctx.fillText(`${count}`, barX + barWidth / 2, barY - 4);
+            }
+        }
+
+        this.ctx.restore();
     }
 
     /**
