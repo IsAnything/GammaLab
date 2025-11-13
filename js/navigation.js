@@ -70,6 +70,86 @@ function setupSourceSimulator(sourceType, options = {}) {
             clearBtn.addEventListener('click', () => clearAll());
         }
 
+            // --- UI: Exposure slider and Sub-pixel toggle (live control for renderers) ---
+            try {
+                const controlsContainer = document.createElement('div');
+                controlsContainer.style.display = 'flex';
+                controlsContainer.style.alignItems = 'center';
+                controlsContainer.style.gap = '12px';
+                controlsContainer.style.marginTop = '10px';
+
+                // Exposure label + slider
+                const expLabel = document.createElement('label');
+                expLabel.style.color = '#ffffff';
+                expLabel.style.fontFamily = '"Courier New", monospace';
+                expLabel.style.fontSize = '13px';
+                expLabel.textContent = 'Exposure:';
+
+                const expValue = document.createElement('span');
+                expValue.style.color = '#ffd966';
+                expValue.style.marginLeft = '6px';
+                expValue.style.minWidth = '44px';
+                expValue.textContent = (renderers[0] && renderers[0].exposureK) ? renderers[0].exposureK.toFixed(1) : '4.0';
+
+                const expSlider = document.createElement('input');
+                expSlider.type = 'range';
+                expSlider.min = '1.0';
+                expSlider.max = '8.0';
+                expSlider.step = '0.1';
+                expSlider.value = (renderers[0] && renderers[0].exposureK) ? renderers[0].exposureK : 4.0;
+                expSlider.style.width = '220px';
+                expSlider.addEventListener('input', (ev) => {
+                    const v = parseFloat(ev.target.value);
+                    expValue.textContent = v.toFixed(1);
+                    renderers.forEach(r => { r.exposureK = v; });
+                    console.log('🔧 exposureK set to', v);
+                });
+
+                // Sub-pixel checkbox
+                const spLabel = document.createElement('label');
+                spLabel.style.color = '#ffffff';
+                spLabel.style.fontFamily = '"Courier New", monospace';
+                spLabel.style.fontSize = '13px';
+                spLabel.style.marginLeft = '8px';
+                spLabel.textContent = 'Sub-pixel:';
+
+                const spCheckbox = document.createElement('input');
+                spCheckbox.type = 'checkbox';
+                spCheckbox.checked = (renderers[0] && !!renderers[0].subpixelEnabled);
+                spCheckbox.style.marginLeft = '6px';
+                spCheckbox.addEventListener('change', (ev) => {
+                    const enabled = !!ev.target.checked;
+                    renderers.forEach(r => { r.subpixelEnabled = enabled; });
+                    console.log('🔧 subpixelEnabled set to', enabled);
+                });
+
+                // assemble
+                const left = document.createElement('div');
+                left.style.display = 'flex';
+                left.style.alignItems = 'center';
+                left.appendChild(expLabel);
+                left.appendChild(expValue);
+                left.appendChild(expSlider);
+
+                const right = document.createElement('div');
+                right.style.display = 'flex';
+                right.style.alignItems = 'center';
+                right.appendChild(spLabel);
+                right.appendChild(spCheckbox);
+
+                controlsContainer.appendChild(left);
+                controlsContainer.appendChild(right);
+
+                // Insert after generate button if available, otherwise append to body
+                if (generateBtn && generateBtn.parentNode) {
+                    generateBtn.parentNode.insertBefore(controlsContainer, generateBtn.nextSibling);
+                } else {
+                    document.body.appendChild(controlsContainer);
+                }
+            } catch (e) {
+                console.warn('Errore creando UI exposure/subpixel:', e);
+            }
+
         console.log(`✅ Simulatore ${sourceType} inizializzato`);
         
         // Auto-genera primo evento dopo caricamento pagina

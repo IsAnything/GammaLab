@@ -250,6 +250,8 @@ class CanvasRenderer {
         // If true, allow sub-pixel placement / small jitter for photon's positions
         // improves realism by avoiding integer-only placement
         this.subpixelEnabled = true;
+    // Exposure parameter for tone-mapping (higher = brighter / more responsive highlights)
+    this.exposureK = 4.0;
     }
 
     /**
@@ -582,7 +584,7 @@ class CanvasRenderer {
             baseRGB = this.colorPalette.mapNormalized(colorT);
 
             // Exposure / tone-mapping -> brightness scalar in 0..1
-            const exposureK = 4.0; // tuned constant; could be exposed as a renderer property
+            const exposureK = this.exposureK || 4.0; // use renderer property if available
             const brightness = this.colorPalette.toneMap(colorT, exposureK);
 
             // Mix intensity into final brightness for extra punch for brighter photons
