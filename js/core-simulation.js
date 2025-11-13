@@ -52,11 +52,13 @@ class SimulationEngine {
         const canvasH = canvasSize?.height || CANVAS_HEIGHT;
         
         // Estrai parametri dal profilo
-        const baseParams = this._sampleFromProfile(sourceProfile);
+    const baseParams = this._sampleFromProfile(sourceProfile);
+    baseParams.sourceType = sourceProfile.type;
         
         // Aggiungi varianza inter-camera
         const cameraVariance = sourceProfile.interCameraVariance || 0.05;
-        const params = this._applyCameraVariance(baseParams, cameraVariance, cameraId);
+    const params = this._applyCameraVariance(baseParams, cameraVariance, cameraId);
+    params.sourceType = sourceProfile.type;
         
         // Genera energia del fotone primario (custom o random)
         const energy = customParams?.energy || this._sampleEnergy(sourceProfile.energyRange);
@@ -228,7 +230,8 @@ class SimulationEngine {
             size: Math.max(100, params.size * factor),
             alpha: params.alpha + (Math.random() - 0.5) * variance * 10,
             elongation: params.elongation,
-            asymmetry: params.asymmetry
+            asymmetry: params.asymmetry,
+            sourceType: params.sourceType
         };
     }
 
@@ -299,43 +302,136 @@ class SimulationEngine {
         }
         
         const tracks = [];
-        
-    // Numero di fotoni dipende dall'energia ma in modo più moderato
-    // 100 GeV → pochi fotoni, 5000 GeV → più fotoni (non troppi)
-    const energyTeV = energy / 1000;
-    const energyBoost = Math.pow(energyTeV, 0.25); // Scala molto sub-lineare (era 0.4)
-    const densityFactor = (0.4 + Math.random() * 1.0) * energyBoost; // Ridotta variabilità
-    const requestedPhotons = Math.floor(params.size * densityFactor);
-    const MAX_PHOTONS = 2500; // Ridotto da 4000
-    const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
-        
-        // Centro della traccia - maggiore dispersione per tracce anche vicino ai bordi
-        const dispersionX = canvasWidth * 0.35;  // 35% della larghezza (era 15%)
-        const dispersionY = canvasHeight * 0.35; // 35% dell'altezza (era 15%)
-        let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
-        let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
 
-        // If options.forceCenter is set, generate the shower centered in the camera
-        if (options && options.forceCenter) {
-            centerX = canvasWidth / 2;
-            centerY = canvasHeight / 2;
+        // Numero di fotoni dipende dall'energia ma in modo più moderato
+        // 100 GeV → pochi fotoni, 5000 GeV → più fotoni (non troppi)
+        const energyTeV = energy / 1000;
+        const energyBoost = Math.pow(energyTeV, 0.25); // Scala molto sub-lineare (era 0.4)
+        const densityFactor = (0.4 + Math.random() * 1.0) * energyBoost; // Ridotta variabilità
+        const requestedPhotons = Math.floor(params.size * densityFactor);
+        const MAX_PHOTONS = 2500; // Ridotto da 4000
+        const numPhotons = Math.min(requestedPhotons, MAX_PHOTONS);
+
+        const sourceType = params.sourceType || options.sourceType || 'generic';
+
+        // Profilo estetico differenziato per sorgente
+        const profileConfig = {
+            dispersionScaleX: 0.35,
+            dispersionScaleY: 0.35,
+            centerBiasX: 0,
+            centerBiasY: 0,
+            lengthScale: 1.0,
+            widthScale: 1.0,
+            alphaNoiseScale: 1.0,
+            spineTightening: 1.0,
+            tailStrength: 0,
+            tailDecay: 0.6,
+            centralCoreBoost: false,
+            ringProbability: 0,
+            ringThickness: 0.6,
+            hotspotCount: 0,
+            hotspotSpread: 0.5,
+            hotspotFill: 0.0,
+            hotspotBoost: 0.8,
+            intensityVariance: 0.4,
+            offAxisShear: 0
+        };
+
+        switch (sourceType) {
+            case 'crab':
+                profileConfig.dispersionScaleX = 0.16;
+                profileConfig.dispersionScaleY = 0.16;
+                profileConfig.alphaNoiseScale = 0.35;
+                profileConfig.centralCoreBoost = true;
+                profileConfig.intensityVariance = 0.2;
+                break;
+            case 'blazar':
+                profileConfig.dispersionScaleX = 0.12;
+                profileConfig.dispersionScaleY = 0.12;
+                profileConfig.widthScale = 0.7;
+                profileConfig.alphaNoiseScale = 0.25;
+                profileConfig.spineTightening = 0.45;
+                profileConfig.centralCoreBoost = true;
+                profileConfig.hotspotCount = 2;
+                profileConfig.hotspotSpread = 0.25;
+                profileConfig.hotspotFill = 0.3;
+                profileConfig.hotspotBoost = 1.1;
+                profileConfig.intensityVariance = 0.25;
+                break;
+            case 'pevatron':
+                profileConfig.dispersionScaleX = 0.48;
+                profileConfig.dispersionScaleY = 0.48;
+                profileConfig.centerBiasX = 0.12;
+                profileConfig.lengthScale = 1.18;
+                profileConfig.widthScale = 1.22;
+                profileConfig.alphaNoiseScale = 1.4;
+                profileConfig.ringProbability = 0.38;
+                profileConfig.ringThickness = 0.55;
+                profileConfig.hotspotCount = 4;
+                profileConfig.hotspotSpread = 0.85;
+                profileConfig.hotspotFill = 0.55;
+                profileConfig.hotspotBoost = 1.35;
+                profileConfig.intensityVariance = 0.9;
+                profileConfig.offAxisShear = 0.25;
+                break;
+            case 'grb':
+                profileConfig.dispersionScaleX = 0.22;
+                profileConfig.dispersionScaleY = 0.22;
+                profileConfig.lengthScale = 1.08;
+                profileConfig.widthScale = 0.95;
+                profileConfig.alphaNoiseScale = 0.55;
+                profileConfig.tailStrength = 0.45;
+                profileConfig.tailDecay = 0.65;
+                profileConfig.hotspotCount = 1;
+                profileConfig.hotspotSpread = 0.35;
+                profileConfig.hotspotFill = 0.25;
+                profileConfig.hotspotBoost = 0.9;
+                profileConfig.intensityVariance = 0.45;
+                break;
+            case 'galactic-center':
+                profileConfig.dispersionScaleX = 0.4;
+                profileConfig.dispersionScaleY = 0.36;
+                profileConfig.centerBiasX = 0.18;
+                profileConfig.centerBiasY = 0.1;
+                profileConfig.lengthScale = 1.1;
+                profileConfig.widthScale = 1.2;
+                profileConfig.alphaNoiseScale = 1.6;
+                profileConfig.hotspotCount = 3;
+                profileConfig.hotspotSpread = 0.65;
+                profileConfig.hotspotFill = 0.65;
+                profileConfig.hotspotBoost = 0.85;
+                profileConfig.intensityVariance = 1.0;
+                profileConfig.offAxisShear = 0.4;
+                break;
+            default:
+                break;
         }
-        
-        // Angolo di orientazione (random)
-        const theta = Math.random() * 2 * Math.PI;
-        const cosTheta = Math.cos(theta);
-        const sinTheta = Math.sin(theta);
-        
-        // Converti Length e Width da gradi a pixel
-        // Scala in base alle dimensioni effettive del canvas
-        const degreeToPixel = canvasWidth / FOV_WIDTH; // Ricalcola per canvas corrente
-        
-        // Energia influenza lunghezza: alte energie → tracce più lunghe
+
+        // Centro della traccia con variazione legata al tipo sorgente
+        const dispersionX = canvasWidth * profileConfig.dispersionScaleX;
+        const dispersionY = canvasHeight * profileConfig.dispersionScaleY;
+
+        let centerX = canvasWidth / 2;
+        let centerY = canvasHeight / 2;
+
+        if (!(options && options.forceCenter)) {
+            centerX += (Math.random() - 0.5) * dispersionX;
+            centerY += (Math.random() - 0.5) * dispersionY;
+        }
+
+        if (profileConfig.centerBiasX) {
+            centerX += (Math.random() - 0.5) * canvasWidth * profileConfig.centerBiasX;
+        }
+        if (profileConfig.centerBiasY) {
+            centerY += (Math.random() - 0.5) * canvasHeight * profileConfig.centerBiasY;
+        }
+
+        // Converti Length e Width da gradi a pixel (canvas aware)
+        const degreeToPixel = canvasWidth / FOV_WIDTH;
         const energyLengthBoost = 1 + (energyTeV - 0.5) * 0.3; // ±30% basato su energia
-        const lengthPx = params.length * degreeToPixel * Math.max(0.7, energyLengthBoost);
-        const widthPx = params.width * degreeToPixel;
-        
-        // Validazione conversione
+        let lengthPx = params.length * degreeToPixel * Math.max(0.7, energyLengthBoost) * profileConfig.lengthScale;
+        let widthPx = params.width * degreeToPixel * profileConfig.widthScale;
+
         if (!isFinite(lengthPx) || !isFinite(widthPx) || lengthPx <= 0 || widthPx <= 0) {
             console.error('❌ Conversione pixel non valida:', {
                 length: params.length,
@@ -346,11 +442,21 @@ class SimulationEngine {
             });
             return [];
         }
-        
+
+        // Calcola orientazione coerente con Alpha del profilo
+        const targetAngle = Math.atan2((canvasHeight / 2) - centerY, (canvasWidth / 2) - centerX);
+        const alphaRad = ((typeof params.alpha === 'number') ? params.alpha : 0) * Math.PI / 180;
+        const alphaJitter = Math.max(0.01, (Math.abs(alphaRad) * 0.3 + 0.02) * profileConfig.alphaNoiseScale);
+        let theta = targetAngle + alphaRad;
+        if (!isFinite(theta)) {
+            theta = Math.random() * 2 * Math.PI;
+        }
+        theta += this._randomGaussian(0, alphaJitter);
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+
         // Parametri per asimmetria
         const asymFactor = this._randomFromDistribution(params.asymmetry);
-        
-        // Validazione asimmetria
         if (!isFinite(asymFactor)) {
             console.error('❌ asymFactor non valido:', {
                 asymmetry: params.asymmetry,
@@ -358,80 +464,150 @@ class SimulationEngine {
             });
             return [];
         }
-        
+
+        // Prepara eventuali hotspot multi-component
+        let hotspotOffsets = null;
+        let hotspotWeightSum = 0;
+        if (profileConfig.hotspotCount > 0) {
+            hotspotOffsets = [];
+            const spread = lengthPx * profileConfig.hotspotSpread;
+            for (let h = 0; h < profileConfig.hotspotCount; h++) {
+                const offset = {
+                    x: this._randomGaussian(0, spread),
+                    y: this._randomGaussian(0, widthPx * (0.35 + profileConfig.hotspotSpread * 0.4)),
+                    gain: 0.4 + Math.random() * profileConfig.hotspotBoost,
+                    weight: 0.5 + Math.random()
+                };
+                hotspotOffsets.push(offset);
+                hotspotWeightSum += offset.weight;
+            }
+        }
+
+        // Configurazione guscio anulare (PeVatron)
+        let ringConfig = null;
+        if (profileConfig.ringProbability > 0 && lengthPx > 0) {
+            ringConfig = {
+                probability: profileConfig.ringProbability,
+                radius: lengthPx * (1.2 + Math.random() * 0.4),
+                thickness: Math.max(widthPx * profileConfig.ringThickness, widthPx * 0.3)
+            };
+        }
+
+        const denom = Math.max(1, numPhotons - 1);
+
         // Genera fotoni
-    for (let i = 0; i < numPhotons; i++) {
-            // Distribuzione ellittica con asimmetria
-            const u = Math.random() - 0.5;
-            const v = Math.random() - 0.5;
-            
-            // Trasformazione Box-Muller per gaussiana 2D
+        for (let i = 0; i < numPhotons; i++) {
+            const progress = i / denom;
+
+            // Distribuzione ellittica (Box-Muller)
             const r = Math.sqrt(-2 * Math.log(Math.random() + 0.001));
             const angle = Math.random() * 2 * Math.PI;
             const gx = r * Math.cos(angle);
             const gy = r * Math.sin(angle);
-            
-            // Validazione gx/gy
+
             if (!isFinite(gx) || !isFinite(gy)) {
                 if (i === 0) console.error('❌ gx/gy non validi:', { r, angle, gx, gy });
-                continue; // Salta questo fotone
+                continue;
             }
-            
-            // Scala con Length/Width - tracce ESTREMAMENTE allungate (gamma-like)
-            // Tuned multipliers (from diagnostics): adjust dx/dy to match target Length/Width
-            // Diagnostics suggested new multipliers based on measured means.
-            let dx = gx * lengthPx * 1.331;  // tuned
-            let dy = gy * widthPx * 1.338;   // tuned
-            
-            // Validazione dx/dy
+
+            let dx = gx * lengthPx * 1.331;
+            let dy = gy * widthPx * 1.338;
+
             if (!isFinite(dx) || !isFinite(dy)) {
                 if (i === 0) console.error('❌ dx/dy non validi:', { gx, gy, lengthPx, widthPx, dx, dy });
-                continue; // Salta questo fotone
+                continue;
             }
-            
-            // Applica asimmetria (shift lungo asse maggiore)
+
+            if (profileConfig.spineTightening !== 1.0) {
+                dy *= profileConfig.spineTightening;
+            }
+
             if (dx > 0) {
                 dx *= (1 + asymFactor);
             } else {
                 dx *= (1 - asymFactor * 0.5);
             }
-            
-            // Validazione dopo asimmetria
-            if (!isFinite(dx) || !isFinite(dy)) {
-                if (i === 0) console.error('❌ dx/dy dopo asimmetria non validi:', { dx, dy, asymFactor });
-                continue; // Salta questo fotone
+
+            if (profileConfig.tailStrength > 0) {
+                dx += progress * lengthPx * profileConfig.tailStrength;
+                dy += progress * widthPx * 0.2 * profileConfig.tailStrength;
             }
-            
-            // Ruota secondo theta
+
+            if (ringConfig && Math.random() < ringConfig.probability) {
+                const norm = Math.hypot(dx, dy) || 1;
+                const target = ringConfig.radius + this._randomGaussian(0, ringConfig.thickness);
+                dx = (dx / norm) * target;
+                dy = (dy / norm) * target;
+            }
+
+            if (profileConfig.offAxisShear) {
+                dy += Math.sin((dx / Math.max(1, lengthPx)) * Math.PI) * widthPx * profileConfig.offAxisShear;
+            }
+
             const rotX = dx * cosTheta - dy * sinTheta;
             const rotY = dx * sinTheta + dy * cosTheta;
-            
-            const x = centerX + rotX;
-            const y = centerY + rotY;
-            
-            // Validazione coordinate finali
+
+            let x = centerX + rotX;
+            let y = centerY + rotY;
+            let hotspotGain = 0;
+
+            if (hotspotOffsets && profileConfig.hotspotFill > 0 && Math.random() < profileConfig.hotspotFill) {
+                const pick = Math.random() * hotspotWeightSum;
+                let acc = 0;
+                let chosen = hotspotOffsets[0];
+                for (const h of hotspotOffsets) {
+                    acc += h.weight;
+                    if (pick <= acc) {
+                        chosen = h;
+                        break;
+                    }
+                }
+                x += chosen.x;
+                y += chosen.y;
+                hotspotGain = chosen.gain;
+            }
+
             if (!isFinite(x) || !isFinite(y)) {
                 if (i === 0) console.error('❌ Coordinate finali non valide:', {
                     centerX, centerY, rotX, rotY, x, y,
                     cosTheta, sinTheta, theta
                 });
-                continue; // Salta questo fotone
+                continue;
             }
-            
-            // Energia del fotone (distribuzione realistica)
+
             const photonEnergy = this._samplePhotonEnergy(energy);
-            
-            // Intensità (photoelectrons)
-            const intensity = this._energyToIntensity(photonEnergy);
-            
+            let intensity = this._energyToIntensity(photonEnergy);
+
+            if (profileConfig.intensityVariance) {
+                const variance = 1 + (Math.random() - 0.5) * profileConfig.intensityVariance;
+                intensity *= Math.max(0.2, variance);
+            }
+
+            if (profileConfig.centralCoreBoost) {
+                const radial = Math.hypot(x - centerX, y - centerY);
+                const coreRadius = Math.max(widthPx * 1.2, lengthPx * 0.18);
+                if (radial < coreRadius) {
+                    intensity *= 1.5;
+                }
+            }
+
+            if (profileConfig.tailStrength > 0) {
+                const decay = Math.max(0.25, 1 - profileConfig.tailDecay * progress);
+                intensity *= decay;
+            }
+
+            if (hotspotGain > 0) {
+                intensity *= 1 + hotspotGain;
+            }
+
             tracks.push({
-                x: x,
-                y: y,
+                x,
+                y,
                 energy: photonEnergy,
                 intensity: intensity
             });
         }
-        
+
         return tracks;
     }
 
