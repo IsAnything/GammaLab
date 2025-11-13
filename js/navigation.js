@@ -110,8 +110,8 @@ window.addExposureControls = function(renderers, generateBtn) {
             renderers.forEach(r => { 
                 r.showHillasOnHover = enabled; 
                 if (!enabled) {
-                    // If disabling hover mode, show ellipse immediately
-                    r.isHovering = false;
+                    // If disabling hover mode, force show ellipse immediately
+                    r.isHovering = true;
                     try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                 } else {
                     // If enabling hover mode, hide ellipse until hover

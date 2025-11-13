@@ -256,7 +256,7 @@ class CanvasRenderer {
         this.showEllipseOnly = false;
         
         // NEW: Mouse hover detection for showing Hillas ellipse on hover
-        this.showHillasOnHover = true; // default: show ellipse only on hover
+        this.showHillasOnHover = false; // default: show ellipse always (disable hover mode)
         this.isHovering = false;
         this.mouseX = -1;
         this.mouseY = -1;
@@ -1744,9 +1744,11 @@ if (typeof window !== 'undefined' && typeof window.addExposureControls !== 'func
                 renderers.forEach(r => { 
                     r.showHillasOnHover = enabled; 
                     if (!enabled) {
-                        r.isHovering = false;
+                        // If disabling hover mode, force show ellipse immediately
+                        r.isHovering = true;
                         try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                     } else {
+                        // If enabling hover mode, hide ellipse until hover
                         r.isHovering = false;
                         try { if (typeof r._redrawHillasOverlay === 'function') r._redrawHillasOverlay(); } catch(e) {}
                     }
