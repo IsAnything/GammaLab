@@ -219,6 +219,11 @@
                 renderer.sourceType = 'pevatron'; // FIRMA SNR
             });
 
+            // Add exposure/sub-pixel controls if available
+            if (typeof window.addExposureControls === 'function') {
+                window.addExposureControls(renderers, document.getElementById('generateBtn'));
+            }
+
             console.log('🎨 Simulatore SNR/PeVatron inizializzato');
 
             document.getElementById('generateBtn').addEventListener('click', generateSNREvent);

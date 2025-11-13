@@ -94,6 +94,10 @@
             engine.colorPalette = colorPalette;
             renderers = [new CanvasRenderer('cam1', 'cam1-overlay'), new CanvasRenderer('cam2', 'cam2-overlay'), new CanvasRenderer('cam3', 'cam3-overlay')];
             renderers.forEach(renderer => { renderer.colorPalette = colorPalette; renderer.lightStyle = true; renderer.sourceType = 'grb'; });
+            // Add exposure/sub-pixel controls if available
+            if (typeof window.addExposureControls === 'function') {
+                window.addExposureControls(renderers, document.getElementById('generateBtn'));
+            }
             document.getElementById('generateBtn').addEventListener('click', generateGRBEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
             setTimeout(() => generateGRBEvent(), 500);

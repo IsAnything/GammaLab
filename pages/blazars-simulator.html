@@ -215,6 +215,11 @@
                 renderer.sourceType = 'blazar'; // FIRMA BLAZAR
             });
 
+            // Add exposure/sub-pixel controls if available
+            if (typeof window.addExposureControls === 'function') {
+                window.addExposureControls(renderers, document.getElementById('generateBtn'));
+            }
+
             console.log('🎨 Simulatore Blazar/AGN inizializzato');
 
             document.getElementById('generateBtn').addEventListener('click', generateBlazarEvent);

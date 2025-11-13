@@ -265,6 +265,11 @@
                 renderer.sourceType = 'crab';
             });
 
+            // Add exposure/sub-pixel controls (global helper)
+            if (typeof window.addExposureControls === 'function') {
+                window.addExposureControls(renderers, document.getElementById('generateBtn'));
+            }
+
             // Event listeners controlli
             setupControls();
             document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
