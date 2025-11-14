@@ -251,6 +251,10 @@ class CanvasRenderer {
         this._cameraInfoEl = null;
         this._ensureSignatureHintElement();
         this._ensureCameraInfoElement();
+        this.embedHillasOutline = true;
+        this._embeddedHillasParams = null;
+        this._embeddingReRender = false;
+        this._lastShowLegend = true;
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
@@ -559,6 +563,10 @@ class CanvasRenderer {
             return;
         }
 
+        if (!this.showHillasOnHover && this.embedHillasOutline) {
+            return;
+        }
+
         this._drawHillasOverlay(this.currentHillasParams);
     }
 
@@ -783,11 +791,24 @@ class CanvasRenderer {
     renderEvent(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
+        this._lastShowLegend = showLegend;
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
 
         this.clear();
         this._updateSignatureHint();
+
+        const embeddedHillas = (!this.showEllipseOnly && event && event.__embeddedHillas && event.__embeddedHillas.valid)
+            ? event.__embeddedHillas
+            : null;
+
+        this._embeddedHillasParams = embeddedHillas || null;
+
+        if (embeddedHillas) {
+            this._withHexClip(() => {
+                this._drawEmbeddedHillasUnderTracks(embeddedHillas);
+            });
+        }
 
         if (this.showEllipseOnly) {
             this._withHexClip(() => {
@@ -832,11 +853,23 @@ class CanvasRenderer {
     renderEventAnimated(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
+        this._lastShowLegend = showLegend;
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
 
         this.clear();
         this._updateSignatureHint();
+
+        const embeddedHillas = (event && event.__embeddedHillas && event.__embeddedHillas.valid) ? event.__embeddedHillas : null;
+
+        this._embeddedHillasParams = embeddedHillas || null;
+
+        if (embeddedHillas) {
+            this._withHexClip(() => {
+                this._drawEmbeddedHillasUnderTracks(embeddedHillas);
+            });
+        }
+
         this.drawCameraInfo(event);
         
         // Ordina tracce per tempo di arrivo simulato
@@ -1538,6 +1571,29 @@ class CanvasRenderer {
             return;
         }
 
+        if (this.embedHillasOutline && !this.showHillasOnHover && this._lastEvent && this._lastEvent.tracks) {
+            try {
+                const baseClone = { ...this.currentHillasParams };
+                const embedded = this.adjustHillasToContainTracks(baseClone, this._lastEvent.tracks) || baseClone;
+                if (embedded) {
+                    embedded.valid = true;
+                    this.currentHillasParams = embedded;
+                    this._embeddedHillasParams = embedded;
+                    this._lastEvent.__embeddedHillas = embedded;
+                    if (!this._embeddingReRender) {
+                        this._embeddingReRender = true;
+                        this.renderEvent(this._lastEvent, this._lastShowLegend);
+                        this._embeddingReRender = false;
+                    }
+                }
+            } catch (err) {
+                console.warn('Embedding Hillas outline failed:', err);
+            }
+        } else if (this._lastEvent && this._lastEvent.__embeddedHillas && (this.showHillasOnHover || !this.embedHillasOutline)) {
+            this._lastEvent.__embeddedHillas = null;
+            this._embeddedHillasParams = null;
+        }
+
         if (this.showHillasOnHover) {
             if (this.mouseX >= 0 && this.mouseY >= 0) {
                 this.isHovering = this._isPointInsideHillas(this.mouseX, this.mouseY, this.currentHillasParams);
@@ -1547,6 +1603,50 @@ class CanvasRenderer {
         }
 
         this._redrawHillasOverlay();
+    }
+
+    _drawEmbeddedHillasUnderTracks(hillasParams) {
+        if (!hillasParams || !hillasParams.valid || !this.ctx) return;
+
+        const ctx = this.ctx;
+        const centerX = hillasParams.cogX;
+        const centerY = hillasParams.cogY;
+        const theta = (hillasParams.theta || 0) * Math.PI / 180;
+
+        const scale = this.respectExactHillas ? 1.2 : 1.32;
+        const lengthPx = Math.max((hillasParams.lengthPx || 0) * scale, 10);
+        const widthPx = Math.max((hillasParams.widthPx || 0) * scale, 6);
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(theta);
+
+        const fillColor = this.lightStyle ? 'rgba(230, 70, 150, 0.16)' : 'rgba(0, 170, 140, 0.18)';
+        ctx.fillStyle = fillColor;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, lengthPx, widthPx, 0, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.lineWidth = this.lightStyle ? 1.4 : 1.6;
+        ctx.strokeStyle = this.lightStyle ? 'rgba(220, 60, 150, 0.78)' : 'rgba(0, 255, 200, 0.78)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, lengthPx, widthPx, 0, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        ctx.lineWidth = this.lightStyle ? 0.9 : 1.1;
+        ctx.strokeStyle = this.lightStyle ? 'rgba(40, 60, 140, 0.55)' : 'rgba(40, 150, 255, 0.55)';
+        ctx.setLineDash([10, 6]);
+        ctx.beginPath();
+        ctx.moveTo(-lengthPx, 0);
+        ctx.lineTo(lengthPx, 0);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -widthPx);
+        ctx.lineTo(0, widthPx);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.restore();
     }
 
     _drawHillasOverlay(hillasParams) {
@@ -1567,24 +1667,30 @@ class CanvasRenderer {
             let displayLengthPx = hillasParams.lengthPx;
             let displayWidthPx = hillasParams.widthPx;
 
-            if (!this.respectExactHillas) {
-                if (this.lightStyle) {
-                    displayWidthPx = Math.max(hillasParams.widthPx * 3, hillasParams.lengthPx * 0.2);
-                }
+            const overlayScale = this.respectExactHillas ? 1.22 : 1.35;
+            displayLengthPx = Math.max(displayLengthPx * overlayScale, (displayLengthPx || 0) + 6);
+            displayWidthPx = Math.max(displayWidthPx * overlayScale, (displayWidthPx || 0) + 6);
 
-                const visibilityScale = 1.12; // enlarge outline slightly for hover visibility
-                displayLengthPx *= visibilityScale;
-                displayWidthPx *= visibilityScale;
-            }
+            if (!isFinite(displayLengthPx) || displayLengthPx <= 0) displayLengthPx = 12;
+            if (!isFinite(displayWidthPx) || displayWidthPx <= 0) displayWidthPx = 6;
 
-            ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#00ff88';
-            ctx.lineWidth = 4;
+            const outlineColor = this.lightStyle ? 'rgba(210, 40, 140, 0.92)' : 'rgba(0, 255, 205, 0.85)';
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.lineWidth = this.lightStyle ? 1.6 : 1.8;
+            ctx.strokeStyle = outlineColor;
+            ctx.shadowBlur = this.lightStyle ? 6 : 10;
+            ctx.shadowColor = outlineColor;
             ctx.beginPath();
             ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, 2 * Math.PI);
             ctx.stroke();
 
-            ctx.strokeStyle = this.lightStyle ? '#cc0066' : '#ffaa00';
-            ctx.lineWidth = 2.5;
+            ctx.shadowBlur = 0;
+            ctx.globalCompositeOperation = 'source-over';
+
+            const axisColor = this.lightStyle ? 'rgba(40, 60, 140, 0.8)' : 'rgba(80, 180, 255, 0.72)';
+            ctx.strokeStyle = axisColor;
+            ctx.lineWidth = this.lightStyle ? 1.0 : 1.1;
+            ctx.setLineDash([9, 6]);
             ctx.beginPath();
             ctx.moveTo(-displayLengthPx, 0);
             ctx.lineTo(displayLengthPx, 0);
@@ -1593,22 +1699,23 @@ class CanvasRenderer {
             ctx.moveTo(0, -displayWidthPx);
             ctx.lineTo(0, displayWidthPx);
             ctx.stroke();
+            ctx.setLineDash([]);
 
             ctx.restore();
 
-            ctx.fillStyle = this.lightStyle ? '#cc0066' : '#ff0055';
+            ctx.fillStyle = this.lightStyle ? 'rgba(210, 40, 140, 0.9)' : 'rgba(255, 70, 120, 0.85)';
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
             ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = this.lightStyle ? 'rgba(250, 230, 255, 0.8)' : 'rgba(255, 255, 255, 0.88)';
+            ctx.lineWidth = 1.6;
             ctx.stroke();
 
             const cameraCenterX = this.overlay.width / 2;
             const cameraCenterY = this.overlay.height / 2;
-            ctx.strokeStyle = this.lightStyle ? '#0066cc' : '#4488ff';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([8, 5]);
+            ctx.strokeStyle = this.lightStyle ? 'rgba(0, 102, 204, 0.7)' : 'rgba(68, 136, 255, 0.6)';
+            ctx.lineWidth = 1.4;
+            ctx.setLineDash([8, 6]);
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.lineTo(cameraCenterX, cameraCenterY);
@@ -1620,7 +1727,7 @@ class CanvasRenderer {
             ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
             ctx.font = 'bold 14px "Courier New", monospace';
             ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#000000';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2;
             ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
             ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
 
@@ -1639,13 +1746,13 @@ class CanvasRenderer {
                 ctx.fill();
 
                 ctx.strokeStyle = '#222200';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 1.8;
                 ctx.beginPath();
                 ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
                 ctx.stroke();
 
                 ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 1.8;
                 const s = 18;
                 ctx.beginPath();
                 ctx.moveTo(cameraCenterX - s, cameraCenterY);
