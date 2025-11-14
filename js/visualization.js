@@ -595,7 +595,36 @@ class CanvasRenderer {
         return aligned;
     }
 
-    _shrinkHillasToFitCluster(hillas, tracks, percentile = 0.7) {
+    _weightedQuantile(pairs, q) {
+        if (!pairs || !pairs.length) {
+            return null;
+        }
+
+        const filtered = pairs.filter(item => Number.isFinite(item.value) && item.value >= 0 && Number.isFinite(item.weight) && item.weight > 0);
+        if (!filtered.length) {
+            return null;
+        }
+
+        filtered.sort((a, b) => a.value - b.value);
+
+        const totalWeight = filtered.reduce((acc, cur) => acc + cur.weight, 0);
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        const targetWeight = totalWeight * Math.min(Math.max(q, 0), 1);
+        let cumulative = 0;
+        for (let i = 0; i < filtered.length; i++) {
+            cumulative += filtered[i].weight;
+            if (cumulative >= targetWeight) {
+                return filtered[i].value;
+            }
+        }
+
+        return filtered[filtered.length - 1].value;
+    }
+
+    _shrinkHillasToFitCluster(hillas, tracks, percentile = 0.6) {
         if (!hillas || !hillas.valid || !tracks || tracks.length < 3) {
             return hillas;
         }
@@ -604,31 +633,33 @@ class CanvasRenderer {
         const cosT = Math.cos(theta);
         const sinT = Math.sin(theta);
 
-        const majorDistances = [];
-        const minorDistances = [];
+        const majorPairs = [];
+        const minorPairs = [];
 
         tracks.forEach(track => {
             const dx = (track.x || 0) - hillas.cogX;
             const dy = (track.y || 0) - hillas.cogY;
             const xr = Math.abs(dx * cosT + dy * sinT);
             const yr = Math.abs(-dx * sinT + dy * cosT);
-            if (Number.isFinite(xr)) majorDistances.push(xr);
-            if (Number.isFinite(yr)) minorDistances.push(yr);
+            const weight = Number.isFinite(track.intensity) ? Math.max(track.intensity, 0.0001) : 1;
+            if (Number.isFinite(xr)) majorPairs.push({ value: xr, weight });
+            if (Number.isFinite(yr)) minorPairs.push({ value: yr, weight });
         });
 
-        if (!majorDistances.length || !minorDistances.length) {
+        if (!majorPairs.length || !minorPairs.length) {
             return hillas;
         }
 
-        majorDistances.sort((a, b) => a - b);
-        minorDistances.sort((a, b) => a - b);
+        const clampPercentile = Math.max(0.35, Math.min(percentile, 0.85));
+        const majorQuantile = this._weightedQuantile(majorPairs, clampPercentile);
+        const minorQuantile = this._weightedQuantile(minorPairs, clampPercentile);
 
-        const clampPercentile = Math.max(0.4, Math.min(percentile, 0.9));
-        const majorIndex = Math.min(majorDistances.length - 1, Math.max(0, Math.floor(clampPercentile * majorDistances.length)));
-        const minorIndex = Math.min(minorDistances.length - 1, Math.max(0, Math.floor(clampPercentile * minorDistances.length)));
+        if (!Number.isFinite(majorQuantile) || !Number.isFinite(minorQuantile)) {
+            return hillas;
+        }
 
-        const targetMajor = Math.max(majorDistances[majorIndex] * 0.9, 4);
-        const targetMinor = Math.max(minorDistances[minorIndex] * 0.9, 3);
+        const targetMajor = Math.max(majorQuantile * 0.85, 4);
+        const targetMinor = Math.max(minorQuantile * 0.85, 3);
 
         const originalLength = Math.max(hillas.lengthPx || 0, 4);
         const originalWidth = Math.max(hillas.widthPx || 0, 3);
@@ -1724,8 +1755,8 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = (hillasParams.theta || 0) * Math.PI / 180;
 
-        const lengthScale = this.respectExactHillas ? 1.0 : 1.05;
-        const widthScale = this.respectExactHillas ? 1.0 : 1.05;
+        const lengthScale = this.respectExactHillas ? 1.0 : 1.02;
+        const widthScale = this.respectExactHillas ? 1.0 : 1.02;
         const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale, 8);
         const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale, 5);
 
@@ -1779,8 +1810,8 @@ class CanvasRenderer {
             let displayLengthPx = hillasParams.lengthPx;
             let displayWidthPx = hillasParams.widthPx;
 
-            const overlayLengthScale = this.respectExactHillas ? 1.0 : 1.06;
-            const overlayWidthScale = this.respectExactHillas ? 1.0 : 1.03;
+            const overlayLengthScale = this.respectExactHillas ? 1.0 : 1.02;
+            const overlayWidthScale = this.respectExactHillas ? 1.0 : 1.02;
             displayLengthPx = Math.max(displayLengthPx * overlayLengthScale, 10);
             displayWidthPx = Math.max(displayWidthPx * overlayWidthScale, 6);
 
