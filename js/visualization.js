@@ -595,6 +595,54 @@ class CanvasRenderer {
         return aligned;
     }
 
+    _shrinkHillasToFitCluster(hillas, tracks, percentile = 0.7) {
+        if (!hillas || !hillas.valid || !tracks || tracks.length < 3) {
+            return hillas;
+        }
+
+        const theta = (hillas.theta || 0) * Math.PI / 180;
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+
+        const majorDistances = [];
+        const minorDistances = [];
+
+        tracks.forEach(track => {
+            const dx = (track.x || 0) - hillas.cogX;
+            const dy = (track.y || 0) - hillas.cogY;
+            const xr = Math.abs(dx * cosT + dy * sinT);
+            const yr = Math.abs(-dx * sinT + dy * cosT);
+            if (Number.isFinite(xr)) majorDistances.push(xr);
+            if (Number.isFinite(yr)) minorDistances.push(yr);
+        });
+
+        if (!majorDistances.length || !minorDistances.length) {
+            return hillas;
+        }
+
+        majorDistances.sort((a, b) => a - b);
+        minorDistances.sort((a, b) => a - b);
+
+        const clampPercentile = Math.max(0.4, Math.min(percentile, 0.9));
+        const majorIndex = Math.min(majorDistances.length - 1, Math.max(0, Math.floor(clampPercentile * majorDistances.length)));
+        const minorIndex = Math.min(minorDistances.length - 1, Math.max(0, Math.floor(clampPercentile * minorDistances.length)));
+
+        const targetMajor = Math.max(majorDistances[majorIndex] * 0.9, 4);
+        const targetMinor = Math.max(minorDistances[minorIndex] * 0.9, 3);
+
+        const originalLength = Math.max(hillas.lengthPx || 0, 4);
+        const originalWidth = Math.max(hillas.widthPx || 0, 3);
+
+        const newLength = Math.min(originalLength, targetMajor);
+        const newWidth = Math.min(originalWidth, targetMinor);
+
+        return {
+            ...hillas,
+            lengthPx: newLength,
+            widthPx: newWidth
+        };
+    }
+
     _redrawHillasOverlay() {
         if (!this.overlayCtx || !this.overlay) return;
 
@@ -849,6 +897,7 @@ class CanvasRenderer {
 
         if (embeddedHillas && event && event.tracks && event.tracks.length) {
             embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
+            embeddedHillas = this._shrinkHillasToFitCluster(embeddedHillas, event.tracks);
             event.__embeddedHillas = embeddedHillas;
         }
 
@@ -914,6 +963,7 @@ class CanvasRenderer {
 
         if (embeddedHillas && event && event.tracks && event.tracks.length) {
             embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
+            embeddedHillas = this._shrinkHillasToFitCluster(embeddedHillas, event.tracks);
             event.__embeddedHillas = embeddedHillas;
         }
 
@@ -1628,14 +1678,20 @@ class CanvasRenderer {
 
         if (this._lastEvent && this._lastEvent.tracks && this._lastEvent.tracks.length) {
             this.currentHillasParams = this._alignHillasToPhotonCluster(this.currentHillasParams, this._lastEvent.tracks);
+            this.currentHillasParams = this._shrinkHillasToFitCluster(this.currentHillasParams, this._lastEvent.tracks);
         }
 
         if (this.embedHillasOutline && !this.showHillasOnHover && this._lastEvent && this._lastEvent.tracks) {
             try {
                 const embedded = { ...this.currentHillasParams };
                 embedded.valid = true;
-                this._embeddedHillasParams = embedded;
-                this._lastEvent.__embeddedHillas = embedded;
+                if (this._lastEvent && this._lastEvent.tracks && this._lastEvent.tracks.length) {
+                    const aligned = this._alignHillasToPhotonCluster(embedded, this._lastEvent.tracks);
+                    this._embeddedHillasParams = this._shrinkHillasToFitCluster(aligned, this._lastEvent.tracks);
+                } else {
+                    this._embeddedHillasParams = embedded;
+                }
+                this._lastEvent.__embeddedHillas = this._embeddedHillasParams;
                 if (!this._embeddingReRender) {
                     this._embeddingReRender = true;
                     this.renderEvent(this._lastEvent, this._lastShowLegend);
@@ -1668,8 +1724,8 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = (hillasParams.theta || 0) * Math.PI / 180;
 
-        const lengthScale = this.respectExactHillas ? 0.92 : 0.98;
-        const widthScale = this.respectExactHillas ? 0.88 : 0.95;
+        const lengthScale = this.respectExactHillas ? 1.0 : 1.05;
+        const widthScale = this.respectExactHillas ? 1.0 : 1.05;
         const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale, 8);
         const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale, 5);
 
@@ -1684,7 +1740,7 @@ class CanvasRenderer {
         ctx.fill();
 
         ctx.lineWidth = this.lightStyle ? 1.1 : 1.3;
-        ctx.strokeStyle = this.lightStyle ? 'rgba(220, 60, 150, 0.68)' : 'rgba(0, 240, 200, 0.7)';
+        ctx.strokeStyle = this.lightStyle ? 'rgba(220, 60, 150, 0.6)' : 'rgba(0, 230, 190, 0.65)';
         ctx.beginPath();
         ctx.ellipse(0, 0, lengthPx, widthPx, 0, 0, 2 * Math.PI);
         ctx.stroke();
@@ -1723,8 +1779,8 @@ class CanvasRenderer {
             let displayLengthPx = hillasParams.lengthPx;
             let displayWidthPx = hillasParams.widthPx;
 
-            const overlayLengthScale = this.respectExactHillas ? 0.98 : 1.05;
-            const overlayWidthScale = this.respectExactHillas ? 0.94 : 1.0;
+            const overlayLengthScale = this.respectExactHillas ? 1.0 : 1.06;
+            const overlayWidthScale = this.respectExactHillas ? 1.0 : 1.03;
             displayLengthPx = Math.max(displayLengthPx * overlayLengthScale, 10);
             displayWidthPx = Math.max(displayWidthPx * overlayWidthScale, 6);
 
