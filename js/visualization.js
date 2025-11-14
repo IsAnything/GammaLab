@@ -1573,18 +1573,14 @@ class CanvasRenderer {
 
         if (this.embedHillasOutline && !this.showHillasOnHover && this._lastEvent && this._lastEvent.tracks) {
             try {
-                const baseClone = { ...this.currentHillasParams };
-                const embedded = this.adjustHillasToContainTracks(baseClone, this._lastEvent.tracks) || baseClone;
-                if (embedded) {
-                    embedded.valid = true;
-                    this.currentHillasParams = embedded;
-                    this._embeddedHillasParams = embedded;
-                    this._lastEvent.__embeddedHillas = embedded;
-                    if (!this._embeddingReRender) {
-                        this._embeddingReRender = true;
-                        this.renderEvent(this._lastEvent, this._lastShowLegend);
-                        this._embeddingReRender = false;
-                    }
+                const embedded = { ...this.currentHillasParams };
+                embedded.valid = true;
+                this._embeddedHillasParams = embedded;
+                this._lastEvent.__embeddedHillas = embedded;
+                if (!this._embeddingReRender) {
+                    this._embeddingReRender = true;
+                    this.renderEvent(this._lastEvent, this._lastShowLegend);
+                    this._embeddingReRender = false;
                 }
             } catch (err) {
                 console.warn('Embedding Hillas outline failed:', err);
@@ -1613,28 +1609,29 @@ class CanvasRenderer {
         const centerY = hillasParams.cogY;
         const theta = (hillasParams.theta || 0) * Math.PI / 180;
 
-        const scale = this.respectExactHillas ? 1.2 : 1.32;
-        const lengthPx = Math.max((hillasParams.lengthPx || 0) * scale, 10);
-        const widthPx = Math.max((hillasParams.widthPx || 0) * scale, 6);
+        const lengthScale = this.respectExactHillas ? 0.92 : 0.98;
+        const widthScale = this.respectExactHillas ? 0.88 : 0.95;
+        const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale, 8);
+        const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale, 5);
 
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);
 
-        const fillColor = this.lightStyle ? 'rgba(230, 70, 150, 0.16)' : 'rgba(0, 170, 140, 0.18)';
+        const fillColor = this.lightStyle ? 'rgba(210, 60, 140, 0.12)' : 'rgba(0, 160, 140, 0.15)';
         ctx.fillStyle = fillColor;
         ctx.beginPath();
         ctx.ellipse(0, 0, lengthPx, widthPx, 0, 0, 2 * Math.PI);
         ctx.fill();
 
-        ctx.lineWidth = this.lightStyle ? 1.4 : 1.6;
-        ctx.strokeStyle = this.lightStyle ? 'rgba(220, 60, 150, 0.78)' : 'rgba(0, 255, 200, 0.78)';
+        ctx.lineWidth = this.lightStyle ? 1.1 : 1.3;
+        ctx.strokeStyle = this.lightStyle ? 'rgba(220, 60, 150, 0.68)' : 'rgba(0, 240, 200, 0.7)';
         ctx.beginPath();
         ctx.ellipse(0, 0, lengthPx, widthPx, 0, 0, 2 * Math.PI);
         ctx.stroke();
 
-        ctx.lineWidth = this.lightStyle ? 0.9 : 1.1;
-        ctx.strokeStyle = this.lightStyle ? 'rgba(40, 60, 140, 0.55)' : 'rgba(40, 150, 255, 0.55)';
+        ctx.lineWidth = this.lightStyle ? 0.7 : 0.9;
+        ctx.strokeStyle = this.lightStyle ? 'rgba(40, 60, 140, 0.45)' : 'rgba(40, 150, 255, 0.45)';
         ctx.setLineDash([10, 6]);
         ctx.beginPath();
         ctx.moveTo(-lengthPx, 0);
@@ -1667,16 +1664,17 @@ class CanvasRenderer {
             let displayLengthPx = hillasParams.lengthPx;
             let displayWidthPx = hillasParams.widthPx;
 
-            const overlayScale = this.respectExactHillas ? 1.22 : 1.35;
-            displayLengthPx = Math.max(displayLengthPx * overlayScale, (displayLengthPx || 0) + 6);
-            displayWidthPx = Math.max(displayWidthPx * overlayScale, (displayWidthPx || 0) + 6);
+            const overlayLengthScale = this.respectExactHillas ? 0.98 : 1.05;
+            const overlayWidthScale = this.respectExactHillas ? 0.94 : 1.0;
+            displayLengthPx = Math.max(displayLengthPx * overlayLengthScale, 10);
+            displayWidthPx = Math.max(displayWidthPx * overlayWidthScale, 6);
 
-            if (!isFinite(displayLengthPx) || displayLengthPx <= 0) displayLengthPx = 12;
-            if (!isFinite(displayWidthPx) || displayWidthPx <= 0) displayWidthPx = 6;
+            if (!isFinite(displayLengthPx) || displayLengthPx <= 0) displayLengthPx = 10;
+            if (!isFinite(displayWidthPx) || displayWidthPx <= 0) displayWidthPx = 5;
 
-            const outlineColor = this.lightStyle ? 'rgba(210, 40, 140, 0.92)' : 'rgba(0, 255, 205, 0.85)';
+            const outlineColor = this.lightStyle ? 'rgba(210, 40, 140, 0.88)' : 'rgba(0, 255, 205, 0.8)';
             ctx.globalCompositeOperation = 'lighter';
-            ctx.lineWidth = this.lightStyle ? 1.6 : 1.8;
+            ctx.lineWidth = this.lightStyle ? 1.4 : 1.6;
             ctx.strokeStyle = outlineColor;
             ctx.shadowBlur = this.lightStyle ? 6 : 10;
             ctx.shadowColor = outlineColor;
@@ -1687,10 +1685,10 @@ class CanvasRenderer {
             ctx.shadowBlur = 0;
             ctx.globalCompositeOperation = 'source-over';
 
-            const axisColor = this.lightStyle ? 'rgba(40, 60, 140, 0.8)' : 'rgba(80, 180, 255, 0.72)';
+            const axisColor = this.lightStyle ? 'rgba(40, 60, 140, 0.7)' : 'rgba(80, 180, 255, 0.66)';
             ctx.strokeStyle = axisColor;
-            ctx.lineWidth = this.lightStyle ? 1.0 : 1.1;
-            ctx.setLineDash([9, 6]);
+            ctx.lineWidth = this.lightStyle ? 0.9 : 1.0;
+            ctx.setLineDash([9, 7]);
             ctx.beginPath();
             ctx.moveTo(-displayLengthPx, 0);
             ctx.lineTo(displayLengthPx, 0);
