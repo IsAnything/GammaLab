@@ -550,6 +550,51 @@ class CanvasRenderer {
         return normalized <= 1.15; // leggero margine per facilitare l'hover
     }
 
+    _computePhotonCentroid(tracks) {
+        if (!tracks || !tracks.length) {
+            return null;
+        }
+
+        let sumW = 0;
+        let sumX = 0;
+        let sumY = 0;
+
+        tracks.forEach(track => {
+            if (!track) return;
+            const weight = Number.isFinite(track.intensity) ? Math.max(track.intensity, 0.0001) : 1;
+            const x = Number.isFinite(track.x) ? track.x : 0;
+            const y = Number.isFinite(track.y) ? track.y : 0;
+            sumW += weight;
+            sumX += x * weight;
+            sumY += y * weight;
+        });
+
+        if (sumW <= 0) {
+            return null;
+        }
+
+        return {
+            x: sumX / sumW,
+            y: sumY / sumW
+        };
+    }
+
+    _alignHillasToPhotonCluster(hillas, tracks) {
+        if (!hillas || !hillas.valid) {
+            return hillas;
+        }
+
+        const centroid = this._computePhotonCentroid(tracks);
+        if (!centroid) {
+            return hillas;
+        }
+
+        const aligned = { ...hillas, cogX: centroid.x, cogY: centroid.y };
+        if (typeof aligned.centerX !== 'undefined') aligned.centerX = centroid.x;
+        if (typeof aligned.centerY !== 'undefined') aligned.centerY = centroid.y;
+        return aligned;
+    }
+
     _redrawHillasOverlay() {
         if (!this.overlayCtx || !this.overlay) return;
 
@@ -798,9 +843,14 @@ class CanvasRenderer {
         this.clear();
         this._updateSignatureHint();
 
-        const embeddedHillas = (!this.showEllipseOnly && event && event.__embeddedHillas && event.__embeddedHillas.valid)
+        let embeddedHillas = (!this.showEllipseOnly && event && event.__embeddedHillas && event.__embeddedHillas.valid)
             ? event.__embeddedHillas
             : null;
+
+        if (embeddedHillas && event && event.tracks && event.tracks.length) {
+            embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
+            event.__embeddedHillas = embeddedHillas;
+        }
 
         this._embeddedHillasParams = embeddedHillas || null;
 
@@ -860,7 +910,12 @@ class CanvasRenderer {
         this.clear();
         this._updateSignatureHint();
 
-        const embeddedHillas = (event && event.__embeddedHillas && event.__embeddedHillas.valid) ? event.__embeddedHillas : null;
+        let embeddedHillas = (event && event.__embeddedHillas && event.__embeddedHillas.valid) ? event.__embeddedHillas : null;
+
+        if (embeddedHillas && event && event.tracks && event.tracks.length) {
+            embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
+            event.__embeddedHillas = embeddedHillas;
+        }
 
         this._embeddedHillasParams = embeddedHillas || null;
 
@@ -1569,6 +1624,10 @@ class CanvasRenderer {
             this.isHovering = false;
             this._redrawHillasOverlay();
             return;
+        }
+
+        if (this._lastEvent && this._lastEvent.tracks && this._lastEvent.tracks.length) {
+            this.currentHillasParams = this._alignHillasToPhotonCluster(this.currentHillasParams, this._lastEvent.tracks);
         }
 
         if (this.embedHillasOutline && !this.showHillasOnHover && this._lastEvent && this._lastEvent.tracks) {
