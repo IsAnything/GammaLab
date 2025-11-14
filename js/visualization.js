@@ -248,7 +248,9 @@ class CanvasRenderer {
         this.signatureHint = '';
         this._signatureHintEl = null;
         this._signatureHintTextEl = null;
+        this._cameraInfoEl = null;
         this._ensureSignatureHintElement();
+        this._ensureCameraInfoElement();
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
@@ -371,6 +373,40 @@ class CanvasRenderer {
         this._signatureHintTextEl = text;
     }
 
+    _ensureCameraInfoElement() {
+        if (this._cameraInfoEl || !this.canvas) return;
+
+        const parent = this.canvas.parentElement;
+        if (!parent) return;
+
+        if (!parent.style.position) {
+            parent.style.position = 'relative';
+        }
+
+        const info = document.createElement('div');
+        info.className = 'camera-info-overlay';
+        info.style.position = 'absolute';
+        info.style.top = '12px';
+        info.style.left = '12px';
+        info.style.padding = '10px 14px';
+        info.style.background = 'rgba(6, 14, 28, 0.78)';
+        info.style.backdropFilter = 'blur(10px)';
+        info.style.borderRadius = '14px';
+        info.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.35)';
+        info.style.color = '#f4f9ff';
+        info.style.fontFamily = '"Courier New", monospace';
+        info.style.fontSize = '12px';
+        info.style.lineHeight = '1.5';
+        info.style.zIndex = '3';
+        info.style.minWidth = '160px';
+        info.style.pointerEvents = 'none';
+        info.style.whiteSpace = 'nowrap';
+        info.style.display = 'none';
+
+        parent.appendChild(info);
+        this._cameraInfoEl = info;
+    }
+
     _updateSignatureHint() {
         if (!this._signatureHintEl) {
             this._ensureSignatureHintElement();
@@ -385,6 +421,44 @@ class CanvasRenderer {
             this._signatureHintTextEl.textContent = '';
             this._signatureHintEl.style.display = 'none';
         }
+    }
+
+    _updateCameraInfoOverlay(event) {
+        if (!this._cameraInfoEl) {
+            this._ensureCameraInfoElement();
+        }
+        if (!this._cameraInfoEl) return;
+
+        if (!event) {
+            this._cameraInfoEl.style.display = 'none';
+            this._cameraInfoEl.textContent = '';
+            return;
+        }
+
+        const energyTeV = event.energy ? (event.energy / 1000).toFixed(2) : '—';
+        const photons = event.tracks ? event.tracks.length : '—';
+        const exposure = (typeof this.exposureK === 'number') ? this.exposureK.toFixed(1) : '4.0';
+        const subpixel = this.subpixelEnabled ? 'ON' : 'OFF';
+        const camId = event.cameraId ? `Camera ${event.cameraId}` : 'Camera';
+
+        const highlightColor = this.lightStyle ? '#0d2344' : '#0a1731';
+        const textColor = this.lightStyle ? '#102645' : '#f4f9ff';
+        const badgeColor = this.lightStyle ? '#284a8b' : '#6ab8ff';
+
+        this._cameraInfoEl.style.background = this.lightStyle
+            ? 'rgba(245, 249, 255, 0.92)'
+            : 'rgba(6, 14, 28, 0.78)';
+        this._cameraInfoEl.style.color = textColor;
+
+        this._cameraInfoEl.innerHTML = `
+            <div style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:11px; color:${badgeColor}; margin-bottom:6px;">${camId}</div>
+            <div>Energia: <span style="color:${highlightColor}; font-weight:600;">${energyTeV} TeV</span></div>
+            <div>Fotoni: <span style="color:${highlightColor}; font-weight:600;">${photons}</span></div>
+            <div>Exposure: <span style="color:${highlightColor}; font-weight:600;">${exposure}</span></div>
+            <div>Sub-pixel: <span style="color:${highlightColor}; font-weight:600;">${subpixel}</span></div>
+        `;
+
+        this._cameraInfoEl.style.display = 'block';
     }
 
     _traceHexPath(ctx, width, height, radius) {
@@ -637,6 +711,11 @@ class CanvasRenderer {
         if (this.overlayCtx) {
             this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
         }
+
+        this._updateCameraInfoOverlay(null);
+        if (this._signatureHintEl) {
+            this._signatureHintEl.style.display = 'none';
+        }
     }
 
     /**
@@ -706,15 +785,16 @@ class CanvasRenderer {
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
-        this._updateSignatureHint();
 
         this.clear();
+        this._updateSignatureHint();
 
         if (this.showEllipseOnly) {
             this._withHexClip(() => {
                 this.renderEllipseOnlyMode(event, showLegend, { clipProvided: true });
             });
             this.drawCameraBorder();
+            this.drawCameraInfo(event);
             return;
         }
 
@@ -738,11 +818,11 @@ class CanvasRenderer {
             }
 
             this.renderEnergyHistogram(event);
-            this.drawCameraInfo(event);
         });
 
         // Bordo in primo piano
         this.drawCameraBorder();
+        this.drawCameraInfo(event);
     }
 
     /**
@@ -754,9 +834,10 @@ class CanvasRenderer {
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
-        this._updateSignatureHint();
 
         this.clear();
+        this._updateSignatureHint();
+        this.drawCameraInfo(event);
         
         // Ordina tracce per tempo di arrivo simulato
         const sortedTracks = [...event.tracks].sort((a, b) => {
@@ -793,11 +874,13 @@ class CanvasRenderer {
                         this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
                     }
                     this.renderEnergyHistogram(event);
-                    this.drawCameraInfo(event);
                 });
             }
 
             this.drawCameraBorder();
+            if (currentIndex >= sortedTracks.length) {
+                this.drawCameraInfo(event);
+            }
         };
 
         // Inizia animazione
@@ -1437,33 +1520,7 @@ class CanvasRenderer {
      * Disegna info camera
      */
     drawCameraInfo(event) {
-        if (!event.cameraId) return;
-
-        const baseX = Math.max(60, this.canvas.width * 0.18);
-        let lineY = Math.max(40, this.canvas.height * 0.12);
-
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.font = 'bold 16px "Courier New", monospace';
-        this.ctx.fillText(`Camera ${event.cameraId}`, baseX, lineY);
-
-        this.ctx.font = '12px "Courier New", monospace';
-        lineY += 20;
-        this.ctx.fillText(`Energia: ${(event.energy / 1000).toFixed(1)} TeV`, baseX, lineY);
-        lineY += 15;
-        this.ctx.fillText(`Fotoni: ${event.tracks.length}`, baseX, lineY);
-        // Show current exposure and subpixel settings for immediate feedback
-        try {
-            const exp = (typeof this.exposureK === 'number') ? this.exposureK.toFixed(1) : '4.0';
-            const sp = !!this.subpixelEnabled ? 'ON' : 'OFF';
-            this.ctx.fillStyle = 'rgba(255, 230, 180, 0.95)';
-            this.ctx.font = '12px "Courier New", monospace';
-            lineY += 17;
-            this.ctx.fillText(`Exposure: ${exp}`, baseX, lineY);
-            lineY += 16;
-            this.ctx.fillText(`Sub-pixel: ${sp}`, baseX, lineY);
-        } catch (e) {
-            // ignore drawing errors
-        }
+        this._updateCameraInfoOverlay(event);
     }
 
     /**
