@@ -246,6 +246,9 @@ class CanvasRenderer {
         this.colorPalette = new EnergyColorPalette();
         this.sourceType = null;
         this.signatureHint = '';
+        this._signatureHintEl = null;
+        this._signatureHintTextEl = null;
+        this._ensureSignatureHintElement();
         
         // NEW: Light style flag (default: false = dark theme)
         this.lightStyle = false;
@@ -316,6 +319,72 @@ class CanvasRenderer {
                 this._redrawHillasOverlay();
             }
         });
+    }
+
+    _ensureSignatureHintElement() {
+        if (this._signatureHintEl || !this.canvas) return;
+
+        const parent = this.canvas.parentElement;
+        if (!parent) return;
+
+        if (!parent.style.position) {
+            parent.style.position = 'relative';
+        }
+
+        const container = document.createElement('div');
+        container.className = 'signature-hint-badge';
+        container.style.display = 'none';
+        container.style.alignItems = 'center';
+        container.style.gap = '10px';
+        container.style.background = 'linear-gradient(135deg, rgba(10, 24, 52, 0.95), rgba(18, 38, 70, 0.92))';
+        container.style.color = '#d0ecff';
+        container.style.padding = '8px 14px';
+        container.style.borderRadius = '999px';
+        container.style.boxShadow = '0 10px 25px rgba(10, 25, 50, 0.35)';
+        container.style.fontFamily = '"Courier New", monospace';
+        container.style.fontSize = '12px';
+        container.style.marginBottom = '10px';
+        container.style.zIndex = '2';
+
+        const badge = document.createElement('span');
+        badge.textContent = 'Firma sorgente';
+        badge.style.textTransform = 'uppercase';
+        badge.style.fontWeight = '700';
+        badge.style.letterSpacing = '0.04em';
+        badge.style.fontSize = '11px';
+        badge.style.padding = '3px 10px';
+        badge.style.borderRadius = '8px';
+        badge.style.background = 'rgba(80, 170, 255, 0.22)';
+        badge.style.color = '#aee4ff';
+
+        const text = document.createElement('span');
+        text.style.fontSize = '12px';
+        text.style.lineHeight = '1.45';
+        text.style.maxWidth = '360px';
+
+        container.appendChild(badge);
+        container.appendChild(text);
+
+        parent.insertBefore(container, parent.firstChild);
+
+        this._signatureHintEl = container;
+        this._signatureHintTextEl = text;
+    }
+
+    _updateSignatureHint() {
+        if (!this._signatureHintEl) {
+            this._ensureSignatureHintElement();
+        }
+        if (!this._signatureHintEl || !this._signatureHintTextEl) return;
+
+        const text = (this.signatureHint || '').trim();
+        if (text) {
+            this._signatureHintTextEl.textContent = text;
+            this._signatureHintEl.style.display = 'inline-flex';
+        } else {
+            this._signatureHintTextEl.textContent = '';
+            this._signatureHintEl.style.display = 'none';
+        }
     }
 
     _traceHexPath(ctx, width, height, radius) {
@@ -637,6 +706,7 @@ class CanvasRenderer {
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
+        this._updateSignatureHint();
 
         this.clear();
 
@@ -684,6 +754,7 @@ class CanvasRenderer {
         try { this._lastEvent = event; } catch (e) {}
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
+        this._updateSignatureHint();
 
         this.clear();
         
@@ -890,32 +961,6 @@ class CanvasRenderer {
             : [60, 235, 210];
 
         return this._mixRGBTowards(baseRGB, target, tintStrength);
-    }
-
-    _drawSignatureHint(x, startY, text, maxWidth) {
-        if (!text || !this.ctx) {
-            return startY;
-        }
-
-        const words = text.split(/\s+/);
-        let line = '';
-        let y = startY;
-        const lineHeight = 14;
-        for (let i = 0; i < words.length; i++) {
-            const testLine = line ? `${line} ${words[i]}` : words[i];
-            const metrics = this.ctx.measureText(testLine);
-            if (metrics.width > maxWidth && line) {
-                this.ctx.fillText(line, x, y);
-                line = words[i];
-                y += lineHeight;
-            } else {
-                line = testLine;
-            }
-        }
-        if (line) {
-            this.ctx.fillText(line, x, y);
-        }
-        return y;
     }
 
     /**
@@ -1416,12 +1461,6 @@ class CanvasRenderer {
             this.ctx.fillText(`Exposure: ${exp}`, baseX, lineY);
             lineY += 16;
             this.ctx.fillText(`Sub-pixel: ${sp}`, baseX, lineY);
-            if (this.signatureHint) {
-                lineY += 20;
-                this.ctx.fillStyle = '#9fe8ff';
-                const finalY = this._drawSignatureHint(baseX, lineY, this.signatureHint, Math.max(220, this.canvas.width * 0.3));
-                lineY = finalY + 6;
-            }
         } catch (e) {
             // ignore drawing errors
         }
