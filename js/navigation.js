@@ -20,6 +20,36 @@ function updateActiveNavItem(currentPage) {
 }
 
 /**
+ * Configura una serie di CanvasRenderer affinché mostrino le ellissi solo su hover
+ * con centro e dimensioni allineati alla traccia dei fotoni (stesso comportamento del quiz).
+ */
+window.configureRendererHoverEllipses = function(renderers) {
+    if (!Array.isArray(renderers)) return;
+
+    renderers.forEach(renderer => {
+        if (!renderer) return;
+        if (typeof renderer.enableHoverHillasMode === 'function') {
+            renderer.enableHoverHillasMode();
+            return;
+        }
+        renderer.showHillasOnHover = true;
+        renderer.embedHillasOutline = false;
+        renderer.showEllipseOnly = false;
+        renderer.respectExactHillas = true;
+        renderer.subpixelEnabled = false;
+        if (renderer.overlay && renderer.overlay.style) {
+            renderer.overlay.style.pointerEvents = 'none';
+        }
+        if (typeof renderer.setSignatureHintsEnabled === 'function') {
+            renderer.setSignatureHintsEnabled(false);
+        } else {
+            renderer.signatureHintsEnabled = false;
+        }
+        renderer.signatureHint = '';
+    });
+};
+
+/**
  * Global helper: inject exposure slider + sub-pixel toggle wired to provided renderers
  * @param {Array} renderers - array of CanvasRenderer instances
  * @param {HTMLElement} generateBtn - reference to the page's generate button
@@ -170,6 +200,10 @@ function setupSourceSimulator(sourceType, options = {}) {
             renderer.respectExactHillas = true;
             renderer.subpixelEnabled = false;
         });
+
+        if (typeof window.configureRendererHoverEllipses === 'function') {
+            window.configureRendererHoverEllipses(renderers);
+        }
 
         console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
 

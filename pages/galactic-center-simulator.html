@@ -90,7 +90,14 @@
             colorPalette = new EnergyColorPalette();
             engine.colorPalette = colorPalette;
             renderers = [new CanvasRenderer('cam1', 'cam1-overlay'), new CanvasRenderer('cam2', 'cam2-overlay'), new CanvasRenderer('cam3', 'cam3-overlay')];
-            renderers.forEach(renderer => { renderer.colorPalette = colorPalette; renderer.lightStyle = true; renderer.sourceType = 'galactic-center'; });
+            renderers.forEach(renderer => {
+                renderer.colorPalette = colorPalette;
+                renderer.lightStyle = true;
+                renderer.sourceType = 'galactic-center';
+                if (typeof renderer.enableHoverHillasMode === 'function') {
+                    renderer.enableHoverHillasMode();
+                }
+            });
             // Add exposure/sub-pixel controls if available
             if (typeof window.addExposureControls === 'function') {
                 window.addExposureControls(renderers, document.getElementById('generateBtn'));

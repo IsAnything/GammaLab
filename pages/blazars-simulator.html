@@ -213,6 +213,9 @@
                 renderer.colorPalette = colorPalette;
                 renderer.lightStyle = true;
                 renderer.sourceType = 'blazar'; // FIRMA BLAZAR
+                if (typeof renderer.enableHoverHillasMode === 'function') {
+                    renderer.enableHoverHillasMode();
+                }
             });
 
             // Add exposure/sub-pixel controls if available

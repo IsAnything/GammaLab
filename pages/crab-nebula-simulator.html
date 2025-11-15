@@ -263,6 +263,9 @@
                 renderer.colorPalette = colorPalette;
                 renderer.lightStyle = true;
                 renderer.sourceType = 'crab';
+                if (typeof renderer.enableHoverHillasMode === 'function') {
+                    renderer.enableHoverHillasMode();
+                }
             });
 
             // Add exposure/sub-pixel controls (global helper)

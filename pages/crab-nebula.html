@@ -413,9 +413,12 @@
                 new CanvasRenderer('cam3', 'cam3-overlay')
             ];
 
-            // Assegna nuova palette a tutti i renderers
+            // Assegna nuova palette e modalità ellissi hover a tutti i renderers
             renderers.forEach(renderer => {
                 renderer.colorPalette = colorPalette;
+                if (typeof renderer.enableHoverHillasMode === 'function') {
+                    renderer.enableHoverHillasMode();
+                }
             });
 
             console.log('🎨 Nuova palette 5 colori assegnata ai renderers');

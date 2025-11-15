@@ -217,6 +217,9 @@
                 renderer.colorPalette = colorPalette;
                 renderer.lightStyle = true;
                 renderer.sourceType = 'pevatron'; // FIRMA SNR
+                if (typeof renderer.enableHoverHillasMode === 'function') {
+                    renderer.enableHoverHillasMode();
+                }
             });
 
             // Add exposure/sub-pixel controls if available

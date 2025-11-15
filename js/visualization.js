@@ -285,6 +285,23 @@ class CanvasRenderer {
         // Store last event for re-rendering
         this._lastEvent = null;
     }
+
+    enableHoverHillasMode() {
+        this.showHillasOnHover = true;
+        this.embedHillasOutline = false;
+        this.showEllipseOnly = false;
+        this.respectExactHillas = true;
+        this.subpixelEnabled = false;
+        if (typeof this.setSignatureHintsEnabled === 'function') {
+            this.setSignatureHintsEnabled(false);
+        } else {
+            this.signatureHintsEnabled = false;
+        }
+        this.signatureHint = '';
+        if (this.overlay && this.overlay.style) {
+            this.overlay.style.pointerEvents = 'none';
+        }
+    }
     
     /**
      * Setup mouse event listeners for hover detection
