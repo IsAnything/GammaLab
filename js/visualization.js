@@ -498,6 +498,20 @@ class CanvasRenderer {
         ctx.closePath();
     }
 
+    _roundedRectPath(ctx, x, y, width, height, radius = 4) {
+        if (!ctx) return;
+        const r = Math.min(radius, width / 2, height / 2);
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + width - r, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+        ctx.lineTo(x + width, y + height - r);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+        ctx.lineTo(x + r, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+    }
+
     _getHexRadius(width, height, inset = 0) {
         const base = Math.min(width, height) / 2 - 5;
         return Math.max(0, base - inset);
@@ -1889,8 +1903,9 @@ class CanvasRenderer {
 
         const lengthScale = this.respectExactHillas ? 1.0 : 1.02;
         const widthScale = this.respectExactHillas ? 1.0 : 1.02;
-        const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale, 8);
-        const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale, 5);
+        const ellipseBoost = 1.15;
+        const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale * ellipseBoost, 8);
+        const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale * ellipseBoost, 5);
 
         ctx.save();
         ctx.translate(centerX, centerY);
@@ -1944,8 +1959,9 @@ class CanvasRenderer {
 
             const overlayLengthScale = this.respectExactHillas ? 1.0 : 1.02;
             const overlayWidthScale = this.respectExactHillas ? 1.0 : 1.02;
-            displayLengthPx = Math.max(displayLengthPx * overlayLengthScale, 10);
-            displayWidthPx = Math.max(displayWidthPx * overlayWidthScale, 6);
+            const overlayBoost = 1.18;
+            displayLengthPx = Math.max(displayLengthPx * overlayLengthScale * overlayBoost, 10);
+            displayWidthPx = Math.max(displayWidthPx * overlayWidthScale * overlayBoost, 6);
 
             if (!isFinite(displayLengthPx) || displayLengthPx <= 0) displayLengthPx = 10;
             if (!isFinite(displayWidthPx) || displayWidthPx <= 0) displayWidthPx = 5;
@@ -2000,12 +2016,36 @@ class CanvasRenderer {
 
             const midX = (centerX + cameraCenterX) / 2;
             const midY = (centerY + cameraCenterY) / 2;
-            ctx.fillStyle = this.lightStyle ? '#000000' : '#ffffff';
-            ctx.font = 'bold 14px "Courier New", monospace';
-            ctx.strokeStyle = this.lightStyle ? '#ffffff' : '#000000';
-            ctx.lineWidth = 2;
-            ctx.strokeText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
-            ctx.fillText(`α = ${hillasParams.alpha.toFixed(1)}°`, midX + 10, midY);
+            const alphaLabel = `α = ${hillasParams.alpha.toFixed(1)}°`;
+            ctx.font = '600 16px "Courier New", monospace';
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'left';
+            const textX = midX + 12;
+            const textY = midY;
+            const metrics = ctx.measureText(alphaLabel);
+            const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
+            const padX = 8;
+            const padY = 4;
+            const boxWidth = metrics.width + padX * 2;
+            const boxHeight = textHeight + padY * 2;
+            const boxX = textX - padX;
+            const boxY = textY - boxHeight / 2;
+
+            ctx.save();
+            ctx.beginPath();
+            this._roundedRectPath(ctx, boxX, boxY, boxWidth, boxHeight, 6);
+            ctx.fillStyle = this.lightStyle ? 'rgba(0, 0, 0, 0.65)' : 'rgba(6, 10, 22, 0.8)';
+            ctx.strokeStyle = this.lightStyle ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.45)';
+            ctx.lineWidth = 1.2;
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = this.lightStyle ? '#f4f7ff' : '#ffffff';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.lineWidth = 0.8;
+            ctx.strokeText(alphaLabel, textX, textY);
+            ctx.fillText(alphaLabel, textX, textY);
 
             try {
                 const dx = centerX - cameraCenterX;
