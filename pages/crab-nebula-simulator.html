@@ -266,6 +266,14 @@
                 if (typeof renderer.enableHoverHillasMode === 'function') {
                     renderer.enableHoverHillasMode();
                 }
+                if (typeof renderer.configureAlphaLabelPlacement === 'function') {
+                    renderer.configureAlphaLabelPlacement({
+                        mode: 'perpendicular',
+                        alongFraction: 0.55,
+                        lateralOffset: 80,
+                        textAlign: 'center'
+                    });
+                }
             });
 
             // Add exposure/sub-pixel controls (global helper)

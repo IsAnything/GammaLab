@@ -284,6 +284,26 @@ class CanvasRenderer {
 
         // Store last event for re-rendering
         this._lastEvent = null;
+
+        // Alpha label placement customization
+        this.alphaLabelConfig = {
+            mode: 'midpoint', // 'midpoint' keeps label along CoG-camera axis
+            alongOffset: 12,
+            midpointYOffset: 0,
+            alongFraction: 0.5,
+            lateralOffset: 48,
+            textAlign: 'left'
+        };
+    }
+
+    configureAlphaLabelPlacement(options = {}) {
+        if (!this.alphaLabelConfig) {
+            this.alphaLabelConfig = {};
+        }
+        this.alphaLabelConfig = {
+            ...this.alphaLabelConfig,
+            ...options
+        };
     }
 
     enableHoverHillasMode() {
@@ -2031,21 +2051,42 @@ class CanvasRenderer {
             ctx.stroke();
             ctx.setLineDash([]);
 
+            const dxCamera = cameraCenterX - centerX;
+            const dyCamera = cameraCenterY - centerY;
+            const distanceToCamera = Math.sqrt(dxCamera * dxCamera + dyCamera * dyCamera) || 1;
             const midX = (centerX + cameraCenterX) / 2;
             const midY = (centerY + cameraCenterY) / 2;
             const alphaLabel = `α = ${hillasParams.alpha.toFixed(1)}°`;
             ctx.font = '700 18px "Courier New", monospace';
             ctx.textBaseline = 'middle';
-            ctx.textAlign = 'left';
-            const textX = midX + 12;
-            const textY = midY;
+
+            const labelCfg = this.alphaLabelConfig || {};
+            const mode = labelCfg.mode || 'midpoint';
+            let textX = midX + (labelCfg.alongOffset ?? 12);
+            let textY = midY + (labelCfg.midpointYOffset ?? 0);
+            let labelTextAlign = labelCfg.textAlign || 'left';
+
+            if (mode === 'perpendicular') {
+                const alongFraction = Math.max(0, Math.min(1, labelCfg.alongFraction ?? 0.5));
+                const baseX = centerX + dxCamera * alongFraction;
+                const baseY = centerY + dyCamera * alongFraction;
+                const lateralOffset = labelCfg.lateralOffset ?? 48;
+                const perpX = -dyCamera / distanceToCamera;
+                const perpY = dxCamera / distanceToCamera;
+                const side = labelCfg.preferPositiveSide === false ? -1 : 1;
+                textX = baseX + perpX * lateralOffset * side;
+                textY = baseY + perpY * lateralOffset * side;
+                labelTextAlign = labelCfg.textAlign || 'center';
+            }
+
+            ctx.textAlign = labelTextAlign;
             const metrics = ctx.measureText(alphaLabel);
             const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
             const padX = 12;
             const padY = 6;
             const boxWidth = metrics.width + padX * 2;
             const boxHeight = textHeight + padY * 2;
-            const boxX = textX - padX;
+            const boxX = textX - padX - (labelTextAlign === 'center' ? metrics.width / 2 : 0);
             const boxY = textY - boxHeight / 2;
 
             ctx.save();
