@@ -579,6 +579,119 @@ class CanvasRenderer {
         };
     }
 
+    _computePhotonCovariance(tracks, centroid) {
+        if (!centroid || !tracks || tracks.length < 2) {
+            return null;
+        }
+
+        let sumW = 0;
+        let sumXX = 0;
+        let sumYY = 0;
+        let sumXY = 0;
+
+        tracks.forEach(track => {
+            if (!track) return;
+            const weight = Number.isFinite(track.intensity) ? Math.max(track.intensity, 0.0001) : 1;
+            const x = Number.isFinite(track.x) ? track.x : centroid.x;
+            const y = Number.isFinite(track.y) ? track.y : centroid.y;
+            const dx = x - centroid.x;
+            const dy = y - centroid.y;
+            sumW += weight;
+            sumXX += weight * dx * dx;
+            sumYY += weight * dy * dy;
+            sumXY += weight * dx * dy;
+        });
+
+        if (sumW <= 0) {
+            return null;
+        }
+
+        return {
+            xx: sumXX / sumW,
+            yy: sumYY / sumW,
+            xy: sumXY / sumW,
+            weight: sumW
+        };
+    }
+
+    _getPixelToDegreeFactor() {
+        const widthPx = (this._lastEvent && this._lastEvent.canvasWidth) || (this.canvas && this.canvas.width);
+        if (!widthPx || !isFinite(widthPx) || widthPx <= 0) {
+            return null;
+        }
+
+        const DEFAULT_FOV_DEG = 15;
+        return DEFAULT_FOV_DEG / widthPx;
+    }
+
+    _fitEllipseToPhotonCluster(hillas, tracks) {
+        if (!hillas || !hillas.valid || !tracks || tracks.length < 3) {
+            return hillas;
+        }
+
+        const centroid = this._computePhotonCentroid(tracks);
+        if (!centroid) {
+            return hillas;
+        }
+
+        const covariance = this._computePhotonCovariance(tracks, centroid);
+        if (!covariance) {
+            return {
+                ...hillas,
+                cogX: centroid.x,
+                cogY: centroid.y
+            };
+        }
+
+        const trace = covariance.xx + covariance.yy;
+        const det = covariance.xx * covariance.yy - covariance.xy * covariance.xy;
+        const sqrtDisc = Math.sqrt(Math.max(0, Math.pow(trace / 2, 2) - det));
+        let lambdaMajor = trace / 2 + sqrtDisc;
+        let lambdaMinor = trace / 2 - sqrtDisc;
+
+        if (!isFinite(lambdaMajor) || lambdaMajor <= 0) {
+            lambdaMajor = Math.max(lambdaMinor, 1);
+        }
+        if (!isFinite(lambdaMinor) || lambdaMinor <= 0) {
+            lambdaMinor = Math.min(lambdaMajor, 0.5);
+        }
+
+        if (lambdaMajor < lambdaMinor) {
+            const tmp = lambdaMajor;
+            lambdaMajor = lambdaMinor;
+            lambdaMinor = tmp;
+        }
+
+        const sigmaMajor = Math.sqrt(Math.max(lambdaMajor, 1e-4));
+        const sigmaMinor = Math.sqrt(Math.max(lambdaMinor, 1e-4));
+        const majorScale = 2.35;
+        const minorScale = 2.0;
+        const lengthPx = Math.max(sigmaMajor * majorScale, 6);
+        const widthPx = Math.max(sigmaMinor * minorScale, 4);
+
+        const thetaRad = 0.5 * Math.atan2(2 * covariance.xy, covariance.xx - covariance.yy) || 0;
+        const pxToDeg = this._getPixelToDegreeFactor();
+
+        const updated = {
+            ...hillas,
+            cogX: centroid.x,
+            cogY: centroid.y,
+            theta: thetaRad * 180 / Math.PI,
+            lengthPx,
+            widthPx
+        };
+
+        if (pxToDeg) {
+            updated.length = lengthPx * pxToDeg;
+            updated.width = widthPx * pxToDeg;
+        }
+
+        if (typeof updated.centerX !== 'undefined') updated.centerX = centroid.x;
+        if (typeof updated.centerY !== 'undefined') updated.centerY = centroid.y;
+
+        return updated;
+    }
+
     _alignHillasToPhotonCluster(hillas, tracks) {
         if (!hillas || !hillas.valid) {
             return hillas;
@@ -929,6 +1042,7 @@ class CanvasRenderer {
         if (embeddedHillas && event && event.tracks && event.tracks.length) {
             embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
             embeddedHillas = this._shrinkHillasToFitCluster(embeddedHillas, event.tracks);
+            embeddedHillas = this._fitEllipseToPhotonCluster(embeddedHillas, event.tracks);
             event.__embeddedHillas = embeddedHillas;
         }
 
@@ -995,6 +1109,7 @@ class CanvasRenderer {
         if (embeddedHillas && event && event.tracks && event.tracks.length) {
             embeddedHillas = this._alignHillasToPhotonCluster(embeddedHillas, event.tracks);
             embeddedHillas = this._shrinkHillasToFitCluster(embeddedHillas, event.tracks);
+            embeddedHillas = this._fitEllipseToPhotonCluster(embeddedHillas, event.tracks);
             event.__embeddedHillas = embeddedHillas;
         }
 
@@ -1710,6 +1825,7 @@ class CanvasRenderer {
         if (this._lastEvent && this._lastEvent.tracks && this._lastEvent.tracks.length) {
             this.currentHillasParams = this._alignHillasToPhotonCluster(this.currentHillasParams, this._lastEvent.tracks);
             this.currentHillasParams = this._shrinkHillasToFitCluster(this.currentHillasParams, this._lastEvent.tracks);
+            this.currentHillasParams = this._fitEllipseToPhotonCluster(this.currentHillasParams, this._lastEvent.tracks);
         }
 
         if (this.embedHillasOutline && !this.showHillasOnHover && this._lastEvent && this._lastEvent.tracks) {
@@ -1718,7 +1834,8 @@ class CanvasRenderer {
                 embedded.valid = true;
                 if (this._lastEvent && this._lastEvent.tracks && this._lastEvent.tracks.length) {
                     const aligned = this._alignHillasToPhotonCluster(embedded, this._lastEvent.tracks);
-                    this._embeddedHillasParams = this._shrinkHillasToFitCluster(aligned, this._lastEvent.tracks);
+                    const trimmed = this._shrinkHillasToFitCluster(aligned, this._lastEvent.tracks);
+                    this._embeddedHillasParams = this._fitEllipseToPhotonCluster(trimmed, this._lastEvent.tracks);
                 } else {
                     this._embeddedHillasParams = embedded;
                 }
