@@ -294,6 +294,20 @@ class CanvasRenderer {
             lateralOffset: 48,
             textAlign: 'left'
         };
+
+        // Camera reference marker customization
+        this.alphaReferenceConfig = {
+            cameraMarkerMode: 'center',
+            cameraMarkerOffset: 0,
+            cameraMarkerRadius: 6,
+            markerClampPadding: 18,
+            drawCameraCenterCross: false,
+            cameraCenterCrossSize: 12,
+            showAlphaArc: false,
+            arcRadiusPx: null,
+            arcColor: null,
+            arcLineWidth: 2.2
+        };
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -302,6 +316,16 @@ class CanvasRenderer {
         }
         this.alphaLabelConfig = {
             ...this.alphaLabelConfig,
+            ...options
+        };
+    }
+
+    configureAlphaReferenceMarkers(options = {}) {
+        if (!this.alphaReferenceConfig) {
+            this.alphaReferenceConfig = {};
+        }
+        this.alphaReferenceConfig = {
+            ...this.alphaReferenceConfig,
             ...options
         };
     }
@@ -1980,6 +2004,8 @@ class CanvasRenderer {
         if (!this.overlayCtx || !this.overlay || !hillasParams || !hillasParams.valid) return;
 
         const ctx = this.overlayCtx;
+        const referenceCfg = this.alphaReferenceConfig || {};
+        const clampPadding = referenceCfg.markerClampPadding ?? 16;
         this._withOverlayHexClip(() => {
             const centerX = hillasParams.cogX;
             const centerY = hillasParams.cogY;
@@ -2042,18 +2068,48 @@ class CanvasRenderer {
 
             const cameraCenterX = this.overlay.width / 2;
             const cameraCenterY = this.overlay.height / 2;
+            const dxCamera = cameraCenterX - centerX;
+            const dyCamera = cameraCenterY - centerY;
+            const distanceToCamera = Math.sqrt(dxCamera * dxCamera + dyCamera * dyCamera) || 1;
+            const unitToCameraX = dxCamera / distanceToCamera;
+            const unitToCameraY = dyCamera / distanceToCamera;
+            const markerMode = referenceCfg.cameraMarkerMode || 'center';
+            const markerOffset = referenceCfg.cameraMarkerOffset || 0;
+            const markerRadius = referenceCfg.cameraMarkerRadius ?? 6;
+            let markerX = cameraCenterX;
+            let markerY = cameraCenterY;
+            if (markerMode === 'offset' && Math.abs(markerOffset) > 0.5) {
+                markerX = cameraCenterX + unitToCameraX * markerOffset;
+                markerY = cameraCenterY + unitToCameraY * markerOffset;
+            }
+            markerX = Math.max(clampPadding, Math.min(this.overlay.width - clampPadding, markerX));
+            markerY = Math.max(clampPadding, Math.min(this.overlay.height - clampPadding, markerY));
+
+            const lineEndX = markerX;
+            const lineEndY = markerY;
             ctx.strokeStyle = this.lightStyle ? 'rgba(0, 102, 204, 0.7)' : 'rgba(68, 136, 255, 0.6)';
             ctx.lineWidth = 1.4;
             ctx.setLineDash([8, 6]);
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
-            ctx.lineTo(cameraCenterX, cameraCenterY);
+            ctx.lineTo(lineEndX, lineEndY);
             ctx.stroke();
             ctx.setLineDash([]);
 
-            const dxCamera = cameraCenterX - centerX;
-            const dyCamera = cameraCenterY - centerY;
-            const distanceToCamera = Math.sqrt(dxCamera * dxCamera + dyCamera * dyCamera) || 1;
+            if (referenceCfg.drawCameraCenterCross) {
+                const crossSize = referenceCfg.cameraCenterCrossSize ?? 12;
+                ctx.save();
+                ctx.strokeStyle = this.lightStyle ? 'rgba(255, 255, 190, 0.85)' : 'rgba(255, 255, 160, 0.85)';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(cameraCenterX - crossSize, cameraCenterY);
+                ctx.lineTo(cameraCenterX + crossSize, cameraCenterY);
+                ctx.moveTo(cameraCenterX, cameraCenterY - crossSize);
+                ctx.lineTo(cameraCenterX, cameraCenterY + crossSize);
+                ctx.stroke();
+                ctx.restore();
+            }
+
             const midX = (centerX + cameraCenterX) / 2;
             const midY = (centerY + cameraCenterY) / 2;
             const alphaLabel = `α = ${hillasParams.alpha.toFixed(1)}°`;
@@ -2111,6 +2167,37 @@ class CanvasRenderer {
             ctx.fillText(alphaLabel, textX, textY);
             ctx.restore();
 
+            if (referenceCfg.showAlphaArc) {
+                const normalizeAngle = (angle) => {
+                    let a = angle;
+                    while (a <= -Math.PI) a += Math.PI * 2;
+                    while (a > Math.PI) a -= Math.PI * 2;
+                    return a;
+                };
+                const delta = normalizeAngle(Math.atan2(dyCamera, dxCamera) - theta);
+                const arcRadius = referenceCfg.arcRadiusPx ?? Math.min(Math.max(displayLengthPx * 0.65, 40), 150);
+                const arcEnd = theta + delta;
+                ctx.save();
+                ctx.strokeStyle = referenceCfg.arcColor || (this.lightStyle ? 'rgba(255, 210, 120, 0.92)' : 'rgba(255, 230, 120, 0.9)');
+                ctx.lineWidth = referenceCfg.arcLineWidth ?? 2.2;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arcRadius, theta, arcEnd, delta < 0);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                const arcMarkerRadius = 4;
+                const startMarkerX = centerX + Math.cos(theta) * arcRadius;
+                const startMarkerY = centerY + Math.sin(theta) * arcRadius;
+                const endMarkerX = centerX + Math.cos(arcEnd) * arcRadius;
+                const endMarkerY = centerY + Math.sin(arcEnd) * arcRadius;
+                ctx.fillStyle = referenceCfg.arcColor || (this.lightStyle ? '#ffe082' : '#ffdd66');
+                ctx.beginPath();
+                ctx.arc(startMarkerX, startMarkerY, arcMarkerRadius, 0, 2 * Math.PI);
+                ctx.arc(endMarkerX, endMarkerY, arcMarkerRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.restore();
+            }
+
             try {
                 const dx = centerX - cameraCenterX;
                 const dy = centerY - cameraCenterY;
@@ -2122,23 +2209,23 @@ class CanvasRenderer {
                 ctx.save();
                 ctx.fillStyle = '#ffff66';
                 ctx.beginPath();
-                ctx.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+                ctx.arc(markerX, markerY, markerRadius, 0, 2 * Math.PI);
                 ctx.fill();
 
                 ctx.strokeStyle = '#222200';
                 ctx.lineWidth = 1.8;
                 ctx.beginPath();
-                ctx.arc(cameraCenterX, cameraCenterY, 10, 0, 2 * Math.PI);
+                ctx.arc(markerX, markerY, markerRadius + 4, 0, 2 * Math.PI);
                 ctx.stroke();
 
                 ctx.strokeStyle = this.lightStyle ? '#ffff00' : '#ffee00';
                 ctx.lineWidth = 1.8;
-                const s = 18;
+                const s = Math.max(16, markerRadius * 2.4);
                 ctx.beginPath();
-                ctx.moveTo(cameraCenterX - s, cameraCenterY);
-                ctx.lineTo(cameraCenterX + s, cameraCenterY);
-                ctx.moveTo(cameraCenterX, cameraCenterY - s);
-                ctx.lineTo(cameraCenterX, cameraCenterY + s);
+                ctx.moveTo(markerX - s, markerY);
+                ctx.lineTo(markerX + s, markerY);
+                ctx.moveTo(markerX, markerY - s);
+                ctx.lineTo(markerX, markerY + s);
                 ctx.stroke();
                 ctx.restore();
 
@@ -2150,16 +2237,28 @@ class CanvasRenderer {
                         main.fillStyle = 'rgba(255, 255, 102, 0.25)';
                         main.lineWidth = 2;
                         main.beginPath();
-                        main.arc(cameraCenterX, cameraCenterY, 6, 0, 2 * Math.PI);
+                        main.arc(markerX, markerY, markerRadius, 0, 2 * Math.PI);
                         main.fill();
                         main.stroke();
 
                         main.beginPath();
-                        main.moveTo(cameraCenterX - 12, cameraCenterY);
-                        main.lineTo(cameraCenterX + 12, cameraCenterY);
-                        main.moveTo(cameraCenterX, cameraCenterY - 12);
-                        main.lineTo(cameraCenterX, cameraCenterY + 12);
+                        main.moveTo(markerX - 12, markerY);
+                        main.lineTo(markerX + 12, markerY);
+                        main.moveTo(markerX, markerY - 12);
+                        main.lineTo(markerX, markerY + 12);
                         main.stroke();
+
+                        if (referenceCfg.drawCameraCenterCross) {
+                            const crossSize = referenceCfg.cameraCenterCrossSize ?? 12;
+                            main.strokeStyle = 'rgba(255, 255, 170, 0.8)';
+                            main.lineWidth = 1.2;
+                            main.beginPath();
+                            main.moveTo(cameraCenterX - crossSize, cameraCenterY);
+                            main.lineTo(cameraCenterX + crossSize, cameraCenterY);
+                            main.moveTo(cameraCenterX, cameraCenterY - crossSize);
+                            main.lineTo(cameraCenterX, cameraCenterY + crossSize);
+                            main.stroke();
+                        }
 
                         main.fillStyle = 'rgba(204, 0, 102, 0.95)';
                         main.strokeStyle = 'rgba(255,255,255,0.9)';
