@@ -30,22 +30,44 @@ window.configureRendererHoverEllipses = function(renderers) {
         if (!renderer) return;
         if (typeof renderer.enableHoverHillasMode === 'function') {
             renderer.enableHoverHillasMode();
-            return;
-        }
-        renderer.showHillasOnHover = true;
-        renderer.embedHillasOutline = false;
-        renderer.showEllipseOnly = false;
-        renderer.respectExactHillas = true;
-        renderer.subpixelEnabled = false;
-        if (renderer.overlay && renderer.overlay.style) {
-            renderer.overlay.style.pointerEvents = 'none';
-        }
-        if (typeof renderer.setSignatureHintsEnabled === 'function') {
-            renderer.setSignatureHintsEnabled(false);
         } else {
-            renderer.signatureHintsEnabled = false;
+            renderer.showHillasOnHover = true;
+            renderer.embedHillasOutline = false;
+            renderer.showEllipseOnly = false;
+            renderer.respectExactHillas = true;
+            renderer.subpixelEnabled = false;
+            if (renderer.overlay && renderer.overlay.style) {
+                renderer.overlay.style.pointerEvents = 'none';
+            }
+            if (typeof renderer.setSignatureHintsEnabled === 'function') {
+                renderer.setSignatureHintsEnabled(false);
+            } else {
+                renderer.signatureHintsEnabled = false;
+            }
+            renderer.signatureHint = '';
         }
-        renderer.signatureHint = '';
+
+        if (typeof renderer.configureAlphaLabelPlacement === 'function') {
+            renderer.configureAlphaLabelPlacement({
+                mode: 'perpendicular',
+                alongFraction: 0.55,
+                lateralOffset: 80,
+                textAlign: 'center'
+            });
+        }
+
+        if (typeof renderer.configureAlphaReferenceMarkers === 'function') {
+            renderer.configureAlphaReferenceMarkers({
+                cameraMarkerMode: 'offset',
+                cameraMarkerOffset: 110,
+                drawCameraCenterCross: true,
+                cameraCenterCrossSize: 14,
+                cameraMarkerRadius: 7,
+                showAlphaArc: true,
+                arcRadiusPx: 120,
+                arcLineWidth: 2.4
+            });
+        }
     });
 };
 

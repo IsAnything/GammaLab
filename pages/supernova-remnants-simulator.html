@@ -220,6 +220,26 @@
                 if (typeof renderer.enableHoverHillasMode === 'function') {
                     renderer.enableHoverHillasMode();
                 }
+                if (typeof renderer.configureAlphaLabelPlacement === 'function') {
+                    renderer.configureAlphaLabelPlacement({
+                        mode: 'perpendicular',
+                        alongFraction: 0.55,
+                        lateralOffset: 80,
+                        textAlign: 'center'
+                    });
+                }
+                if (typeof renderer.configureAlphaReferenceMarkers === 'function') {
+                    renderer.configureAlphaReferenceMarkers({
+                        cameraMarkerMode: 'offset',
+                        cameraMarkerOffset: 110,
+                        drawCameraCenterCross: true,
+                        cameraCenterCrossSize: 14,
+                        cameraMarkerRadius: 7,
+                        showAlphaArc: true,
+                        arcRadiusPx: 120,
+                        arcLineWidth: 2.4
+                    });
+                }
             });
 
             // Add exposure/sub-pixel controls if available
