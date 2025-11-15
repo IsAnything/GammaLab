@@ -1903,7 +1903,7 @@ class CanvasRenderer {
 
         const lengthScale = this.respectExactHillas ? 1.0 : 1.02;
         const widthScale = this.respectExactHillas ? 1.0 : 1.02;
-        const ellipseBoost = 1.15;
+        const ellipseBoost = this.lightStyle ? 1.28 : 1.24;
         const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale * ellipseBoost, 8);
         const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale * ellipseBoost, 5);
 
@@ -1959,7 +1959,7 @@ class CanvasRenderer {
 
             const overlayLengthScale = this.respectExactHillas ? 1.0 : 1.02;
             const overlayWidthScale = this.respectExactHillas ? 1.0 : 1.02;
-            const overlayBoost = 1.18;
+            const overlayBoost = this.lightStyle ? 1.35 : 1.3;
             displayLengthPx = Math.max(displayLengthPx * overlayLengthScale * overlayBoost, 10);
             displayWidthPx = Math.max(displayWidthPx * overlayWidthScale * overlayBoost, 6);
 
