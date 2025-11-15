@@ -97,6 +97,11 @@ class QuizEngine {
         
         // Abilita rendering stile chiaro e source-specific per quiz
         this.renderers.forEach(renderer => {
+            if (typeof renderer.setSignatureHintsEnabled === 'function') {
+                renderer.setSignatureHintsEnabled(false);
+            } else {
+                renderer.signatureHintsEnabled = false;
+            }
             renderer.colorPalette = this.colorPalette;
             renderer.lightStyle = true; // Nuovo stile chiaro
             // In quiz vogliamo che le ellissi siano geometricamente aderenti

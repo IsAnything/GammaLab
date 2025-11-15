@@ -251,6 +251,7 @@ class CanvasRenderer {
         this._cameraInfoEl = null;
         this._ensureSignatureHintElement();
         this._ensureCameraInfoElement();
+        this.signatureHintsEnabled = true;
         this.embedHillasOutline = true;
         this._embeddedHillasParams = null;
         this._embeddingReRender = false;
@@ -377,6 +378,17 @@ class CanvasRenderer {
         this._signatureHintTextEl = text;
     }
 
+    setSignatureHintsEnabled(enabled) {
+        this.signatureHintsEnabled = !!enabled;
+        if (!this.signatureHintsEnabled) {
+            if (this._signatureHintEl) {
+                this._signatureHintEl.style.display = 'none';
+            }
+        } else {
+            this._updateSignatureHint();
+        }
+    }
+
     _ensureCameraInfoElement() {
         if (this._cameraInfoEl || !this.canvas) return;
 
@@ -390,9 +402,9 @@ class CanvasRenderer {
         const info = document.createElement('div');
         info.className = 'camera-info-overlay';
         info.style.position = 'absolute';
-        info.style.top = '12px';
-        info.style.left = '12px';
-        info.style.padding = '10px 14px';
+        info.style.top = '-10px';
+        info.style.left = '-10px';
+        info.style.padding = '8px 12px';
         info.style.background = 'rgba(6, 14, 28, 0.78)';
         info.style.backdropFilter = 'blur(10px)';
         info.style.borderRadius = '14px';
@@ -402,7 +414,7 @@ class CanvasRenderer {
         info.style.fontSize = '12px';
         info.style.lineHeight = '1.5';
         info.style.zIndex = '3';
-        info.style.minWidth = '160px';
+        info.style.minWidth = '140px';
         info.style.pointerEvents = 'none';
         info.style.whiteSpace = 'nowrap';
         info.style.display = 'none';
@@ -416,6 +428,11 @@ class CanvasRenderer {
             this._ensureSignatureHintElement();
         }
         if (!this._signatureHintEl || !this._signatureHintTextEl) return;
+
+        if (!this.signatureHintsEnabled) {
+            this._signatureHintEl.style.display = 'none';
+            return;
+        }
 
         const text = (this.signatureHint || '').trim();
         if (text) {
@@ -441,8 +458,6 @@ class CanvasRenderer {
 
         const energyTeV = event.energy ? (event.energy / 1000).toFixed(2) : '—';
         const photons = event.tracks ? event.tracks.length : '—';
-        const exposure = (typeof this.exposureK === 'number') ? this.exposureK.toFixed(1) : '4.0';
-        const subpixel = this.subpixelEnabled ? 'ON' : 'OFF';
         const camId = event.cameraId ? `Camera ${event.cameraId}` : 'Camera';
 
         const highlightColor = this.lightStyle ? '#0d2344' : '#0a1731';
@@ -455,11 +470,11 @@ class CanvasRenderer {
         this._cameraInfoEl.style.color = textColor;
 
         this._cameraInfoEl.innerHTML = `
-            <div style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:11px; color:${badgeColor}; margin-bottom:6px;">${camId}</div>
-            <div>Energia: <span style="color:${highlightColor}; font-weight:600;">${energyTeV} TeV</span></div>
-            <div>Fotoni: <span style="color:${highlightColor}; font-weight:600;">${photons}</span></div>
-            <div>Exposure: <span style="color:${highlightColor}; font-weight:600;">${exposure}</span></div>
-            <div>Sub-pixel: <span style="color:${highlightColor}; font-weight:600;">${subpixel}</span></div>
+            <div style="font-weight:700; text-transform:uppercase; letter-spacing:0.05em; font-size:11px; color:${badgeColor}; margin-bottom:4px;">${camId}</div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+                <span>Energia: <span style="color:${highlightColor}; font-weight:600;">${energyTeV} TeV</span></span>
+                <span>Fotoni: <span style="color:${highlightColor}; font-weight:600;">${photons}</span></span>
+            </div>
         `;
 
         this._cameraInfoEl.style.display = 'block';

@@ -90,6 +90,14 @@
           new CanvasRenderer(c3.getContext('2d'), { canvas: c3 })
         ];
 
+        engine.renderers.forEach(r => {
+          if (typeof r.setSignatureHintsEnabled === 'function') {
+            r.setSignatureHintsEnabled(false);
+          } else {
+            r.signatureHintsEnabled = false;
+          }
+        });
+
         // Ensure suppressNoise/respectExactHillas are settable
         engine.renderers.forEach(r => {
           if (typeof r.suppressNoise !== 'undefined') r.suppressNoise = true;
