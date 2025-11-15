@@ -2017,15 +2017,15 @@ class CanvasRenderer {
             const midX = (centerX + cameraCenterX) / 2;
             const midY = (centerY + cameraCenterY) / 2;
             const alphaLabel = `α = ${hillasParams.alpha.toFixed(1)}°`;
-            ctx.font = '600 16px "Courier New", monospace';
+            ctx.font = '700 18px "Courier New", monospace';
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'left';
             const textX = midX + 12;
             const textY = midY;
             const metrics = ctx.measureText(alphaLabel);
             const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
-            const padX = 8;
-            const padY = 4;
+            const padX = 12;
+            const padY = 6;
             const boxWidth = metrics.width + padX * 2;
             const boxHeight = textHeight + padY * 2;
             const boxX = textX - padX;
@@ -2034,18 +2034,24 @@ class CanvasRenderer {
             ctx.save();
             ctx.beginPath();
             this._roundedRectPath(ctx, boxX, boxY, boxWidth, boxHeight, 6);
-            ctx.fillStyle = this.lightStyle ? 'rgba(0, 0, 0, 0.65)' : 'rgba(6, 10, 22, 0.8)';
-            ctx.strokeStyle = this.lightStyle ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.45)';
-            ctx.lineWidth = 1.2;
+            ctx.fillStyle = this.lightStyle ? 'rgba(0, 0, 0, 0.7)' : 'rgba(4, 6, 14, 0.82)';
+            ctx.strokeStyle = this.lightStyle ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 1.4;
+            ctx.shadowColor = this.lightStyle ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 8;
             ctx.fill();
             ctx.stroke();
             ctx.restore();
 
-            ctx.fillStyle = this.lightStyle ? '#f4f7ff' : '#ffffff';
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-            ctx.lineWidth = 0.8;
+            ctx.save();
+            ctx.fillStyle = this.lightStyle ? '#fefefe' : '#ffffff';
+            ctx.strokeStyle = this.lightStyle ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.85)';
+            ctx.lineWidth = 0.9;
+            ctx.shadowColor = this.lightStyle ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 6;
             ctx.strokeText(alphaLabel, textX, textY);
             ctx.fillText(alphaLabel, textX, textY);
+            ctx.restore();
 
             try {
                 const dx = centerX - cameraCenterX;
