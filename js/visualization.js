@@ -346,6 +346,8 @@ class CanvasRenderer {
             x: -1,
             y: -1
         };
+
+        this._hoverLensGeometry = null;
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -388,15 +390,36 @@ class CanvasRenderer {
         };
     }
 
+    _clampHoverZoomFocus(x, y) {
+        if (!this.canvas) {
+            return { x, y };
+        }
+        const cfg = this.hoverZoomConfig || {};
+        const canvasWidth = this.canvas.width || 0;
+        const canvasHeight = this.canvas.height || 0;
+        const fallbackRadius = Math.min(canvasWidth, canvasHeight) * 0.25;
+        const lensRadius = Number.isFinite(cfg.radiusPx) ? cfg.radiusPx : fallbackRadius;
+        const padding = cfg.edgePadding ?? 4;
+        const minX = lensRadius + padding;
+        const maxX = Math.max(minX, canvasWidth - lensRadius - padding);
+        const minY = lensRadius + padding;
+        const maxY = Math.max(minY, canvasHeight - lensRadius - padding);
+        return {
+            x: Math.max(minX, Math.min(maxX, x)),
+            y: Math.max(minY, Math.min(maxY, y))
+        };
+    }
+
     lockHoverZoom(x, y) {
         if (!this.hoverZoomManual) {
             this.hoverZoomManual = {};
         }
+        const clamped = this._clampHoverZoomFocus(x, y);
         this.hoverZoomManual.active = true;
-        this.hoverZoomManual.x = x;
-        this.hoverZoomManual.y = y;
-        this.mouseX = x;
-        this.mouseY = y;
+        this.hoverZoomManual.x = clamped.x;
+        this.hoverZoomManual.y = clamped.y;
+        this.mouseX = clamped.x;
+        this.mouseY = clamped.y;
         this.isHovering = true;
     }
 
@@ -410,6 +433,7 @@ class CanvasRenderer {
         this.mouseX = -1;
         this.mouseY = -1;
         this.isHovering = false;
+        this._hoverLensGeometry = null;
     }
 
     isHoverZoomLocked() {
@@ -421,6 +445,13 @@ class CanvasRenderer {
             return { x: this.hoverZoomManual.x, y: this.hoverZoomManual.y };
         }
         return null;
+    }
+
+    getHoverZoomLensGeometry() {
+        if (!this._hoverLensGeometry) {
+            return null;
+        }
+        return { ...this._hoverLensGeometry };
     }
 
     enableHoverHillasMode() {
@@ -982,6 +1013,7 @@ class CanvasRenderer {
         if (!this.overlayCtx || !this.overlay) return;
 
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+        this._hoverLensGeometry = null;
 
         if (!this.currentHillasParams || !this.currentHillasParams.valid) {
             return;
@@ -2044,12 +2076,17 @@ class CanvasRenderer {
             this._embeddedHillasParams = null;
         }
 
-        if (this.showHillasOnHover) {
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+        if (hoverLocked) {
+            this.isHovering = true;
+        } else if (this.showHillasOnHover) {
             if (this.mouseX >= 0 && this.mouseY >= 0) {
                 this.isHovering = this._isPointInsideHillas(this.mouseX, this.mouseY, this.currentHillasParams);
             } else {
                 this.isHovering = false;
             }
+        } else if (!this.showHillasOnHover) {
+            this.isHovering = false;
         }
 
         this._redrawHillasOverlay();
@@ -2541,8 +2578,21 @@ class CanvasRenderer {
         const zoomScale = Math.max(1.2, cfg.scale || 1.8);
         const lensRadius = cfg.radiusPx || Math.max(displayLengthPx, displayWidthPx) * zoomScale * 0.65;
         const padding = cfg.edgePadding ?? 4;
-        const rawX = centerX + (cfg.offsetX || 0);
-        const rawY = centerY + (cfg.offsetY || 0);
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+        let focusX = centerX;
+        let focusY = centerY;
+        if (hoverLocked) {
+            const manualFocus = typeof this.getHoverZoomFocus === 'function' ? this.getHoverZoomFocus() : null;
+            if (manualFocus && Number.isFinite(manualFocus.x) && Number.isFinite(manualFocus.y)) {
+                focusX = manualFocus.x;
+                focusY = manualFocus.y;
+            }
+        }
+
+        const offsetX = hoverLocked ? 0 : (cfg.offsetX || 0);
+        const offsetY = hoverLocked ? 0 : (cfg.offsetY || 0);
+        const rawX = focusX + offsetX;
+        const rawY = focusY + offsetY;
         const lensCenterX = Math.max(lensRadius + padding, Math.min(this.overlay.width - lensRadius - padding, rawX));
         const lensCenterY = Math.max(lensRadius + padding, Math.min(this.overlay.height - lensRadius - padding, rawY));
         return { centerX: lensCenterX, centerY: lensCenterY, radius: lensRadius, zoomScale };
@@ -2558,6 +2608,15 @@ class CanvasRenderer {
         const lensGeometry = this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx);
         if (!lensGeometry) return;
         const { centerX: lensCenterX, centerY: lensCenterY, radius: lensRadius, zoomScale } = lensGeometry;
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+        const manualFocus = hoverLocked && typeof this.getHoverZoomFocus === 'function' ? this.getHoverZoomFocus() : null;
+        const focusX = manualFocus && Number.isFinite(manualFocus.x) ? manualFocus.x : centerX;
+        const focusY = manualFocus && Number.isFinite(manualFocus.y) ? manualFocus.y : centerY;
+        this._hoverLensGeometry = {
+            centerX: lensCenterX,
+            centerY: lensCenterY,
+            radius: lensRadius
+        };
         const directionCfg = this.alphaDirectionGuides || {};
         const dxCamera = (cameraCenterX ?? this.overlay.width / 2) - centerX;
         const dyCamera = (cameraCenterY ?? this.overlay.height / 2) - centerY;
@@ -2583,13 +2642,13 @@ class CanvasRenderer {
         ctx.clip();
 
         ctx.save();
-        ctx.translate(lensCenterX - centerX * zoomScale, lensCenterY - centerY * zoomScale);
+        ctx.translate(lensCenterX - focusX * zoomScale, lensCenterY - focusY * zoomScale);
         ctx.scale(zoomScale, zoomScale);
         ctx.drawImage(this.canvas, 0, 0);
         ctx.restore();
 
         ctx.save();
-        ctx.translate(lensCenterX - centerX * zoomScale, lensCenterY - centerY * zoomScale);
+        ctx.translate(lensCenterX - focusX * zoomScale, lensCenterY - focusY * zoomScale);
         ctx.scale(zoomScale, zoomScale);
         ctx.translate(centerX, centerY);
         ctx.rotate(theta);

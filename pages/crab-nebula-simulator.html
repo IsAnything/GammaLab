@@ -340,7 +340,20 @@
                 return renderer.hoverZoomFocus || null;
             };
 
+            const getLensGeometry = () => {
+                if (typeof renderer.getHoverZoomLensGeometry === 'function') {
+                    return renderer.getHoverZoomLensGeometry();
+                }
+                return null;
+            };
+
             const isPointInsideLens = (x, y) => {
+                const geometry = getLensGeometry();
+                if (geometry) {
+                    const dx = x - geometry.centerX;
+                    const dy = y - geometry.centerY;
+                    return Math.sqrt(dx * dx + dy * dy) <= geometry.radius;
+                }
                 const focus = getFocus();
                 if (!focus) return false;
                 const radius = computeLensRadius();
@@ -367,10 +380,14 @@
                 if (typeof renderer.lockHoverZoom === 'function') {
                     renderer.lockHoverZoom(x, y);
                 } else {
+                    const padding = (renderer.hoverZoomConfig && renderer.hoverZoomConfig.edgePadding) ?? 4;
+                    const radius = computeLensRadius();
+                    const clampedX = Math.max(radius + padding, Math.min(canvas.width - radius - padding, x));
+                    const clampedY = Math.max(radius + padding, Math.min(canvas.height - radius - padding, y));
                     renderer.isHovering = true;
-                    renderer.mouseX = x;
-                    renderer.mouseY = y;
-                    renderer.hoverZoomFocus = { x, y };
+                    renderer.mouseX = clampedX;
+                    renderer.mouseY = clampedY;
+                    renderer.hoverZoomFocus = { x: clampedX, y: clampedY };
                 }
             };
 
