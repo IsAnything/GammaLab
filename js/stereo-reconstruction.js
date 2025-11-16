@@ -93,6 +93,7 @@ function renderStereoReconstruction(canvas, hillasMap, options = {}) {
         showGeometry: true,
         showCameraPositions: true,
         showArrows: true,
+        showArrivalDirection: true,
         ...options
     };
 
@@ -313,6 +314,41 @@ function renderStereoReconstruction(canvas, hillasMap, options = {}) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(-2.2, -2.2, 4.4, 4.4);
     ctx.restore();
+
+    if (opts.showArrivalDirection) {
+        const dirLength = Math.max(80, a_px * 1.6);
+        const dirAngle = rec.angle || 0;
+        const farX = centerX + Math.cos(dirAngle) * dirLength;
+        const farY = centerY + Math.sin(dirAngle) * dirLength;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 180, 0.85)';
+        ctx.fillStyle = 'rgba(255, 255, 180, 0.95)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(farX, farY);
+        ctx.lineTo(centerX, centerY);
+        ctx.stroke();
+
+        const angle = Math.atan2(centerY - farY, centerX - farX);
+        const headSize = 12;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(centerX - headSize * Math.cos(angle - 0.4), centerY - headSize * Math.sin(angle - 0.4));
+        ctx.lineTo(centerX - headSize * Math.cos(angle + 0.4), centerY - headSize * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fill();
+
+        const labelX = (centerX + farX) / 2 + 10;
+        const labelY = (centerY + farY) / 2 - 10;
+        ctx.font = '600 13px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(255, 255, 210, 0.95)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.lineWidth = 3;
+        ctx.strokeText('Direzione arrivo γ', labelX, labelY);
+        ctx.fillText('Direzione arrivo γ', labelX, labelY);
+        ctx.restore();
+    }
 
     // === LEGEND ===
     ctx.fillStyle = '#9fb8d6';
