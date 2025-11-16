@@ -318,6 +318,8 @@ class CanvasRenderer {
             arrowSize: 10,
             majorAxisLengthPx: null,
             cameraRayExtensionPx: 25,
+            cameraRayLengthPx: null,
+            cameraRayBacktrackPx: 0,
             cameraRayDash: [8, 6],
             majorAxisDash: [12, 6]
         };
@@ -2110,16 +2112,46 @@ class CanvasRenderer {
 
             const lineEndX = markerX;
             const lineEndY = markerY;
+            const directionCfg = this.alphaDirectionGuides || {};
+            let rayForwardEndX = lineEndX;
+            let rayForwardEndY = lineEndY;
+            let backtrackStartX = null;
+            let backtrackStartY = null;
+
+            if (directionCfg.enabled) {
+                const baseLength = Math.sqrt((lineEndX - centerX) ** 2 + (lineEndY - centerY) ** 2) || distanceToCamera;
+                const forwardLength = Math.max(12, directionCfg.cameraRayLengthPx ?? (baseLength + (directionCfg.cameraRayExtensionPx ?? 0)));
+                rayForwardEndX = centerX + unitToCameraX * forwardLength;
+                rayForwardEndY = centerY + unitToCameraY * forwardLength;
+                rayForwardEndX = Math.max(clampPadding, Math.min(this.overlay.width - clampPadding, rayForwardEndX));
+                rayForwardEndY = Math.max(clampPadding, Math.min(this.overlay.height - clampPadding, rayForwardEndY));
+
+                const backtrack = Math.max(0, directionCfg.cameraRayBacktrackPx || 0);
+                if (backtrack > 0) {
+                    backtrackStartX = centerX - unitToCameraX * backtrack;
+                    backtrackStartY = centerY - unitToCameraY * backtrack;
+                    backtrackStartX = Math.max(clampPadding, Math.min(this.overlay.width - clampPadding, backtrackStartX));
+                    backtrackStartY = Math.max(clampPadding, Math.min(this.overlay.height - clampPadding, backtrackStartY));
+                }
+            }
+
             ctx.strokeStyle = this.lightStyle ? 'rgba(0, 102, 204, 0.7)' : 'rgba(68, 136, 255, 0.6)';
             ctx.lineWidth = 1.4;
             ctx.setLineDash([8, 6]);
+
+            if (directionCfg.enabled && backtrackStartX !== null && backtrackStartY !== null) {
+                ctx.beginPath();
+                ctx.moveTo(backtrackStartX, backtrackStartY);
+                ctx.lineTo(centerX, centerY);
+                ctx.stroke();
+            }
+
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
-            ctx.lineTo(lineEndX, lineEndY);
+            ctx.lineTo(directionCfg.enabled ? rayForwardEndX : lineEndX, directionCfg.enabled ? rayForwardEndY : lineEndY);
             ctx.stroke();
             ctx.setLineDash([]);
 
-            const directionCfg = this.alphaDirectionGuides || {};
             if (directionCfg.enabled) {
                 const majorAxisLength = directionCfg.majorAxisLengthPx ?? Math.max(displayLengthPx * 1.15, 40);
                 const majorEndX = centerX + Math.cos(theta) * majorAxisLength;
@@ -2131,10 +2163,7 @@ class CanvasRenderer {
                     dash: directionCfg.majorAxisDash || [12, 6]
                 });
 
-                const cameraExtend = directionCfg.cameraRayExtensionPx ?? 25;
-                const rayEndX = lineEndX + unitToCameraX * cameraExtend;
-                const rayEndY = lineEndY + unitToCameraY * cameraExtend;
-                this._drawArrow(ctx, centerX, centerY, rayEndX, rayEndY, {
+                this._drawArrow(ctx, centerX, centerY, rayForwardEndX, rayForwardEndY, {
                     color: directionCfg.cameraRayColor || (this.lightStyle ? 'rgba(120, 220, 255, 0.95)' : 'rgba(120, 220, 255, 0.95)'),
                     lineWidth: directionCfg.lineWidth || 2.2,
                     arrowSize: directionCfg.arrowSize || 12,
