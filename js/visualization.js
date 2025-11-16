@@ -422,6 +422,7 @@ class CanvasRenderer {
         this.mouseX = clamped.x;
         this.mouseY = clamped.y;
         this.isHovering = true;
+        this._hoverZoomHiddenUntilReset = false;
         if (this.hoverZoomConfig) {
             this.hoverZoomConfig.enabled = true;
         }
@@ -439,6 +440,7 @@ class CanvasRenderer {
         this.mouseY = -1;
         this.isHovering = false;
         this._hoverLensGeometry = null;
+        this._hoverZoomHiddenUntilReset = false;
         this.refreshHillasOverlay();
     }
 
@@ -461,11 +463,14 @@ class CanvasRenderer {
     }
 
     hideHoverZoomUntilExit() {
-        if (!this.showHillasOnHover || !this.isHovering || this.isHoverZoomLocked && this.isHoverZoomLocked()) {
+        const lensLocked = this.isHoverZoomLocked && this.isHoverZoomLocked();
+        if (!this.showHillasOnHover || !this.isHovering || lensLocked) {
+            return;
+        }
+        if (this._hoverZoomHiddenUntilReset) {
             return;
         }
         this._hoverZoomHiddenUntilReset = true;
-        this.isHovering = false;
         this.refreshHillasOverlay();
     }
 
@@ -514,17 +519,8 @@ class CanvasRenderer {
 
             const hovering = this._isPointInsideHillas(x, y, this.currentHillasParams);
 
-            const hoverZoomHidden = this._hoverZoomHiddenUntilReset;
-            if (hoverZoomHidden) {
-                if (!hovering) {
-                    this._hoverZoomHiddenUntilReset = false;
-                } else {
-                    if (this.isHovering) {
-                        this.isHovering = false;
-                        this._redrawHillasOverlay();
-                    }
-                    return;
-                }
+            if (this._hoverZoomHiddenUntilReset && !hovering) {
+                this._hoverZoomHiddenUntilReset = false;
             }
 
             if (hovering !== this.isHovering) {
@@ -2113,6 +2109,7 @@ class CanvasRenderer {
         const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
         if (hoverLocked) {
             this.isHovering = true;
+            this._hoverZoomHiddenUntilReset = false;
         } else if (this.showHillasOnHover) {
             if (this.mouseX >= 0 && this.mouseY >= 0) {
                 this.isHovering = this._isPointInsideHillas(this.mouseX, this.mouseY, this.currentHillasParams);
@@ -2179,7 +2176,10 @@ class CanvasRenderer {
         const referenceCfg = this.alphaReferenceConfig || {};
         const clampPadding = referenceCfg.markerClampPadding ?? 16;
         const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
-        const shouldDrawZoom = this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked);
+        const shouldDrawZoom = this.hoverZoomConfig
+            && this.hoverZoomConfig.enabled
+            && (this.isHovering || hoverLocked)
+            && !this._hoverZoomHiddenUntilReset;
         let pendingZoomDraw = null;
 
         this._withOverlayHexClip(() => {
