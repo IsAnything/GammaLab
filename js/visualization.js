@@ -335,7 +335,10 @@ class CanvasRenderer {
             overlayFill: 'rgba(0, 0, 0, 0.25)',
             shadowColor: 'rgba(0, 0, 0, 0.6)',
             shadowBlur: 18,
-            showLabel: true
+            showLabel: true,
+            showAlphaArc: false,
+            arcColor: null,
+            arcLineWidth: 2.2
         };
     }
 
@@ -2298,7 +2301,7 @@ class CanvasRenderer {
             }
 
             if (this.hoverZoomConfig && this.hoverZoomConfig.enabled && this.isHovering) {
-                this._drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams);
+                this._drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY);
             }
 
             try {
@@ -2415,7 +2418,7 @@ class CanvasRenderer {
         ctx.restore();
     }
 
-    _drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams) {
+    _drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY) {
         if (!ctx || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled || !this.isHovering) {
             return;
         }
@@ -2426,6 +2429,16 @@ class CanvasRenderer {
         const lensRadius = cfg.radiusPx || Math.max(displayLengthPx, displayWidthPx) * zoomScale * 0.65;
         const lensCenterX = Math.max(lensRadius + 4, Math.min(this.overlay.width - lensRadius - 4, centerX + (cfg.offsetX || 0)));
         const lensCenterY = Math.max(lensRadius + 4, Math.min(this.overlay.height - lensRadius - 4, centerY + (cfg.offsetY || 0)));
+        const directionCfg = this.alphaDirectionGuides || {};
+        const dxCamera = (cameraCenterX ?? this.overlay.width / 2) - centerX;
+        const dyCamera = (cameraCenterY ?? this.overlay.height / 2) - centerY;
+        const distanceToCamera = Math.sqrt(dxCamera * dxCamera + dyCamera * dyCamera) || 1;
+        const unitToCameraX = dxCamera / distanceToCamera;
+        const unitToCameraY = dyCamera / distanceToCamera;
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+        const unitCameraRotX = unitToCameraX * cosT + unitToCameraY * sinT;
+        const unitCameraRotY = -unitToCameraX * sinT + unitToCameraY * cosT;
 
         ctx.save();
         ctx.beginPath();
@@ -2467,6 +2480,54 @@ class CanvasRenderer {
         ctx.moveTo(0, -displayWidthPx);
         ctx.lineTo(0, displayWidthPx);
         ctx.stroke();
+
+        if (directionCfg.enabled) {
+            const majorAxisLength = directionCfg.majorAxisLengthPx ?? Math.max(displayLengthPx * 1.15, 40);
+            const majorEndX = majorAxisLength;
+            const majorEndY = 0;
+            this._drawArrow(ctx, 0, 0, majorEndX, majorEndY, {
+                color: directionCfg.majorAxisColor || (this.lightStyle ? 'rgba(255, 200, 120, 0.95)' : 'rgba(255, 200, 120, 0.95)'),
+                lineWidth: (directionCfg.lineWidth || 2.2) / zoomScale,
+                arrowSize: (directionCfg.arrowSize || 12) / zoomScale,
+                dash: (directionCfg.majorAxisDash || [12, 6]).map(value => value / zoomScale)
+            });
+
+            const cameraRayLength = directionCfg.cameraRayLengthPx ?? (distanceToCamera + (directionCfg.cameraRayExtensionPx || 0));
+            const rayEndX = unitCameraRotX * cameraRayLength;
+            const rayEndY = unitCameraRotY * cameraRayLength;
+            this._drawArrow(ctx, 0, 0, rayEndX, rayEndY, {
+                color: directionCfg.cameraRayColor || (this.lightStyle ? 'rgba(120, 220, 255, 0.95)' : 'rgba(120, 220, 255, 0.95)'),
+                lineWidth: (directionCfg.lineWidth || 2.2) / zoomScale,
+                arrowSize: (directionCfg.arrowSize || 12) / zoomScale,
+                dash: (directionCfg.cameraRayDash || [8, 6]).map(value => value / zoomScale)
+            });
+
+            const backtrack = Math.max(0, directionCfg.cameraRayBacktrackPx || 0);
+            if (backtrack > 0) {
+                ctx.save();
+                ctx.setLineDash((directionCfg.cameraRayDash || [8, 6]).map(value => value / zoomScale));
+                ctx.strokeStyle = directionCfg.cameraRayColor || (this.lightStyle ? 'rgba(120, 220, 255, 0.95)' : 'rgba(120, 220, 255, 0.95)');
+                ctx.lineWidth = (directionCfg.lineWidth || 2.2) / zoomScale;
+                ctx.beginPath();
+                ctx.moveTo(-unitCameraRotX * backtrack, -unitCameraRotY * backtrack);
+                ctx.lineTo(0, 0);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        if (this.hoverZoomConfig.showAlphaArc && hillasParams) {
+            const delta = Math.atan2(unitCameraRotY, unitCameraRotX);
+            ctx.save();
+            ctx.setLineDash([6 / zoomScale, 4 / zoomScale]);
+            ctx.strokeStyle = this.hoverZoomConfig.arcColor || (this.lightStyle ? 'rgba(255, 210, 120, 0.85)' : 'rgba(255, 230, 120, 0.85)');
+            ctx.lineWidth = (this.hoverZoomConfig.arcLineWidth || 2.2) / zoomScale;
+            const arcRadius = Math.min(Math.max(displayLengthPx * 0.65, 40), 150);
+            ctx.beginPath();
+            ctx.arc(0, 0, arcRadius, 0, delta, delta < 0);
+            ctx.stroke();
+            ctx.restore();
+        }
         ctx.restore();
 
         ctx.restore();
