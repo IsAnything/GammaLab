@@ -299,6 +299,18 @@
                         cameraRayBacktrackPx: 60
                     });
                 }
+                if (typeof renderer.configureHoverZoom === 'function') {
+                    renderer.configureHoverZoom({
+                        enabled: true,
+                        scale: 2.1,
+                        radiusPx: 140,
+                        offsetX: 0,
+                        offsetY: -120,
+                        borderColor: 'rgba(255, 255, 255, 0.95)',
+                        borderWidth: 2.8,
+                        overlayFill: 'rgba(4, 6, 14, 0.3)'
+                    });
+                }
             });
 
             // Add exposure/sub-pixel controls (global helper)

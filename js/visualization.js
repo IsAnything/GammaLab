@@ -323,6 +323,20 @@ class CanvasRenderer {
             cameraRayDash: [8, 6],
             majorAxisDash: [12, 6]
         };
+
+        this.hoverZoomConfig = {
+            enabled: false,
+            scale: 1.9,
+            radiusPx: null,
+            offsetX: 0,
+            offsetY: 0,
+            borderColor: 'rgba(255, 255, 255, 0.85)',
+            borderWidth: 2.2,
+            overlayFill: 'rgba(0, 0, 0, 0.25)',
+            shadowColor: 'rgba(0, 0, 0, 0.6)',
+            shadowBlur: 18,
+            showLabel: true
+        };
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -351,6 +365,16 @@ class CanvasRenderer {
         }
         this.alphaDirectionGuides = {
             ...this.alphaDirectionGuides,
+            ...options
+        };
+    }
+
+    configureHoverZoom(options = {}) {
+        if (!this.hoverZoomConfig) {
+            this.hoverZoomConfig = {};
+        }
+        this.hoverZoomConfig = {
+            ...this.hoverZoomConfig,
             ...options
         };
     }
@@ -2273,6 +2297,10 @@ class CanvasRenderer {
                 ctx.restore();
             }
 
+            if (this.hoverZoomConfig && this.hoverZoomConfig.enabled && this.isHovering) {
+                this._drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams);
+            }
+
             try {
                 const dx = centerX - cameraCenterX;
                 const dy = centerY - cameraCenterY;
@@ -2385,6 +2413,80 @@ class CanvasRenderer {
         ctx.fill();
 
         ctx.restore();
+    }
+
+    _drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams) {
+        if (!ctx || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled || !this.isHovering) {
+            return;
+        }
+        if (!this.canvas) return;
+
+        const cfg = this.hoverZoomConfig;
+        const zoomScale = Math.max(1.2, cfg.scale || 1.8);
+        const lensRadius = cfg.radiusPx || Math.max(displayLengthPx, displayWidthPx) * zoomScale * 0.65;
+        const lensCenterX = Math.max(lensRadius + 4, Math.min(this.overlay.width - lensRadius - 4, centerX + (cfg.offsetX || 0)));
+        const lensCenterY = Math.max(lensRadius + 4, Math.min(this.overlay.height - lensRadius - 4, centerY + (cfg.offsetY || 0)));
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lensCenterX, lensCenterY, lensRadius, 0, Math.PI * 2);
+        ctx.closePath();
+        if (cfg.overlayFill) {
+            ctx.shadowColor = cfg.shadowColor || 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = cfg.shadowBlur ?? 18;
+            ctx.fillStyle = cfg.overlayFill;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+        ctx.clip();
+
+        ctx.save();
+        ctx.translate(lensCenterX - centerX * zoomScale, lensCenterY - centerY * zoomScale);
+        ctx.scale(zoomScale, zoomScale);
+        ctx.drawImage(this.canvas, 0, 0);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(lensCenterX - centerX * zoomScale, lensCenterY - centerY * zoomScale);
+        ctx.scale(zoomScale, zoomScale);
+        ctx.translate(centerX, centerY);
+        ctx.rotate(theta);
+        const zoomOutlineColor = this.lightStyle ? 'rgba(210, 40, 140, 0.85)' : 'rgba(0, 255, 205, 0.8)';
+        ctx.lineWidth = (this.lightStyle ? 1.4 : 1.6) / zoomScale;
+        ctx.strokeStyle = zoomOutlineColor;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, displayLengthPx, displayWidthPx, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([10 / zoomScale, 6 / zoomScale]);
+        ctx.strokeStyle = this.lightStyle ? 'rgba(40, 60, 140, 0.55)' : 'rgba(80, 180, 255, 0.55)';
+        ctx.beginPath();
+        ctx.moveTo(-displayLengthPx, 0);
+        ctx.lineTo(displayLengthPx, 0);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -displayWidthPx);
+        ctx.lineTo(0, displayWidthPx);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(lensCenterX, lensCenterY, lensRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = cfg.borderColor || 'rgba(255, 255, 255, 0.9)';
+        ctx.lineWidth = cfg.borderWidth || 2;
+        ctx.stroke();
+        ctx.restore();
+
+        if (cfg.showLabel) {
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '600 12px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Zoom ×' + zoomScale.toFixed(1), lensCenterX, lensCenterY + lensRadius + 14);
+            ctx.restore();
+        }
     }
 
 }
