@@ -2242,10 +2242,76 @@ class CanvasRenderer {
             const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
             const padX = 12;
             const padY = 6;
-            const boxWidth = metrics.width + padX * 2;
-            const boxHeight = textHeight + padY * 2;
-            const boxX = textX - padX - (labelTextAlign === 'center' ? metrics.width / 2 : 0);
-            const boxY = textY - boxHeight / 2;
+            const lensGeometry = (this.hoverZoomConfig && this.hoverZoomConfig.enabled && this.isHovering)
+                ? this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx)
+                : null;
+
+            const recomputeBox = () => {
+                const boxWidth = metrics.width + padX * 2;
+                const boxHeight = textHeight + padY * 2;
+                let boxX = textX - padX;
+                if (labelTextAlign === 'center') {
+                    boxX -= metrics.width / 2;
+                } else if (labelTextAlign === 'right') {
+                    boxX -= metrics.width;
+                }
+                const boxY = textY - boxHeight / 2;
+                return { boxWidth, boxHeight, boxX, boxY };
+            };
+
+            let { boxWidth, boxHeight, boxX, boxY } = recomputeBox();
+            const updateLabelPosition = (dxShift, dyShift) => {
+                textX += dxShift;
+                textY += dyShift;
+                ({ boxWidth, boxHeight, boxX, boxY } = recomputeBox());
+            };
+
+            if (lensGeometry) {
+                // Keep alpha label away from the hover zoom lens so it stays readable
+                const labelHalfDiag = Math.sqrt((boxWidth / 2) ** 2 + (boxHeight / 2) ** 2);
+                const avoidPadding = labelCfg.lensAvoidancePadding ?? (this.hoverZoomConfig.labelAvoidancePadding ?? 12);
+                let labelCenterX = boxX + boxWidth / 2;
+                let labelCenterY = boxY + boxHeight / 2;
+                let dxLens = labelCenterX - lensGeometry.centerX;
+                let dyLens = labelCenterY - lensGeometry.centerY;
+                let distance = Math.sqrt(dxLens * dxLens + dyLens * dyLens);
+                const safeDistance = lensGeometry.radius + labelHalfDiag + avoidPadding;
+                if (distance < safeDistance) {
+                    if (distance === 0) {
+                        const fallbackAngle = theta + Math.PI / 2;
+                        dxLens = Math.cos(fallbackAngle);
+                        dyLens = Math.sin(fallbackAngle);
+                        distance = 1;
+                    }
+                    const normX = dxLens / distance;
+                    const normY = dyLens / distance;
+                    const delta = safeDistance - distance;
+                    updateLabelPosition(normX * delta, normY * delta);
+                }
+            }
+
+            const boundsPadding = labelCfg.boundsPadding ?? 10;
+            if (this.overlay) {
+                const ensureWithinBounds = () => {
+                    let shifted = false;
+                    if (boxX < boundsPadding) {
+                        updateLabelPosition(boundsPadding - boxX, 0);
+                        shifted = true;
+                    } else if (boxX + boxWidth > this.overlay.width - boundsPadding) {
+                        updateLabelPosition((this.overlay.width - boundsPadding) - (boxX + boxWidth), 0);
+                        shifted = true;
+                    }
+                    if (boxY < boundsPadding) {
+                        updateLabelPosition(0, boundsPadding - boxY);
+                        shifted = true;
+                    } else if (boxY + boxHeight > this.overlay.height - boundsPadding) {
+                        updateLabelPosition(0, (this.overlay.height - boundsPadding) - (boxY + boxHeight));
+                        shifted = true;
+                    }
+                    return shifted;
+                };
+                ensureWithinBounds();
+            }
 
             ctx.save();
             ctx.beginPath();
@@ -2418,6 +2484,21 @@ class CanvasRenderer {
         ctx.restore();
     }
 
+    _getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx) {
+        if (!this.overlay || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled) {
+            return null;
+        }
+        const cfg = this.hoverZoomConfig;
+        const zoomScale = Math.max(1.2, cfg.scale || 1.8);
+        const lensRadius = cfg.radiusPx || Math.max(displayLengthPx, displayWidthPx) * zoomScale * 0.65;
+        const padding = cfg.edgePadding ?? 4;
+        const rawX = centerX + (cfg.offsetX || 0);
+        const rawY = centerY + (cfg.offsetY || 0);
+        const lensCenterX = Math.max(lensRadius + padding, Math.min(this.overlay.width - lensRadius - padding, rawX));
+        const lensCenterY = Math.max(lensRadius + padding, Math.min(this.overlay.height - lensRadius - padding, rawY));
+        return { centerX: lensCenterX, centerY: lensCenterY, radius: lensRadius, zoomScale };
+    }
+
     _drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY) {
         if (!ctx || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled || !this.isHovering) {
             return;
@@ -2425,10 +2506,9 @@ class CanvasRenderer {
         if (!this.canvas) return;
 
         const cfg = this.hoverZoomConfig;
-        const zoomScale = Math.max(1.2, cfg.scale || 1.8);
-        const lensRadius = cfg.radiusPx || Math.max(displayLengthPx, displayWidthPx) * zoomScale * 0.65;
-        const lensCenterX = Math.max(lensRadius + 4, Math.min(this.overlay.width - lensRadius - 4, centerX + (cfg.offsetX || 0)));
-        const lensCenterY = Math.max(lensRadius + 4, Math.min(this.overlay.height - lensRadius - 4, centerY + (cfg.offsetY || 0)));
+        const lensGeometry = this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx);
+        if (!lensGeometry) return;
+        const { centerX: lensCenterX, centerY: lensCenterY, radius: lensRadius, zoomScale } = lensGeometry;
         const directionCfg = this.alphaDirectionGuides || {};
         const dxCamera = (cameraCenterX ?? this.overlay.width / 2) - centerX;
         const dyCamera = (cameraCenterY ?? this.overlay.height / 2) - centerY;
