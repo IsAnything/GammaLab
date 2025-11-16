@@ -145,10 +145,6 @@
                     });
                 }
             });
-            // Add exposure/sub-pixel controls if available
-            if (typeof window.addExposureControls === 'function') {
-                window.addExposureControls(renderers, document.getElementById('generateBtn'));
-            }
             document.getElementById('generateBtn').addEventListener('click', generateGCEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
             setTimeout(() => generateGCEvent(), 500);
