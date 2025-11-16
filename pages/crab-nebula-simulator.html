@@ -278,7 +278,7 @@
                         showAlphaArc: true,
                         arcColor: 'rgba(255, 210, 120, 0.9)'
                     });
-                    setupClickToEnableZoom(renderer);
+                    setupClickZoomToggle(renderer);
                 }
             });
 
@@ -292,34 +292,50 @@
             setTimeout(() => generateCrabEvent(), 500);
         });
 
-        function setupClickToEnableZoom(renderer) {
-            if (!renderer || !renderer.canvas) return;
+        function setupClickZoomToggle(renderer) {
+            if (!renderer || !renderer.canvas || renderer._zoomToggleAttached) return;
+
+            renderer._zoomToggleAttached = true;
 
             if (!renderer.hoverZoomConfig) {
                 renderer.hoverZoomConfig = {};
             }
 
             renderer.hoverZoomConfig.enabled = false;
+            renderer.hoverZoomActive = false;
 
             const canvas = renderer.canvas;
             const originalCursor = canvas.style.cursor;
 
-            canvas.style.cursor = 'zoom-in';
+            const updateCursor = () => {
+                canvas.style.cursor = renderer.hoverZoomActive ? (originalCursor || 'default') : 'zoom-in';
+            };
 
-            const activateZoom = () => {
-                renderer.hoverZoomConfig.enabled = true;
-                canvas.style.cursor = originalCursor || 'default';
+            const rerenderSafely = () => {
                 if (typeof renderer.reRenderLastEvent === 'function') {
                     try {
                         renderer.reRenderLastEvent();
                     } catch (e) {
-                        console.warn('Errore ri-renderizzando dopo attivazione zoom:', e);
+                        console.warn('Errore ri-renderizzando dopo toggle zoom:', e);
                     }
                 }
-                canvas.removeEventListener('click', activateZoom);
             };
 
-            canvas.addEventListener('click', activateZoom);
+            updateCursor();
+
+            canvas.addEventListener('click', () => {
+                renderer.hoverZoomActive = !renderer.hoverZoomActive;
+                renderer.hoverZoomConfig.enabled = renderer.hoverZoomActive;
+
+                if (!renderer.hoverZoomActive) {
+                    renderer.isHovering = false;
+                    renderer.mouseX = -1;
+                    renderer.mouseY = -1;
+                }
+
+                updateCursor();
+                rerenderSafely();
+            });
         }
 
         function generateCrabEvent() {
