@@ -421,6 +421,10 @@
                 if (typeof renderer.enableHoverHillasMode === 'function') {
                     renderer.enableHoverHillasMode();
                 }
+
+                if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
+                    renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
+                }
             });
 
             console.log('🎨 Nuova palette 5 colori assegnata ai renderers');

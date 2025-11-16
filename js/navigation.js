@@ -110,6 +110,10 @@ function setupSourceSimulator(sourceType, options = {}) {
             renderer.colorPalette = colorPalette;
             renderer.respectExactHillas = true;
             renderer.subpixelEnabled = false;
+
+            if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
+                renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
+            }
         });
 
         if (typeof window.configureRendererHoverEllipses === 'function') {

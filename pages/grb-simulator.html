@@ -147,6 +147,10 @@
                         arcColor: 'rgba(255, 210, 120, 0.9)'
                     });
                 }
+
+                if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
+                    renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
+                }
             });
             document.getElementById('generateBtn').addEventListener('click', generateGRBEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
