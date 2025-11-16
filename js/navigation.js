@@ -412,7 +412,8 @@ function setupSourceSimulator(sourceType, options = {}) {
                 renderStereoReconstruction(stereoCanvas, hillasMap, {
                     showGeometry: true,
                     showCameraPositions: true,
-                    showArrows: true
+                    showArrows: true,
+                    showArrivalDirection: true
                 });
             } else if (stereoCanvas) {
                 // Fallback a vecchia stereo

@@ -117,6 +117,33 @@
                         arcLineWidth: 2.4
                     });
                 }
+                if (typeof renderer.configureAlphaDirectionGuides === 'function') {
+                    renderer.configureAlphaDirectionGuides({
+                        enabled: true,
+                        majorAxisColor: 'rgba(255, 210, 120, 0.95)',
+                        cameraRayColor: 'rgba(130, 220, 255, 0.95)',
+                        lineWidth: 2.4,
+                        arrowSize: 12,
+                        majorAxisLengthPx: 160,
+                        cameraRayExtensionPx: 35,
+                        cameraRayLengthPx: 230,
+                        cameraRayBacktrackPx: 60
+                    });
+                }
+                if (typeof renderer.configureHoverZoom === 'function') {
+                    renderer.configureHoverZoom({
+                        enabled: true,
+                        scale: 2.1,
+                        radiusPx: 140,
+                        offsetX: 0,
+                        offsetY: -120,
+                        borderColor: 'rgba(255, 255, 255, 0.95)',
+                        borderWidth: 2.8,
+                        overlayFill: 'rgba(4, 6, 14, 0.3)',
+                        showAlphaArc: true,
+                        arcColor: 'rgba(255, 210, 120, 0.9)'
+                    });
+                }
             });
             // Add exposure/sub-pixel controls if available
             if (typeof window.addExposureControls === 'function') {
@@ -138,7 +165,7 @@
                 if (hillas && hillas.valid) { hillasParams.push(hillas); hillasMap[camKey] = hillas; renderers[i].renderHillasOverlay(hillas); }
             }
             const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) window.renderStereoReconstruction(stereoCanvas, hillasMap, {showGeometry: true, showCameraPositions: true, showArrows: true});
+            if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) window.renderStereoReconstruction(stereoCanvas, hillasMap, {showGeometry: true, showCameraPositions: true, showArrows: true, showArrivalDirection: true});
             displayHillasParameters(hillasParams);
             if (hillasParams.length >= 2) displayCoherence(compareHillasAcrossCameras(hillasParams));
         }
