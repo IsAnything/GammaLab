@@ -278,6 +278,7 @@
                         showAlphaArc: true,
                         arcColor: 'rgba(255, 210, 120, 0.9)'
                     });
+                    setupClickToEnableZoom(renderer);
                 }
             });
 
@@ -290,6 +291,36 @@
             // Auto-genera primo evento
             setTimeout(() => generateCrabEvent(), 500);
         });
+
+        function setupClickToEnableZoom(renderer) {
+            if (!renderer || !renderer.canvas) return;
+
+            if (!renderer.hoverZoomConfig) {
+                renderer.hoverZoomConfig = {};
+            }
+
+            renderer.hoverZoomConfig.enabled = false;
+
+            const canvas = renderer.canvas;
+            const originalCursor = canvas.style.cursor;
+
+            canvas.style.cursor = 'zoom-in';
+
+            const activateZoom = () => {
+                renderer.hoverZoomConfig.enabled = true;
+                canvas.style.cursor = originalCursor || 'default';
+                if (typeof renderer.reRenderLastEvent === 'function') {
+                    try {
+                        renderer.reRenderLastEvent();
+                    } catch (e) {
+                        console.warn('Errore ri-renderizzando dopo attivazione zoom:', e);
+                    }
+                }
+                canvas.removeEventListener('click', activateZoom);
+            };
+
+            canvas.addEventListener('click', activateZoom);
+        }
 
         function generateCrabEvent() {
             console.log('🦀 Generazione evento Crab Nebula...');
