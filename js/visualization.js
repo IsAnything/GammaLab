@@ -2159,6 +2159,10 @@ class CanvasRenderer {
         const ctx = this.overlayCtx;
         const referenceCfg = this.alphaReferenceConfig || {};
         const clampPadding = referenceCfg.markerClampPadding ?? 16;
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+        const shouldDrawZoom = this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked);
+        let pendingZoomDraw = null;
+
         this._withOverlayHexClip(() => {
             const centerX = hillasParams.cogX;
             const centerY = hillasParams.cogY;
@@ -2343,7 +2347,6 @@ class CanvasRenderer {
             const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
             const padX = 12;
             const padY = 6;
-            const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
             const lensGeometry = (this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked))
                 ? this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx)
                 : null;
@@ -2468,8 +2471,17 @@ class CanvasRenderer {
                 ctx.restore();
             }
 
-            if (this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked)) {
-                this._drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY);
+            if (shouldDrawZoom) {
+                pendingZoomDraw = {
+                    centerX,
+                    centerY,
+                    displayLengthPx,
+                    displayWidthPx,
+                    theta,
+                    hillasParams,
+                    cameraCenterX,
+                    cameraCenterY
+                };
             }
 
             try {
@@ -2550,6 +2562,20 @@ class CanvasRenderer {
                 console.warn('Errore diagnostico HillasOverlay:', diagErr);
             }
         }, 4);
+
+        if (pendingZoomDraw) {
+            this._drawHoverZoomLens(
+                ctx,
+                pendingZoomDraw.centerX,
+                pendingZoomDraw.centerY,
+                pendingZoomDraw.displayLengthPx,
+                pendingZoomDraw.displayWidthPx,
+                pendingZoomDraw.theta,
+                pendingZoomDraw.hillasParams,
+                pendingZoomDraw.cameraCenterX,
+                pendingZoomDraw.cameraCenterY
+            );
+        }
     }
 
     _drawArrow(ctx, startX, startY, endX, endY, options = {}) {
