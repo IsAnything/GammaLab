@@ -421,6 +421,9 @@ class CanvasRenderer {
         this.mouseX = clamped.x;
         this.mouseY = clamped.y;
         this.isHovering = true;
+        if (this.hoverZoomConfig) {
+            this.hoverZoomConfig.enabled = true;
+        }
         this.refreshHillasOverlay();
     }
 
@@ -1021,7 +1024,9 @@ class CanvasRenderer {
             return;
         }
 
-        if (this.showHillasOnHover && !this.isHovering) {
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+
+        if (this.showHillasOnHover && !this.isHovering && !hoverLocked) {
             return;
         }
 
@@ -2609,7 +2614,11 @@ class CanvasRenderer {
     }
 
     _drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY) {
-        if (!ctx || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled || !this.isHovering) {
+        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+        if (!ctx || !this.hoverZoomConfig || !this.hoverZoomConfig.enabled) {
+            return;
+        }
+        if (!hoverLocked && !this.isHovering) {
             return;
         }
         if (!this.canvas) return;
@@ -2618,7 +2627,6 @@ class CanvasRenderer {
         const lensGeometry = this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx);
         if (!lensGeometry) return;
         const { centerX: lensCenterX, centerY: lensCenterY, radius: lensRadius, zoomScale } = lensGeometry;
-        const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
         const manualFocus = hoverLocked && typeof this.getHoverZoomFocus === 'function' ? this.getHoverZoomFocus() : null;
         const focusX = manualFocus && Number.isFinite(manualFocus.x) ? manualFocus.x : centerX;
         const focusY = manualFocus && Number.isFinite(manualFocus.y) ? manualFocus.y : centerY;
