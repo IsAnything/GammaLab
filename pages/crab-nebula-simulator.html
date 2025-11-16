@@ -388,6 +388,11 @@
                     renderer.mouseX = clampedX;
                     renderer.mouseY = clampedY;
                     renderer.hoverZoomFocus = { x: clampedX, y: clampedY };
+                    if (typeof renderer.refreshHillasOverlay === 'function') {
+                        renderer.refreshHillasOverlay();
+                    } else if (typeof renderer._redrawHillasOverlay === 'function') {
+                        renderer._redrawHillasOverlay();
+                    }
                 }
             };
 
@@ -399,6 +404,11 @@
                     renderer.mouseX = -1;
                     renderer.mouseY = -1;
                     renderer.hoverZoomFocus = null;
+                    if (typeof renderer.refreshHillasOverlay === 'function') {
+                        renderer.refreshHillasOverlay();
+                    } else if (typeof renderer._redrawHillasOverlay === 'function') {
+                        renderer._redrawHillasOverlay();
+                    }
                 }
             };
 

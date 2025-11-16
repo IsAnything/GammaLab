@@ -421,6 +421,7 @@ class CanvasRenderer {
         this.mouseX = clamped.x;
         this.mouseY = clamped.y;
         this.isHovering = true;
+        this.refreshHillasOverlay();
     }
 
     unlockHoverZoom() {
@@ -434,6 +435,7 @@ class CanvasRenderer {
         this.mouseY = -1;
         this.isHovering = false;
         this._hoverLensGeometry = null;
+        this.refreshHillasOverlay();
     }
 
     isHoverZoomLocked() {
@@ -1028,6 +1030,14 @@ class CanvasRenderer {
         }
 
         this._drawHillasOverlay(this.currentHillasParams);
+    }
+
+    refreshHillasOverlay() {
+        try {
+            this._redrawHillasOverlay();
+        } catch (err) {
+            console.warn('refreshHillasOverlay failed:', err);
+        }
     }
 
     /**
