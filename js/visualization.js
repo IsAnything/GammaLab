@@ -1596,6 +1596,10 @@ class CanvasRenderer {
             return;
         }
 
+        const trackSourceTag = track.sourceType || this.sourceType;
+        const isHadronic = this._isHadronicSource(trackSourceTag);
+        const isGammaLike = !isHadronic;
+
         // Light style: rendering con pixel esagonali
         if (this.lightStyle) {
             this.renderPhotonHexagonal(track);
@@ -1636,10 +1640,14 @@ class CanvasRenderer {
         }
 
         // Sub-pixel jitter / small deterministic pattern (kept small to avoid large offsets)
-        const sinPattern = Math.sin((track.x + track.y) * 0.12) * 0.3;
-        const jitterMag = this.subpixelEnabled ? (Math.random() - 0.5) * 0.6 : 0.0;
-        const offsetX = sinPattern + jitterMag;
-        const offsetY = Math.cos((track.x - track.y) * 0.09) * 0.28 + (this.subpixelEnabled ? (Math.random() - 0.5) * 0.5 : 0.0);
+        const jitterAttenuation = isGammaLike ? 0.55 : 1.0;
+        const sinPattern = Math.sin((track.x + track.y) * 0.12) * 0.3 * jitterAttenuation;
+        const jitterMag = this.subpixelEnabled ? (Math.random() - 0.5) * 0.6 * jitterAttenuation : 0.0;
+        const jitterY = (this.subpixelEnabled ? (Math.random() - 0.5) * 0.5 : 0.0) * jitterAttenuation;
+        const hadronicShearX = isHadronic ? (Math.random() - 0.5) * 0.35 : 0;
+        const hadronicShearY = isHadronic ? (Math.random() - 0.5) * 0.6 : 0;
+        const offsetX = sinPattern + jitterMag + hadronicShearX;
+        const offsetY = Math.cos((track.x - track.y) * 0.09) * 0.28 * jitterAttenuation + jitterY + hadronicShearY;
 
         const drawX = track.x + offsetX;
         const drawY = track.y + offsetY;
@@ -1651,7 +1659,8 @@ class CanvasRenderer {
 
         // Glow esterno: use computed final color with alpha ramp
         // Ridotto glow radius (da 5.0 → 2.5) per rendere ellissi più definite
-        const glowScale = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.28; // modest per-step increase
+        let glowScale = 1 + (Math.max(0, (this.exposureK || 4.0) - 4.0)) * 0.28; // modest per-step increase
+        glowScale *= isHadronic ? 1.35 : 0.92;
         const gradient = this.ctx.createRadialGradient(
             drawX, drawY, 0,
             drawX, drawY, radius * 2.5 * glowScale
@@ -1677,6 +1686,17 @@ class CanvasRenderer {
         this.ctx.beginPath();
         this.ctx.arc(drawX, drawY, radius * 0.5, 0, 2 * Math.PI);
         this.ctx.fill();
+
+        if (isHadronic) {
+            this._renderHadronicPhotonArtifacts({
+                x: drawX,
+                y: drawY,
+                radius,
+                baseRGB: [r, g, b],
+                intensityFactor,
+                alpha
+            });
+        }
     }
 
     renderEnergyHistogram(event) {
@@ -1809,6 +1829,8 @@ class CanvasRenderer {
      */
     renderPhotonHexagonal(track) {
         const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+        const trackSourceTag = track.sourceType || this.sourceType;
+        const isHadronic = this._isHadronicSource(trackSourceTag);
 
         // Parametri source-specific (default: Crab Nebula)
         let longMultiplier = 10;
@@ -1850,12 +1872,21 @@ class CanvasRenderer {
                 break;
         }
 
+        if (isHadronic) {
+            longMultiplier *= 1.35;
+            shortMultiplier *= 1.55;
+            maxPixels = Math.round(maxPixels * 1.35);
+            densityMin *= 1.1;
+            densityMax *= 1.3;
+        }
+
         const pixelRadius = 4;
         const radiusBase = this.intensityToRadius(track.intensity);
         const spreadRadiusLong = radiusBase * longMultiplier;
         const spreadRadiusShort = radiusBase * shortMultiplier;
 
         const densityVariation = densityMin + Math.random() * (densityMax - densityMin);
+        const radialExponent = isHadronic ? 1.4 : 2.2;
         const numPixels = Math.max(5, Math.floor(intensityFactor * maxPixels * densityVariation));
         const minDistance = pixelRadius * 3;
 
@@ -1876,7 +1907,7 @@ class CanvasRenderer {
 
             while (!validPosition && attempts < 32) {
                 const t = Math.random() * Math.PI * 2;
-                const radiusFactor = Math.pow(Math.random(), 1.8);
+                const radiusFactor = Math.pow(Math.random(), radialExponent);
 
                 const localX = Math.cos(t) * spreadRadiusLong * radiusFactor;
                 const localY = Math.sin(t) * spreadRadiusShort * radiusFactor;
@@ -1942,8 +1973,9 @@ class CanvasRenderer {
             let drawX = px;
             let drawY = py;
             if (this.subpixelEnabled) {
-                drawX += (Math.random() - 0.5) * 0.6;
-                drawY += (Math.random() - 0.5) * 0.6;
+                const jitterScale = isHadronic ? 1 : 0.6;
+                drawX += (Math.random() - 0.5) * 0.6 * jitterScale;
+                drawY += (Math.random() - 0.5) * 0.6 * jitterScale;
             }
 
             const isHotspot = distanceFactor > 0.8 && Math.random() < 0.25;
@@ -1973,6 +2005,10 @@ class CanvasRenderer {
             this.ctx.stroke();
         });
 
+        if (isHadronic) {
+            this._renderHadronicHexArtifacts(track, pixels, pixelRadius, intensityFactor);
+        }
+
         const centerNorm = (() => {
             const energyMin = this.colorPalette?.minEnergy || 1;
             const energyMax = this.colorPalette?.maxEnergy || (energyMin * 10);
@@ -2001,6 +2037,130 @@ class CanvasRenderer {
         this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.7)';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
+    }
+
+    _isHadronicSource(sourceTag) {
+        if (!sourceTag && !this.sourceType) {
+            return false;
+        }
+        const tag = (sourceTag || this.sourceType || '').toString().toLowerCase();
+        const hadronicTags = ['pevatron', 'snr', 'hadron', 'hadronic', 'muon', 'galactic-center', 'cosmic-ray'];
+        return hadronicTags.includes(tag);
+    }
+
+    _renderHadronicPhotonArtifacts({ x, y, radius, baseRGB, intensityFactor }) {
+        if (!this.ctx) return;
+        this._renderHadronicAsymmetricGlow(x, y, radius, baseRGB, intensityFactor);
+        this._renderHadronicHotspots(x, y, radius, intensityFactor);
+        this._renderHadronicMuonTrack(x, y, radius, intensityFactor);
+    }
+
+    _renderHadronicAsymmetricGlow(x, y, radius, baseRGB, intensityFactor) {
+        const ctx = this.ctx;
+        if (!ctx) return;
+        const angle = Math.random() * Math.PI * 2;
+        const stretchMajor = 1.25 + Math.random() * 0.7;
+        const stretchMinor = 0.75 + Math.random() * 0.35;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.scale(stretchMajor, stretchMinor);
+        const outerRadius = radius * 3.4;
+        const asymGradient = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, outerRadius);
+        const innerAlpha = 0.35 + intensityFactor * 0.25;
+        asymGradient.addColorStop(0, `rgba(${baseRGB[0]}, ${baseRGB[1]}, ${baseRGB[2]}, ${innerAlpha})`);
+        asymGradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = asymGradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, outerRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
+        ctx.globalCompositeOperation = 'source-over';
+    }
+
+    _renderHadronicHotspots(centerX, centerY, radius, intensityFactor) {
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const hotspotCount = Math.max(2, Math.round(2 + intensityFactor * 3));
+        for (let i = 0; i < hotspotCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = radius * (0.8 + Math.random() * 1.6);
+            const hx = centerX + Math.cos(angle) * dist;
+            const hy = centerY + Math.sin(angle) * dist;
+            const hr = radius * (0.25 + Math.random() * 0.55);
+            ctx.save();
+            ctx.fillStyle = `rgba(${220 + Math.random() * 30}, ${120 + Math.random() * 40}, ${40 + Math.random() * 30}, ${0.45 + Math.random() * 0.35})`;
+            ctx.shadowColor = 'rgba(255, 170, 60, 0.55)';
+            ctx.shadowBlur = 8 + Math.random() * 10;
+            ctx.beginPath();
+            ctx.arc(hx, hy, hr, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    _renderHadronicMuonTrack(centerX, centerY, radius, intensityFactor) {
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const chance = 0.08 + intensityFactor * 0.2;
+        if (Math.random() > chance) {
+            return;
+        }
+        const angle = Math.random() * Math.PI * 2;
+        const length = radius * (4 + Math.random() * 6);
+        const halfLength = length / 2;
+        const startX = centerX - Math.cos(angle) * halfLength;
+        const startY = centerY - Math.sin(angle) * halfLength;
+        const endX = centerX + Math.cos(angle) * halfLength;
+        const endY = centerY + Math.sin(angle) * halfLength;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.32)';
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    _renderHadronicHexArtifacts(track, pixels, pixelRadius, intensityFactor) {
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const basePoint = pixels.length ? pixels[Math.floor(Math.random() * pixels.length)] : { x: track.x, y: track.y, alpha: 1 };
+        const hotspotCount = Math.max(2, Math.round(2 + intensityFactor * 2));
+        for (let i = 0; i < hotspotCount; i++) {
+            const ref = pixels.length ? pixels[Math.floor(Math.random() * pixels.length)] : basePoint;
+            const jitter = pixelRadius * (1 + Math.random() * 3);
+            const hx = ref.x + (Math.random() - 0.5) * jitter * 2.5;
+            const hy = ref.y + (Math.random() - 0.5) * jitter * 2.5;
+            const hr = pixelRadius * (1.2 + Math.random() * 1.6);
+            ctx.fillStyle = `rgba(${240 + Math.random() * 15}, ${150 + Math.random() * 60}, ${60 + Math.random() * 30}, ${0.5 + Math.random() * 0.35})`;
+            ctx.beginPath();
+            ctx.arc(hx, hy, hr, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        const muonChance = 0.12 + intensityFactor * 0.25;
+        if (Math.random() < muonChance) {
+            const angle = Math.random() * Math.PI * 2;
+            const length = 80 + intensityFactor * 140;
+            const startX = track.x - Math.cos(angle) * length * 0.5;
+            const startY = track.y - Math.sin(angle) * length * 0.5;
+            const endX = track.x + Math.cos(angle) * length * 0.5;
+            const endY = track.y + Math.sin(angle) * length * 0.5;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 
     /**
