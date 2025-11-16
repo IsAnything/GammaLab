@@ -308,6 +308,19 @@ class CanvasRenderer {
             arcColor: null,
             arcLineWidth: 2.2
         };
+
+        // Optional direction guides for alpha visualization
+        this.alphaDirectionGuides = {
+            enabled: false,
+            majorAxisColor: 'rgba(255, 190, 0, 0.95)',
+            cameraRayColor: 'rgba(130, 220, 255, 0.95)',
+            lineWidth: 2.2,
+            arrowSize: 10,
+            majorAxisLengthPx: null,
+            cameraRayExtensionPx: 25,
+            cameraRayDash: [8, 6],
+            majorAxisDash: [12, 6]
+        };
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -326,6 +339,16 @@ class CanvasRenderer {
         }
         this.alphaReferenceConfig = {
             ...this.alphaReferenceConfig,
+            ...options
+        };
+    }
+
+    configureAlphaDirectionGuides(options = {}) {
+        if (!this.alphaDirectionGuides) {
+            this.alphaDirectionGuides = {};
+        }
+        this.alphaDirectionGuides = {
+            ...this.alphaDirectionGuides,
             ...options
         };
     }
@@ -2096,6 +2119,29 @@ class CanvasRenderer {
             ctx.stroke();
             ctx.setLineDash([]);
 
+            const directionCfg = this.alphaDirectionGuides || {};
+            if (directionCfg.enabled) {
+                const majorAxisLength = directionCfg.majorAxisLengthPx ?? Math.max(displayLengthPx * 1.15, 40);
+                const majorEndX = centerX + Math.cos(theta) * majorAxisLength;
+                const majorEndY = centerY + Math.sin(theta) * majorAxisLength;
+                this._drawArrow(ctx, centerX, centerY, majorEndX, majorEndY, {
+                    color: directionCfg.majorAxisColor || (this.lightStyle ? 'rgba(255, 200, 120, 0.95)' : 'rgba(255, 200, 120, 0.95)'),
+                    lineWidth: directionCfg.lineWidth || 2.2,
+                    arrowSize: directionCfg.arrowSize || 12,
+                    dash: directionCfg.majorAxisDash || [12, 6]
+                });
+
+                const cameraExtend = directionCfg.cameraRayExtensionPx ?? 25;
+                const rayEndX = lineEndX + unitToCameraX * cameraExtend;
+                const rayEndY = lineEndY + unitToCameraY * cameraExtend;
+                this._drawArrow(ctx, centerX, centerY, rayEndX, rayEndY, {
+                    color: directionCfg.cameraRayColor || (this.lightStyle ? 'rgba(120, 220, 255, 0.95)' : 'rgba(120, 220, 255, 0.95)'),
+                    lineWidth: directionCfg.lineWidth || 2.2,
+                    arrowSize: directionCfg.arrowSize || 12,
+                    dash: directionCfg.cameraRayDash || [8, 6]
+                });
+            }
+
             if (referenceCfg.drawCameraCenterCross) {
                 const crossSize = referenceCfg.cameraCenterCrossSize ?? 12;
                 ctx.save();
@@ -2276,6 +2322,40 @@ class CanvasRenderer {
                 console.warn('Errore diagnostico HillasOverlay:', diagErr);
             }
         }, 4);
+    }
+
+    _drawArrow(ctx, startX, startY, endX, endY, options = {}) {
+        if (!ctx) return;
+        const color = options.color || '#ffffff';
+        const lineWidth = options.lineWidth || 2;
+        const arrowSize = options.arrowSize || 10;
+        const dash = options.dash || null;
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = lineWidth;
+        if (Array.isArray(dash) && dash.length) {
+            ctx.setLineDash(dash);
+        } else {
+            ctx.setLineDash([]);
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        const angle = Math.atan2(endY - startY, endX - startX);
+        const headLength = arrowSize;
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 8), endY - headLength * Math.sin(angle - Math.PI / 8));
+        ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 8), endY - headLength * Math.sin(angle + Math.PI / 8));
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
     }
 
 }

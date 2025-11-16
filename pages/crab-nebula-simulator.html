@@ -286,6 +286,17 @@
                         arcLineWidth: 2.4
                     });
                 }
+                if (typeof renderer.configureAlphaDirectionGuides === 'function') {
+                    renderer.configureAlphaDirectionGuides({
+                        enabled: true,
+                        majorAxisColor: 'rgba(255, 210, 120, 0.95)',
+                        cameraRayColor: 'rgba(130, 220, 255, 0.95)',
+                        lineWidth: 2.4,
+                        arrowSize: 12,
+                        majorAxisLengthPx: 160,
+                        cameraRayExtensionPx: 35
+                    });
+                }
             });
 
             // Add exposure/sub-pixel controls (global helper)
