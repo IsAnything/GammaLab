@@ -2343,7 +2343,8 @@ class CanvasRenderer {
             const textHeight = (metrics.actualBoundingBoxAscent || 10) + (metrics.actualBoundingBoxDescent || 4);
             const padX = 12;
             const padY = 6;
-            const lensGeometry = (this.hoverZoomConfig && this.hoverZoomConfig.enabled && this.isHovering)
+            const hoverLocked = typeof this.isHoverZoomLocked === 'function' && this.isHoverZoomLocked();
+            const lensGeometry = (this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked))
                 ? this._getHoverLensGeometry(centerX, centerY, displayLengthPx, displayWidthPx)
                 : null;
 
@@ -2467,7 +2468,7 @@ class CanvasRenderer {
                 ctx.restore();
             }
 
-            if (this.hoverZoomConfig && this.hoverZoomConfig.enabled && this.isHovering) {
+            if (this.hoverZoomConfig && this.hoverZoomConfig.enabled && (this.isHovering || hoverLocked)) {
                 this._drawHoverZoomLens(ctx, centerX, centerY, displayLengthPx, displayWidthPx, theta, hillasParams, cameraCenterX, cameraCenterY);
             }
 
