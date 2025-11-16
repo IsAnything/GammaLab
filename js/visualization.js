@@ -340,6 +340,12 @@ class CanvasRenderer {
             arcColor: null,
             arcLineWidth: 2.2
         };
+
+        this.hoverZoomManual = {
+            active: false,
+            x: -1,
+            y: -1
+        };
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -382,6 +388,41 @@ class CanvasRenderer {
         };
     }
 
+    lockHoverZoom(x, y) {
+        if (!this.hoverZoomManual) {
+            this.hoverZoomManual = {};
+        }
+        this.hoverZoomManual.active = true;
+        this.hoverZoomManual.x = x;
+        this.hoverZoomManual.y = y;
+        this.mouseX = x;
+        this.mouseY = y;
+        this.isHovering = true;
+    }
+
+    unlockHoverZoom() {
+        if (!this.hoverZoomManual) {
+            this.hoverZoomManual = {};
+        }
+        this.hoverZoomManual.active = false;
+        this.hoverZoomManual.x = -1;
+        this.hoverZoomManual.y = -1;
+        this.mouseX = -1;
+        this.mouseY = -1;
+        this.isHovering = false;
+    }
+
+    isHoverZoomLocked() {
+        return !!(this.hoverZoomManual && this.hoverZoomManual.active);
+    }
+
+    getHoverZoomFocus() {
+        if (this.hoverZoomManual && this.hoverZoomManual.active) {
+            return { x: this.hoverZoomManual.x, y: this.hoverZoomManual.y };
+        }
+        return null;
+    }
+
     enableHoverHillasMode() {
         this.showHillasOnHover = true;
         this.embedHillasOutline = false;
@@ -412,6 +453,10 @@ class CanvasRenderer {
                 return;
             }
 
+            if (this.isHoverZoomLocked && this.isHoverZoomLocked()) {
+                return;
+            }
+
             const rect = listenTarget.getBoundingClientRect();
             const scaleX = this.canvas.width / rect.width;
             const scaleY = this.canvas.height / rect.height;
@@ -430,6 +475,10 @@ class CanvasRenderer {
 
         listenTarget.addEventListener('mouseleave', () => {
             if (!this.showHillasOnHover) {
+                return;
+            }
+
+            if (this.isHoverZoomLocked && this.isHoverZoomLocked()) {
                 return;
             }
             if (this.isHovering) {

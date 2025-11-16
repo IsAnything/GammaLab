@@ -114,7 +114,7 @@
                 <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">💡 Come interagire con la traccia</p>
                 <ul style="margin-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 6px;">Passa il mouse sopra l'ellisse per far comparire le guide di Hillas e leggere i parametri aggiornati.</li>
-                    <li style="margin-bottom: 6px;">Fai click sul canvas per attivare lo <strong>zoom circolare</strong> e seguire la struttura della traccia; clicca di nuovo per nasconderlo.</li>
+                    <li style="margin-bottom: 6px;">Fai click sul canvas per attivare lo <strong>zoom circolare</strong>; clicca all'interno del cerchio per chiuderlo oppure in un punto diverso per spostarlo.</li>
                     <li style="margin-bottom: 0;">Quando l'animazione è attiva, attendi il completamento (≈2,5 s) prima che alpha e zoom mostrino il nuovo evento.</li>
                 </ul>
             </div>
@@ -314,10 +314,43 @@
             renderer.hoverZoomActive = false;
 
             const canvas = renderer.canvas;
-            const originalCursor = canvas.style.cursor;
+
+            const getCanvasCoordinates = (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                return {
+                    x: (event.clientX - rect.left) * scaleX,
+                    y: (event.clientY - rect.top) * scaleY
+                };
+            };
+
+            const computeLensRadius = () => {
+                const cfg = renderer.hoverZoomConfig || {};
+                if (cfg.radiusPx && Number.isFinite(cfg.radiusPx)) {
+                    return cfg.radiusPx;
+                }
+                return Math.min(canvas.width, canvas.height) * 0.25;
+            };
+
+            const getFocus = () => {
+                if (typeof renderer.getHoverZoomFocus === 'function') {
+                    return renderer.getHoverZoomFocus();
+                }
+                return renderer.hoverZoomFocus || null;
+            };
+
+            const isPointInsideLens = (x, y) => {
+                const focus = getFocus();
+                if (!focus) return false;
+                const radius = computeLensRadius();
+                const dx = x - focus.x;
+                const dy = y - focus.y;
+                return Math.sqrt(dx * dx + dy * dy) <= radius;
+            };
 
             const updateCursor = () => {
-                canvas.style.cursor = renderer.hoverZoomActive ? (originalCursor || 'default') : 'zoom-in';
+                canvas.style.cursor = renderer.hoverZoomActive ? 'zoom-out' : 'zoom-in';
             };
 
             const rerenderSafely = () => {
@@ -330,21 +363,53 @@
                 }
             };
 
-            updateCursor();
+            const lockFocus = (x, y) => {
+                if (typeof renderer.lockHoverZoom === 'function') {
+                    renderer.lockHoverZoom(x, y);
+                } else {
+                    renderer.isHovering = true;
+                    renderer.mouseX = x;
+                    renderer.mouseY = y;
+                    renderer.hoverZoomFocus = { x, y };
+                }
+            };
 
-            canvas.addEventListener('click', () => {
-                renderer.hoverZoomActive = !renderer.hoverZoomActive;
-                renderer.hoverZoomConfig.enabled = renderer.hoverZoomActive;
-
-                if (!renderer.hoverZoomActive) {
+            const unlockFocus = () => {
+                if (typeof renderer.unlockHoverZoom === 'function') {
+                    renderer.unlockHoverZoom();
+                } else {
                     renderer.isHovering = false;
                     renderer.mouseX = -1;
                     renderer.mouseY = -1;
+                    renderer.hoverZoomFocus = null;
+                }
+            };
+
+            canvas.addEventListener('click', (event) => {
+                const { x, y } = getCanvasCoordinates(event);
+
+                if (!renderer.hoverZoomActive) {
+                    renderer.hoverZoomActive = true;
+                    renderer.hoverZoomConfig.enabled = true;
+                    lockFocus(x, y);
+                    updateCursor();
+                    rerenderSafely();
+                    return;
+                }
+
+                if (isPointInsideLens(x, y)) {
+                    renderer.hoverZoomActive = false;
+                    renderer.hoverZoomConfig.enabled = false;
+                    unlockFocus();
+                } else {
+                    lockFocus(x, y);
                 }
 
                 updateCursor();
                 rerenderSafely();
             });
+
+            updateCursor();
         }
 
         function generateCrabEvent() {
