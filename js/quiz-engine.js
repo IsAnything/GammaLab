@@ -109,6 +109,65 @@ class QuizEngine {
             renderer.subpixelEnabled = false;
             // Modalità didattica: sopprimi rumore di background
             if (this.quizGammaOnly) renderer.suppressNoise = true;
+
+            if (typeof renderer.enableHoverHillasMode === 'function') {
+                renderer.enableHoverHillasMode();
+            } else {
+                renderer.showHillasOnHover = true;
+                renderer.embedHillasOutline = false;
+                renderer.showEllipseOnly = false;
+            }
+
+            if (typeof renderer.configureAlphaLabelPlacement === 'function') {
+                renderer.configureAlphaLabelPlacement({
+                    mode: 'perpendicular',
+                    alongFraction: 0.55,
+                    lateralOffset: 80,
+                    textAlign: 'center'
+                });
+            }
+
+            if (typeof renderer.configureAlphaReferenceMarkers === 'function') {
+                renderer.configureAlphaReferenceMarkers({
+                    cameraMarkerMode: 'offset',
+                    cameraMarkerOffset: 110,
+                    drawCameraCenterCross: true,
+                    cameraCenterCrossSize: 14,
+                    cameraMarkerRadius: 7,
+                    showAlphaArc: true,
+                    arcRadiusPx: 120,
+                    arcLineWidth: 2.4
+                });
+            }
+
+            if (typeof renderer.configureAlphaDirectionGuides === 'function') {
+                renderer.configureAlphaDirectionGuides({
+                    enabled: true,
+                    majorAxisColor: 'rgba(255, 210, 120, 0.95)',
+                    cameraRayColor: 'rgba(130, 220, 255, 0.95)',
+                    lineWidth: 2.4,
+                    arrowSize: 12,
+                    majorAxisLengthPx: 160,
+                    cameraRayExtensionPx: 35,
+                    cameraRayLengthPx: 230,
+                    cameraRayBacktrackPx: 60
+                });
+            }
+
+            if (typeof renderer.configureHoverZoom === 'function') {
+                renderer.configureHoverZoom({
+                    enabled: true,
+                    scale: 2.1,
+                    radiusPx: 140,
+                    offsetX: 0,
+                    offsetY: -120,
+                    borderColor: 'rgba(255, 255, 255, 0.95)',
+                    borderWidth: 2.8,
+                    overlayFill: 'rgba(4, 6, 14, 0.3)',
+                    showAlphaArc: true,
+                    arcColor: 'rgba(255, 210, 120, 0.9)'
+                });
+            }
         });
         
         // FORZA dimensioni quadrate per i canvas overlay
