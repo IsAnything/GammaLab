@@ -112,40 +112,6 @@
 
             <!-- Controlli Interattivi -->
             <div class="controls-panel" style="background: linear-gradient(135deg, rgba(255,200,100,0.1), rgba(100,200,255,0.1)); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(100,150,255,0.3);">
-                <h3 style="margin-top: 0; color: var(--accent-blue);">⚙️ Controlli Evento</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 16px;">
-                    
-                    <!-- Controllo Energia -->
-                    <div>
-                        <label for="energySlider" style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
-                            ⚡ Energia Fotone Gamma: <span id="energyValue" style="color: #ff8800;">AUTO</span>
-                        </label>
-                        <input type="range" id="energySlider" min="0" max="100" value="0" step="1" 
-                               style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #4488ff, #ff8800, #ff4444); cursor: pointer;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
-                            <span>AUTO</span>
-                            <span>0.1 TeV</span>
-                            <span>1 TeV</span>
-                            <span>10 TeV</span>
-                            <span>100 TeV</span>
-                        </div>
-                    </div>
-
-                    <!-- Controllo Angolo Zenitale -->
-                    <div>
-                        <label for="zenithSlider" style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
-                            📐 Angolo Zenitale: <span id="zenithValue" style="color: #4488ff;">0°</span>
-                        </label>
-                        <input type="range" id="zenithSlider" min="0" max="60" value="0" step="5" 
-                               style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #44ff88, #ffaa44); cursor: pointer;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
-                            <span>0° (zenit)</span>
-                            <span>30°</span>
-                            <span>60° (orizzonte)</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Checkbox Animazione -->
                 <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; background: rgba(100,150,255,0.1); border-radius: 8px;">
                     <input type="checkbox" id="animateCheckbox" checked style="width: 20px; height: 20px; cursor: pointer;">
@@ -316,7 +282,6 @@
             });
 
             // Event listeners controlli
-            setupControls();
             document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
@@ -326,57 +291,10 @@
             setTimeout(() => generateCrabEvent(), 500);
         });
 
-        // Setup controlli interattivi
-        function setupControls() {
-            const energySlider = document.getElementById('energySlider');
-            const energyValue = document.getElementById('energyValue');
-            const zenithSlider = document.getElementById('zenithSlider');
-            const zenithValue = document.getElementById('zenithValue');
-
-            energySlider.addEventListener('input', (e) => {
-                const val = parseInt(e.target.value);
-                if (val === 0) {
-                    energyValue.textContent = 'AUTO';
-                } else {
-                    const energyTeV = Math.pow(10, (val - 50) / 25);
-                    energyValue.textContent = energyTeV < 1 
-                        ? `${(energyTeV * 1000).toFixed(0)} GeV`
-                        : `${energyTeV.toFixed(1)} TeV`;
-                }
-            });
-
-            zenithSlider.addEventListener('input', (e) => {
-                zenithValue.textContent = e.target.value + '°';
-            });
-        }
-
-        function getCustomParams() {
-            const energySlider = document.getElementById('energySlider');
-            const zenithSlider = document.getElementById('zenithSlider');
-            
-            const energyVal = parseInt(energySlider.value);
-            const zenithAngle = parseInt(zenithSlider.value);
-            
-            const customParams = {};
-            
-            // Solo se non è AUTO (0)
-            if (energyVal > 0) {
-                const energyTeV = Math.pow(10, (energyVal - 50) / 25);
-                customParams.energy = energyTeV * 1000; // Converti in GeV
-            }
-            
-            if (zenithAngle > 0) {
-                customParams.zenithAngle = zenithAngle;
-            }
-            
-            return Object.keys(customParams).length > 0 ? customParams : null;
-        }
-
         function generateCrabEvent() {
             console.log('🦀 Generazione evento Crab Nebula...');
 
             const crabProfile = getSourceProfile('crab');
-            const customParams = getCustomParams();
             const shouldAnimate = document.getElementById('animateCheckbox').checked;
             const events = [];
             const hillasParams = [];
@@ -387,7 +305,7 @@
                 const cameraId = i + 1;
                 const camKey = `cam${cameraId}`;
                 
-                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 }, customParams);
+                const event = engine.generateEvent(crabProfile, cameraId, { width: 600, height: 600 });
                 events.push(event);
                 
                 // Renderizza con o senza animazione
