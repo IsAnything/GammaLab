@@ -348,6 +348,7 @@ class CanvasRenderer {
         };
 
         this._hoverLensGeometry = null;
+        this._hoverZoomHiddenUntilReset = false;
     }
 
     configureAlphaLabelPlacement(options = {}) {
@@ -459,6 +460,15 @@ class CanvasRenderer {
         return { ...this._hoverLensGeometry };
     }
 
+    hideHoverZoomUntilExit() {
+        if (!this.showHillasOnHover || !this.isHovering || this.isHoverZoomLocked && this.isHoverZoomLocked()) {
+            return;
+        }
+        this._hoverZoomHiddenUntilReset = true;
+        this.isHovering = false;
+        this.refreshHillasOverlay();
+    }
+
     enableHoverHillasMode() {
         this.showHillasOnHover = true;
         this.embedHillasOutline = false;
@@ -540,10 +550,22 @@ class CanvasRenderer {
         container.className = 'signature-hint-badge';
         container.style.display = 'none';
         container.style.alignItems = 'center';
-        container.style.gap = '10px';
-        container.style.background = 'linear-gradient(135deg, rgba(10, 24, 52, 0.95), rgba(18, 38, 70, 0.92))';
-        container.style.color = '#d0ecff';
-        container.style.padding = '8px 14px';
+                const hoverZoomHidden = this._hoverZoomHiddenUntilReset;
+                if (hoverZoomHidden) {
+                    if (!hovering) {
+                        this._hoverZoomHiddenUntilReset = false;
+                    } else {
+                        if (this.isHovering) {
+                            this.isHovering = false;
+                            this._redrawHillasOverlay();
+                        }
+                        return;
+                    }
+                }
+                if (hovering !== this.isHovering) {
+                    this.isHovering = hovering;
+                    this._redrawHillasOverlay();
+                }
         container.style.borderRadius = '999px';
         container.style.boxShadow = '0 10px 25px rgba(10, 25, 50, 0.35)';
         container.style.fontFamily = '"Courier New", monospace';
@@ -560,7 +582,7 @@ class CanvasRenderer {
         badge.style.padding = '3px 10px';
         badge.style.borderRadius = '8px';
         badge.style.background = 'rgba(80, 170, 255, 0.22)';
-        badge.style.color = '#aee4ff';
+                this._hoverZoomHiddenUntilReset = false;
 
         const text = document.createElement('span');
         text.style.fontSize = '12px';
