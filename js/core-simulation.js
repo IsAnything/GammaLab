@@ -531,6 +531,12 @@ class SimulationEngine {
                 dy += Math.sin((dx / Math.max(1, lengthPx)) * Math.PI) * widthPx * profileConfig.offAxisShear;
             }
 
+            const longDen = Math.max(1e-3, lengthPx * 1.331);
+            const latDen = Math.max(1e-3, widthPx * 1.338);
+            const longitudinalNormalized = Math.max(-2, Math.min(2, dx / longDen));
+            const lateralNormalized = Math.max(-2, Math.min(2, dy / latDen));
+            const radialNormalized = Math.max(0, Math.min(2.5, Math.hypot(dx, dy) / longDen));
+
             const rotX = dx * cosTheta - dy * sinTheta;
             const rotY = dx * sinTheta + dy * cosTheta;
 
@@ -622,7 +628,11 @@ class SimulationEngine {
                 y,
                 energy: photonEnergy,
                 intensity: intensity * Math.pow(energyScale, 0.35),
-                sourceType: sourceType
+                sourceType: sourceType,
+                progress,
+                longitudinalNormalized,
+                lateralNormalized,
+                radialNormalized
             });
         }
 

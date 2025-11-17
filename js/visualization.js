@@ -1583,6 +1583,59 @@ class CanvasRenderer {
         return this._mixRGBTowards(baseRGB, target, tintStrength);
     }
 
+    _applySourceDifferentiation(baseRGB, intensityFactor, track) {
+        if (!track) {
+            return { rgb: baseRGB, intensity: intensityFactor };
+        }
+
+        const sourceTag = track.sourceType || this.sourceType;
+        let rgb = baseRGB;
+        let intensity = intensityFactor;
+
+        const longitudinal = typeof track.longitudinalNormalized === 'number'
+            ? Math.max(-1.5, Math.min(1.5, track.longitudinalNormalized))
+            : null;
+        const radialNorm = typeof track.radialNormalized === 'number'
+            ? Math.max(0, Math.min(1, track.radialNormalized))
+            : null;
+
+        const axisCenterWeight = longitudinal !== null
+            ? Math.max(0, 1 - Math.min(1, Math.abs(longitudinal)))
+            : null;
+        const axialProgress = longitudinal !== null
+            ? Math.max(0, Math.min(1, 0.5 + longitudinal * 0.5))
+            : null;
+
+        if (sourceTag === 'blazar' && axisCenterWeight !== null) {
+            intensity = Math.min(1, intensity * (0.85 + axisCenterWeight * 0.6));
+            rgb = this._mixRGBTowards(rgb, [120, 255, 200], axisCenterWeight * 0.35);
+        } else if (sourceTag === 'grb' && axialProgress !== null) {
+            rgb = this._mixRGBTowards(rgb, [70, 220, 130], axialProgress * 0.85);
+            intensity = Math.min(1, intensity * (0.75 + (1 - axialProgress) * 0.45));
+        } else if ((sourceTag === 'pevatron' || sourceTag === 'galactic-center') && radialNorm !== null) {
+            const focus = 1 - radialNorm * 0.7;
+            intensity = Math.min(1, intensity * (0.85 + focus * 0.45));
+            rgb = this._mixRGBTowards(rgb, [120, 200, 255], (1 - focus) * 0.25);
+        }
+
+        return { rgb, intensity };
+    }
+
+    _getSourceJitterMultiplier(sourceTag) {
+        switch (sourceTag) {
+            case 'blazar':
+                return 0.75;
+            case 'grb':
+                return 1.25;
+            case 'pevatron':
+                return 0.8;
+            case 'galactic-center':
+                return 0.85;
+            default:
+                return 1;
+        }
+    }
+
     /**
      * Renderizza singolo fotone
      */
@@ -1607,7 +1660,7 @@ class CanvasRenderer {
         }
 
         // Dark style: rendering tradizionale con glow
-        const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+        let intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
 
         // Color mapping: combine energy and intensity, then tone-map for photographic dynamic range
         let baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
@@ -1617,6 +1670,10 @@ class CanvasRenderer {
             const colorT = (intensityFactor * 0.7 + energyNorm * 0.3);
             baseRGB = this.colorPalette.mapNormalized(colorT);
             baseRGB = this._applyHighEnergyTint(baseRGB, track);
+
+            const sourceAdjust = this._applySourceDifferentiation(baseRGB, intensityFactor, track);
+            baseRGB = sourceAdjust.rgb;
+            intensityFactor = sourceAdjust.intensity;
 
             // Exposure / tone-mapping -> brightness scalar in 0..1
             const exposureK = this.exposureK || 4.0; // use renderer property if available
@@ -1640,7 +1697,8 @@ class CanvasRenderer {
         }
 
         // Sub-pixel jitter / small deterministic pattern (kept small to avoid large offsets)
-        const jitterAttenuation = isGammaLike ? 0.55 : 1.0;
+        let jitterAttenuation = isGammaLike ? 0.55 : 1.0;
+        jitterAttenuation *= this._getSourceJitterMultiplier(trackSourceTag);
         const sinPattern = Math.sin((track.x + track.y) * 0.12) * 0.3 * jitterAttenuation;
         const jitterMag = this.subpixelEnabled ? (Math.random() - 0.5) * 0.6 * jitterAttenuation : 0.0;
         const jitterY = (this.subpixelEnabled ? (Math.random() - 0.5) * 0.5 : 0.0) * jitterAttenuation;
@@ -1653,7 +1711,18 @@ class CanvasRenderer {
         const drawY = track.y + offsetY;
 
         const radius = this.intensityToRadius(track.intensity);
-        const alpha = Math.min(1, track.intensity * 1.2 + 0.5);
+        let alpha = Math.min(1, track.intensity * 1.2 + 0.5);
+
+        const longitudinal = typeof track.longitudinalNormalized === 'number'
+            ? Math.max(-1.5, Math.min(1.5, track.longitudinalNormalized))
+            : null;
+        if (trackSourceTag === 'grb' && longitudinal !== null) {
+            const axialProgress = Math.max(0, Math.min(1, 0.5 + longitudinal * 0.5));
+            alpha *= Math.max(0.3, 0.85 + (1 - axialProgress) * 0.25);
+        } else if (trackSourceTag === 'blazar' && longitudinal !== null) {
+            const axisCenterWeight = Math.max(0, 1 - Math.min(1, Math.abs(longitudinal)));
+            alpha = Math.min(1, alpha * (0.85 + axisCenterWeight * 0.35));
+        }
 
         if (!isFinite(radius) || radius <= 0) return;
 
