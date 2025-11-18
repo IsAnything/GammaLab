@@ -109,6 +109,143 @@
             box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
         }
         
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+            margin: 3rem 0;
+            padding: 2rem 0;
+        }
+        
+        .timeline-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .timeline-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .timeline-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+        
+        .timeline-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
+        }
+        
+        .timeline-line {
+            position: relative;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            margin: 2rem 0;
+            border-radius: 2px;
+        }
+        
+        .timeline-progress {
+            position: absolute;
+            height: 100%;
+            background: #ffd700;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .timeline-events {
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .timeline-event {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .timeline-event.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+        
+        .event-marker {
+            position: absolute;
+            top: -30px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .event-marker:hover {
+            transform: scale(1.3);
+            border-color: #764ba2;
+        }
+        
+        .event-marker.active {
+            background: #ffd700;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+        
+        .event-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .event-date {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .event-title {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .event-description {
+            color: #333;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+        
+        .event-image {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .event-image img {
+            max-width: 60%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
         @media (max-width: 768px) {
             .content-with-image,
             .content-with-image.reverse {
@@ -136,6 +273,170 @@
         <section class="hero-section">
             <img src="../crab nebula materials/heart of crab nebula.png" alt="Il cuore della Nebulosa del Granchio" class="hero-image">
         </section>
+
+        <section id="timeline">
+            <h2>📅 Storia delle Scoperte</h2>
+            <div class="timeline-container">
+                <div class="timeline-controls">
+                    <button class="timeline-btn" onclick="changeEvent(-1)">← Precedente</button>
+                    <button class="timeline-btn active" onclick="playTimeline()">▶ Play Automatico</button>
+                    <button class="timeline-btn" onclick="changeEvent(1)">Successivo →</button>
+                </div>
+                
+                <div class="timeline-line">
+                    <div class="timeline-progress" id="timeline-progress"></div>
+                    <div class="event-marker" style="left: 0%;" onclick="goToEvent(0)"></div>
+                    <div class="event-marker" style="left: 20%;" onclick="goToEvent(1)"></div>
+                    <div class="event-marker" style="left: 40%;" onclick="goToEvent(2)"></div>
+                    <div class="event-marker" style="left: 60%;" onclick="goToEvent(3)"></div>
+                    <div class="event-marker" style="left: 80%;" onclick="goToEvent(4)"></div>
+                    <div class="event-marker" style="left: 100%;" onclick="goToEvent(5)"></div>
+                </div>
+                
+                <div class="timeline-events">
+                    <div class="timeline-event active" data-event="0">
+                        <div class="event-content">
+                            <div class="event-date">1054 d.C.</div>
+                            <h3 class="event-title">🌟 La Grande Esplosione</h3>
+                            <div class="event-description">
+                                <p>Astronomi cinesi e arabi osservano una "stella ospite" nella costellazione del Toro, così brillante da essere visibile anche di giorno per 23 giorni. Si tratta dell'esplosione di una supernova, a circa 6.500 anni luce dalla Terra.</p>
+                                <p><strong>Fatto curioso:</strong> L'evento fu registrato in dettaglio dagli astronomi della dinastia Song in Cina, che descrissero la stella come "gialla e rossastra".</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-event" data-event="1">
+                        <div class="event-content">
+                            <div class="event-date">1731</div>
+                            <h3 class="event-title">🔭 Prima Osservazione Moderna</h3>
+                            <div class="event-description">
+                                <p>L'astronomo inglese John Bevis identifica per primo la nebulosa con un telescopio, osservandone la caratteristica forma nebulare.</p>
+                                <p><strong>Curiosità:</strong> Charles Messier la catalogò nel 1758 come M1, il primo oggetto del suo celebre catalogo, creato proprio per evitare di confondere le nebulose con le comete!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-event" data-event="2">
+                        <div class="event-content">
+                            <div class="event-date">1968</div>
+                            <h3 class="event-title">⚡ Scoperta della Pulsar</h3>
+                            <div class="event-description">
+                                <p>Gli astronomi scoprono al centro della nebulosa una <strong>pulsar</strong>, una stella di neutroni che ruota 30 volte al secondo. È la prima pulsar ottica mai osservata!</p>
+                                <p><strong>Significato:</strong> Questa scoperta conferma che le supernove possono lasciare dietro di sé stelle di neutroni ultra-dense, oggetti previsti dalla teoria ma mai visti prima.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-event" data-event="3">
+                        <div class="event-content">
+                            <div class="event-date">1989</div>
+                            <h3 class="event-title">🛰️ Era dei Raggi Gamma</h3>
+                            <div class="event-description">
+                                <p>Il satellite <strong>EGRET</strong> a bordo del Compton Gamma Ray Observatory rileva per la prima volta emissioni gamma dalla Nebulosa del Granchio nella banda GeV.</p>
+                                <p><strong>Rivoluzione scientifica:</strong> Si capisce che la nebulosa non emette solo luce visibile e raggi X, ma anche fotoni di energia estrema, aprendo nuove domande sui meccanismi di accelerazione delle particelle.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-event" data-event="4">
+                        <div class="event-content">
+                            <div class="event-date">2008-2011</div>
+                            <h3 class="event-title">💥 Flares Gamma Misteriosi</h3>
+                            <div class="event-description">
+                                <p>I telescopi <strong>AGILE</strong> e <strong>Fermi-LAT</strong> scoprono improvvisi lampi di raggi gamma provenienti dalla nebulosa, con energia che aumenta fino a 30 volte in poche ore!</p>
+                                <p><strong>Mistero:</strong> Ancora oggi gli scienziati dibattono su cosa causi questi flare improvvisi. Le teorie includono riconnessione magnetica o zone di accelerazione localizzate.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-event" data-event="5">
+                        <div class="event-content">
+                            <div class="event-date">2019-2021</div>
+                            <h3 class="event-title">🚀 Record di Energia</h3>
+                            <div class="event-description">
+                                <p>L'osservatorio <strong>LHAASO</strong> in Tibet rileva fotoni gamma con energia superiore a <strong>1 PeV</strong> (1.000.000.000.000.000 eV) provenienti dalla Nebulosa del Granchio!</p>
+                                <p><strong>Importanza:</strong> Questi sono i fotoni più energetici mai rilevati da una sorgente identificata. La Nebulosa del Granchio diventa ufficialmente la prima "PeVatron" galattica confermata, un acceleratore cosmico di potenza inimmaginabile.</p>
+                            </div>
+                            <div class="event-image">
+                                <img src="../crab nebula materials/universe-07-00448-g001.png" alt="Spettro gamma record">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <script>
+            let currentEventIndex = 0;
+            let isPlaying = false;
+            let playInterval;
+            const totalEvents = 6;
+            
+            function updateTimeline() {
+                // Aggiorna eventi
+                document.querySelectorAll('.timeline-event').forEach((event, index) => {
+                    event.classList.toggle('active', index === currentEventIndex);
+                });
+                
+                // Aggiorna marker
+                document.querySelectorAll('.event-marker').forEach((marker, index) => {
+                    marker.classList.toggle('active', index === currentEventIndex);
+                });
+                
+                // Aggiorna barra di progresso
+                const progress = (currentEventIndex / (totalEvents - 1)) * 100;
+                document.getElementById('timeline-progress').style.width = progress + '%';
+            }
+            
+            function changeEvent(direction) {
+                stopPlayback();
+                currentEventIndex += direction;
+                if (currentEventIndex < 0) currentEventIndex = totalEvents - 1;
+                if (currentEventIndex >= totalEvents) currentEventIndex = 0;
+                updateTimeline();
+            }
+            
+            function goToEvent(index) {
+                stopPlayback();
+                currentEventIndex = index;
+                updateTimeline();
+            }
+            
+            function playTimeline() {
+                if (isPlaying) {
+                    stopPlayback();
+                } else {
+                    isPlaying = true;
+                    document.querySelector('.timeline-btn.active').textContent = '⏸ Pausa';
+                    playInterval = setInterval(() => {
+                        currentEventIndex++;
+                        if (currentEventIndex >= totalEvents) {
+                            currentEventIndex = 0;
+                        }
+                        updateTimeline();
+                    }, 4000); // Cambia evento ogni 4 secondi
+                }
+            }
+            
+            function stopPlayback() {
+                isPlaying = false;
+                clearInterval(playInterval);
+                document.querySelector('.timeline-btn.active').textContent = '▶ Play Automatico';
+            }
+            
+            // Supporto tastiera
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') changeEvent(-1);
+                if (e.key === 'ArrowRight') changeEvent(1);
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    playTimeline();
+                }
+            });
+            
+            // Inizializza
+            updateTimeline();
+        </script>
 
         <section id="introduzione">
             <h2>📖 Introduzione</h2>
