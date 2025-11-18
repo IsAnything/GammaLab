@@ -3,681 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crab Nebula - GammaLab</title>
+    <title>Nebulosa del Granchio - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .content-with-image.reverse {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .content-with-image.reverse .text-content {
+            order: 2;
+        }
+        
+        .content-with-image.reverse .image-content {
+            order: 1;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .process-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .instruments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .instrument-tag {
+            background: #e9ecef;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content-with-image,
+            .content-with-image.reverse {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-with-image.reverse .text-content,
+            .content-with-image.reverse .image-content {
+                order: initial;
+            }
+            
+            .image-content {
+                position: static;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1 class="site-title">🔭 GammaLab</h1>
-            <p class="site-subtitle">🦀 Crab Nebula - La Candela Standard dell'Astronomia Gamma</p>
-            
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="../homepage.html">🏠 Home</a></li>
-                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
-                    <li><a href="crab-nebula.html" class="active">🦀 Crab Nebula</a></li>
-                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
-                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
-                    <li><a href="grb.html">⚡ GRB</a></li>
-                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
-                    <li><a href="comparison.html">📊 Confronto</a></li>
-                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
-                    <li><a href="quiz.html">🎮 Quiz</a></li>
-                </ul>
-            </nav>
-            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
-                <a href="crab-nebula-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
-                    🎮 Vai al Simulatore della Crab
-                </a>
-            </div>
-        </div>
+        <h1>🌌 La Nebulosa del Granchio</h1>
+        <p style="text-align: center; font-size: 1.1rem; color: #666;">Un laboratorio cosmico per studiare l'Universo estremo</p>
     </header>
+    
+    <main>
+        <section class="hero-section">
+            <img src="../crab nebula materials/heart of crab nebula.png" alt="Il cuore della Nebulosa del Granchio" class="hero-image">
+        </section>
 
-    <main class="container">
-        <!-- Immagine Reale -->
-        <section class="card">
-            <h2>🦀 Crab Nebula: La Candela Standard</h2>
-            <div style="text-align: center; margin: 24px 0;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Crab_Nebula.jpg/800px-Crab_Nebula.jpg" 
-                     alt="Crab Nebula - NASA/ESA Hubble Space Telescope" 
-                     style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">
-                    📸 <strong>Crab Nebula</strong> - Immagine composita Hubble Space Telescope (NASA/ESA)<br>
-                    La nebulosa è il resto della supernova SN 1054, osservata dagli astronomi cinesi nel 1054 d.C.<br>
-                    Al centro si trova la Crab Pulsar, stella di neutroni che ruota 30 volte al secondo.
-                </p>
-                <div style="margin-top: 18px;">
-                    <a href="crab-nebula-simulator.html" class="btn btn-primary" style="font-size:1.05rem; padding:12px 28px;">
-                        🚀 Avvia Simulatore Crab (Apri)
-                    </a>
+        <section id="introduzione">
+            <h2>📖 Introduzione</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>La <strong>Nebulosa del Granchio</strong> (Crab Nebula, M1, NGC 1952) rappresenta uno degli oggetti astrofisici più iconici e studiati dell'Universo. Resti di una supernova esplosa nel <strong>1054 d.C.</strong>, la nebulosa è alimentata da una pulsar centrale che accelera particelle a energie estreme, generando emissioni che spaziano dalle onde radio fino ai raggi gamma di altissima energia (TeV–PeV).</p>
+                    <p>La sua luminosità e la varietà di processi fisici coinvolti la rendono un <em>laboratorio naturale</em> per lo studio dell'accelerazione di particelle, della radiazione di sincrotrone e del Compton inverso, nonché delle dinamiche dei plasmi magnetizzati.</p>
+                    <div class="highlight-box">
+                        <h3>💡 Lo sapevi?</h3>
+                        <p>La supernova del 1054 fu osservata dagli astronomi cinesi e arabi, che la descrissero come una "stella ospite" visibile anche di giorno per 23 giorni!</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../crab nebula materials/Crab Nebula's powerful gamma rays beams.png" alt="Raggi gamma della Nebulosa del Granchio">
+                        <figcaption>I potenti fasci di raggi gamma emessi dalla pulsar al centro della nebulosa</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
 
-        <!-- Introduzione -->
-        <section class="card">
-            <h2>📍 La Candela Standard dell'Astronomia Gamma</h2>
-            <p>
-                La <strong>Nebulosa del Granchio</strong> è situata nella costellazione del Toro a circa 
-                <strong>6500 anni luce</strong> dalla Terra. È considerata la <strong>"candela standard"</strong> 
-                dell'astronomia gamma perché:
-            </p>
-            <ul>
-                <li>📍 <strong>Sorgente puntiforme</strong>: Dimensione angolare ~4' (molto piccola per IACT)</li>
-                <li>🔄 <strong>Emissione stabile</strong>: Flusso costante nel tempo (±5% variazioni)</li>
-                <li>⚡ <strong>Spettro ben noto</strong>: Studiata da 50-60 GeV fino a 100+ TeV</li>
-                <li>🎯 <strong>Riferimento di calibrazione</strong>: Usata per verificare performance strumentali</li>
-            </ul>
-        </section>
-
-        <!-- Fisica della Sorgente -->
-        <section class="card">
-            <h2>⚙️ Fisica della Crab Nebula</h2>
+        <section id="osservazioni">
+            <h2>🔭 Osservazioni e Strumenti</h2>
+            <p>Negli ultimi decenni, osservatori spaziali e telescopi a terra hanno prodotto una ricca collezione di immagini e dati multi-spettrali. Queste osservazioni hanno permesso di visualizzare la distribuzione spaziale dell'emissione gamma, di confrontarla con le strutture osservate in altre bande (radio, ottico, X, infrarosso) e di testare modelli teorici sui meccanismi di emissione.</p>
             
-            <h3>🌟 La Pulsar del Granchio</h3>
-            <p>
-                Al centro della nebulosa si trova la <strong>Crab Pulsar (PSR B0531+21)</strong>, 
-                una stella di neutroni che ruota <strong>~30 volte al secondo</strong>. Questa 
-                rotazione ultra-rapida genera:
-            </p>
-            <ul>
-                <li><strong>Vento relativistico</strong>: Particelle accelerate a energie estreme</li>
-                <li><strong>Campo magnetico intenso</strong>: B ~ 10¹² Gauss</li>
-                <li><strong>Emissione pulsata</strong>: Dalle onde radio ai raggi gamma (>100 GeV)</li>
-            </ul>
-
-            <h3>💨 Vento della Pulsar e Nebulosa</h3>
-            <p>
-                Il vento della pulsar si scontra con il materiale espulso dalla supernova, 
-                creando una <strong>nebulosa a vento di pulsar (PWN - Pulsar Wind Nebula)</strong>. 
-                In questa regione:
-            </p>
-            <ul>
-                <li>Gli <strong>elettroni e positroni</strong> vengono accelerati a energie ultra-relativistiche (fino a PeV)</li>
-                <li>Queste particelle interagiscono con fotoni ambientali tramite <strong>Compton inverso</strong></li>
-                <li>Il risultato è l'emissione di <strong>raggi gamma</strong> da GeV a multi-TeV</li>
-            </ul>
-
-            <h3>📊 Caratteristiche Spettrali</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parametro</th>
-                        <th>Valore</th>
-                        <th>Nota</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Flusso (>1 TeV)</strong></td>
-                        <td>~2 × 10⁻¹¹ cm⁻² s⁻¹</td>
-                        <td>Usato come unità "Crab Units"</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Indice spettrale</strong></td>
-                        <td>Γ ~ 2.6-2.7</td>
-                        <td>Spettro di tipo power-law</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Cutoff energetico</strong></td>
-                        <td>>100 TeV</td>
-                        <td>Limite superiore ancora incerto</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Variabilità</strong></td>
-                        <td><5%</td>
-                        <td>Eccetto rare flare ottici</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Parametri IACT Tipici -->
-        <section class="card">
-            <h2>📸 Firma Cherenkov della Crab Nebula</h2>
-            <p>
-                Le osservazioni IACT della Crab mostrano caratteristiche distintive che la 
-                rendono facilmente riconoscibile:
-            </p>
-
-            <h3>Parametri di Hillas Tipici</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parametro</th>
-                        <th>Range Tipico</th>
-                        <th>Valore Medio</th>
-                        <th>Interpretazione</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Length</strong></td>
-                        <td>0.20° - 0.30°</td>
-                        <td>~0.25°</td>
-                        <td>Tracce compatte, energia moderata (~1 TeV)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Width</strong></td>
-                        <td>0.05° - 0.10°</td>
-                        <td>~0.08°</td>
-                        <td>Sciami sottili, ben collimati</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Size</strong></td>
-                        <td>800 - 1200 p.e.</td>
-                        <td>~1000 p.e.</td>
-                        <td>Corrispondente a E ~ 0.5-2 TeV</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Alpha (α)</strong></td>
-                        <td>0° - 5°</td>
-                        <td>~0° (picco)</td>
-                        <td>Sorgente puntiforme → α → 0°</td>
-                    </tr>
-                    <tr>
-                        <td><strong>L/W Ratio</strong></td>
-                        <td>2.5 - 4.0</td>
-                        <td>~3.1</td>
-                        <td>Ellissi allungate e regolari</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>🎯 Caratteristiche Distintive</h3>
-            <ul>
-                <li><strong>Coerenza stereoscopica eccellente</strong>: I parametri di Hillas sono molto simili tra le 3 camere (varianza inter-camera bassa: σ ~ 5-10%)</li>
-                <li><strong>Alpha clustering</strong>: Forte picco a α ~ 0°, distribuzioni strette (σ_α ~ 2-3°)</li>
-                <li><strong>Forme regolari</strong>: Ellissi pulite senza irregolarità o doppi picchi</li>
-                <li><strong>Size consistente</strong>: Distribuzioni di Size centrate attorno a 1000 p.e. con spread moderato</li>
-            </ul>
-
-            <h3>📐 Conversione Angolare</h3>
-            <p>
-                Nella simulazione usiamo la conversione: <strong>1° = 100 pixel</strong>
-            </p>
-            <ul>
-                <li>Length ~ 0.25° → <strong>25 pixel</strong></li>
-                <li>Width ~ 0.08° → <strong>8 pixel</strong></li>
-                <li>Campo di vista camera: 1500×1000 px → <strong>15° × 10°</strong></li>
-            </ul>
-        </section>
-
-        <!-- Link al Simulatore -->
-        <section class="card" style="text-align: center; background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 2px solid var(--accent-purple);">
-            <h2>🎮 Simulatore IACT Interattivo</h2>
-            <p style="font-size: 1.1rem; margin: 24px 0;">
-                Vuoi vedere come i telescopi Cherenkov rilevano i raggi gamma dalla Crab Nebula?
-            </p>
-            <p style="color: var(--text-secondary); margin-bottom: 32px;">
-                Il simulatore mostra in tempo reale come 3 telescopi catturano lo stesso evento da angolazioni diverse,
-                permettendoti di analizzare i parametri di Hillas e la ricostruzione stereoscopica.
-            </p>
-            <a href="crab-nebula-simulator.html" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 48px;">
-                🚀 Avvia Simulatore Crab Nebula
-            </a>
-        </section>
-
-        <!-- Simulatore (OLD - nascosto) -->
-        <section class="card simulator-section" style="display: none;">
-            <h2>🎮 Simulatore IACT - Crab Nebula</h2>
-            <p>
-                Questa simulazione mostra come apparirebbe un evento gamma dalla Crab Nebula 
-                osservato da <strong>3 telescopi Cherenkov</strong> in configurazione stereoscopica.
-            </p>
-            <p style="color: var(--text-secondary); font-size: 0.95em;">
-                💡 <strong>Nota</strong>: Clicca su "Genera Evento" per simulare l'arrivo di un fotone gamma. 
-                Osserva come le 3 camere catturano lo stesso sciame da angolazioni diverse, 
-                producendo parametri di Hillas coerenti con la caratteristica "firma" della Crab.
-            </p>
-
-            <div style="text-align: center; margin: 24px 0;">
-                <button id="generateBtn" class="btn btn-primary">🌟 Genera Evento Crab</button>
-                <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
-            </div>
-
-            <!-- 3 Camere -->
-            <div class="cameras-grid">
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 1 (Nord)</div>
-                    <canvas id="cam1" class="camera-canvas" width="900" height="600"></canvas>
-                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
-                </div>
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 2</div>
-                    <canvas id="cam2" class="camera-canvas" width="900" height="600"></canvas>
-                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
-                </div>
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 3</div>
-                    <canvas id="cam3" class="camera-canvas" width="900" height="600"></canvas>
-                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="900" height="600"></canvas>
-                </div>
-            </div>
-
-            <!-- Pannello Parametri di Hillas -->
-            <div class="hillas-panel">
-                <h3>📊 Parametri di Hillas Misurati</h3>
-                <div id="hillasDisplay">
-                    <p style="text-align: center; color: var(--text-secondary);">
-                        Genera un evento per visualizzare i parametri di Hillas
-                    </p>
-                </div>
-            </div>
-
-            <!-- Ricostruzione Stereoscopica -->
-            <div class="stereo-container">
-                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                    La triangolazione dagli assi delle 3 ellissi determina la direzione di arrivo del fotone gamma
-                </p>
-                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
+            <div class="instruments-grid">
+                <div class="instrument-tag">Fermi LAT</div>
+                <div class="instrument-tag">AGILE</div>
+                <div class="instrument-tag">H.E.S.S.</div>
+                <div class="instrument-tag">MAGIC</div>
+                <div class="instrument-tag">VERITAS</div>
+                <div class="instrument-tag">Chandra</div>
+                <div class="instrument-tag">XMM-Newton</div>
+                <div class="instrument-tag">Hubble</div>
+                <div class="instrument-tag">Spitzer</div>
+                <div class="instrument-tag">JWST</div>
             </div>
         </section>
 
-        <!-- Confronto con Altre Sorgenti -->
-        <section class="card">
-            <h2>⚖️ Confronto con Altre Sorgenti</h2>
-            <p>
-                La Crab Nebula serve da riferimento per caratterizzare altre sorgenti. 
-                Ecco le principali differenze:
-            </p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Caratteristica</th>
-                        <th>Crab Nebula</th>
-                        <th>PeVatron</th>
-                        <th>Blazar</th>
-                        <th>GRB</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Length</strong></td>
-                        <td>~0.25° (compatta)</td>
-                        <td>~0.40° (estesa)</td>
-                        <td>~0.15° (piccola)</td>
-                        <td>~0.18° (variabile)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Size</strong></td>
-                        <td>~1000 p.e.</td>
-                        <td>>2000 p.e. ⚡</td>
-                        <td>~1200 p.e.</td>
-                        <td>~1500 p.e.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Alpha</strong></td>
-                        <td>~0° (picco stretto)</td>
-                        <td>5-15° (disperso)</td>
-                        <td>~0° (punto)</td>
-                        <td>~0° (iniziale)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Variabilità</strong></td>
-                        <td>Stabile (<5%)</td>
-                        <td>Moderata</td>
-                        <td>Alta (ore-giorni)</td>
-                        <td>Estrema (sec)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Coerenza</strong></td>
-                        <td>Eccellente (σ~5%)</td>
-                        <td>Buona (σ~10%)</td>
-                        <td>Eccellente</td>
-                        <td>Buona</td>
-                    </tr>
-                </tbody>
-            </table>
+        <section id="spettro-gamma">
+            <h2>📊 Lo Spettro Gamma</h2>
+            <p>Lo spettro gamma della Nebulosa del Granchio copre oltre <strong>dieci ordini di grandezza</strong> in energia, dai GeV ai PeV. I dati sono raccolti da diversi strumenti:</p>
+            <ul>
+                <li><strong>Fermi-LAT</strong> (cerchi rosa): copre la banda GeV–centinaia di GeV, mostrando la transizione tra emissione di sincrotrone e Compton inverso.</li>
+                <li><strong>MAGIC, H.E.S.S., HEGRA, HAWC, Tibet AS-γ, LHAASO</strong>: coprono la banda TeV–PeV, evidenziando la presenza di fotoni gamma di energia superiore a 1 PeV, tra le più alte mai osservate da una sorgente astrofisica.</li>
+            </ul>
+            <p style="font-size: 0.9rem; color: #666;"><em>Fonte: Amato & Olmi (2021), dati da Fermi-LAT, MAGIC, H.E.S.S., HEGRA, HAWC, Tibet AS-γ, LHAASO</em></p>
         </section>
 
-        <!-- Osservazioni Reali -->
-        <section class="card">
-            <h2>🔬 Osservazioni Reali della Crab</h2>
+        <section id="processi-fisici">
+            <h2>⚡ Processi Fisici</h2>
             
-            <h3>Scoperta in Raggi Gamma</h3>
-            <p>
-                La Crab Nebula è stata una delle prime sorgenti TeV confermate:
-            </p>
-            <ul>
-                <li><strong>1989</strong>: Prima rilevazione da parte del Whipple Observatory (>1 TeV)</li>
-                <li><strong>Anni '90-2000</strong>: Conferme da HEGRA, CAT, VERITAS</li>
-                <li><strong>2004-2005</strong>: Osservazioni dettagliate con MAGIC e H.E.S.S.</li>
-                <li><strong>2011</strong>: Fermi-LAT rileva "flare" inattesi a energie >100 MeV</li>
-            </ul>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <div class="process-card">
+                        <h3>Radiazione di Sincrotrone</h3>
+                        <p>Quando un elettrone (o altra particella carica) viaggia quasi alla velocità della luce e viene deviato da un campo magnetico, emette radiazione elettromagnetica. Questa radiazione copre un ampio spettro, dalla radio ai raggi X, ed è molto intensa e polarizzata.</p>
+                        <p><strong>Nella Nebulosa del Granchio:</strong> gli elettroni accelerati dalla pulsar centrale spiraleggiano nei campi magnetici, producendo la brillante emissione visibile e radio.</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../crab nebula materials/synchrotron_radiation.png" alt="Radiazione di sincrotrone">
+                        <figcaption>Schema della radiazione di sincrotrone: elettroni che spiraleggiano in un campo magnetico</figcaption>
+                    </figure>
+                </div>
+            </div>
 
-            <h3>📈 Performance come Riferimento</h3>
-            <p>
-                Gli osservatori IACT usano la Crab per:
-            </p>
-            <ul>
-                <li><strong>Calibrazione</strong>: Verificare che l'array funzioni correttamente</li>
-                <li><strong>Sensibilità</strong>: Misurare il tempo necessario per rilevare "1 Crab" (tipicamente ~25 ore per 5σ a E>1 TeV)</li>
-                <li><strong>Risoluzione angolare</strong>: Testare la precisione di ricostruzione (~0.1° @ 1 TeV)</li>
-                <li><strong>Risoluzione energetica</strong>: Verificare ΔE/E ~ 10-15%</li>
-            </ul>
-
-            <h3>🎓 Importanza Scientifica</h3>
-            <p>
-                Nonostante sia studiata da decenni, la Crab rimane oggetto di ricerca attiva:
-            </p>
-            <ul>
-                <li><strong>Cutoff energetico</strong>: Dove si ferma lo spettro? HAWC ha visto emissione >100 TeV</li>
-                <li><strong>Flare ottici</strong>: Eventi improvvisi nel "wisp" interno alla nebulosa</li>
-                <li><strong>Fisica della pulsar</strong>: Meccanismi di emissione pulsata ad alta energia</li>
-                <li><strong>Accelerazione</strong>: Come si raggiungono energie PeV?</li>
-            </ul>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <div class="process-card">
+                        <h3>Compton Inverso</h3>
+                        <p>Un fotone a bassa energia (radio, infrarosso, microonde) urta un elettrone relativistico. L'elettrone trasferisce parte della sua energia al fotone, che "sale di livello" diventando un fotone gamma.</p>
+                        <p><strong>Importanza:</strong> questo processo è fondamentale per spiegare la componente gamma ad altissima energia della Nebulosa del Granchio, quella che emerge sopra i 450 MeV.</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../crab nebula materials/Inverse Compton.webp" alt="Schema del processo di Compton inverso">
+                        <figcaption>Il processo di Compton inverso: un fotone a bassa energia viene "potenziato" da un elettrone relativistico</figcaption>
+                    </figure>
+                </div>
+            </div>
         </section>
 
-        <!-- Prossimi Passi -->
-        <section class="card">
-            <h2>🚀 Esplora Altre Sorgenti</h2>
-            <p>
-                Ora che hai visto la "sorgente di riferimento", esplora sorgenti più estreme:
-            </p>
-            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
-                <a href="supernova-remnants.html" class="btn btn-primary">💥 Resti di Supernova (PeVatron)</a>
-                <a href="blazars.html" class="btn btn-primary">🌀 Blazar (AGN)</a>
-                <a href="comparison.html" class="btn btn-secondary">📊 Tabella Comparativa</a>
+        <section id="pulsar">
+            <h2>🌟 La Pulsar Centrale</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>Al centro della Nebulosa del Granchio si trova una <strong>pulsar</strong>, una stella di neutroni che ruota su se stessa circa 30 volte al secondo. Questo oggetto compatto, con un diametro di appena 20 km ma una massa superiore a quella del Sole, è il "motore" che alimenta l'intera nebulosa.</p>
+                    <div class="highlight-box">
+                        <h3>⚙️ Come funziona?</h3>
+                        <p>La rotazione rapidissima della pulsar genera campi magnetici intensissimi che accelerano le particelle cariche a velocità prossime a quella della luce, producendo i fasci di radiazione che osserviamo.</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../crab nebula materials/pulsar and gamma rays.webp" alt="Pulsar e raggi gamma">
+                        <figcaption>Rappresentazione artistica della pulsar e dei suoi fasci di raggi gamma</figcaption>
+                    </figure>
+                </div>
             </div>
         </section>
     </main>
-
-    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
-        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    
+    <footer>
+        <p>📚 Pagina creata per studenti di quinta liceo scientifico | GammaLab 2025</p>
     </footer>
-
-    <script src="../js/core-simulation.js?v=7"></script>
-    <script src="../js/source-profiles.js?v=7"></script>
-    <script src="../js/hillas-analysis.js?v=7"></script>
-    <script src="../js/visualization.js?v=20"></script>
-    <script src="../js/stereo-reconstruction.js?v=7"></script>
-    <script src="../js/navigation.js?v=7"></script>
-    <script src="../js/lightbox.js"></script>
-    <script>
-        // === SIMULATORE CRAB NEBULA ===
-        let engine, renderers, hillasAnalyzer, colorPalette;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inizializza componenti
-            engine = new SimulationEngine();
-            hillasAnalyzer = new HillasAnalyzer();
-            colorPalette = new EnergyColorPalette();
-            engine.colorPalette = colorPalette;
-
-            // Inizializza renderers per 3 camere
-            renderers = [
-                new CanvasRenderer('cam1', 'cam1-overlay'),
-                new CanvasRenderer('cam2', 'cam2-overlay'),
-                new CanvasRenderer('cam3', 'cam3-overlay')
-            ];
-
-            // Assegna nuova palette e modalità ellissi hover a tutti i renderers
-            renderers.forEach(renderer => {
-                renderer.colorPalette = colorPalette;
-                if (typeof renderer.enableHoverHillasMode === 'function') {
-                    renderer.enableHoverHillasMode();
-                }
-
-                if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
-                    renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
-                }
-            });
-
-            console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
-
-            // Event listeners
-            document.getElementById('generateBtn').addEventListener('click', generateCrabEvent);
-            document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
-
-            console.log('✅ Simulatore Crab Nebula inizializzato');
-            
-            // Auto-genera primo evento
-            setTimeout(() => {
-                console.log('🎬 Auto-generating initial Crab event...');
-                generateCrabEvent();
-            }, 500);
-        });
-
-        /**
-         * Genera evento Crab Nebula completo (3 camere + stereo)
-         */
-        function generateCrabEvent() {
-            console.log('🦀 Generazione evento Crab Nebula...');
-
-            const crabProfile = getSourceProfile('crab');
-            const events = [];
-            const hillasParams = [];
-            const hillasMap = {};
-
-            // Genera per 3 camere
-            for (let i = 0; i < 3; i++) {
-                const cameraId = i + 1;
-                const camKey = `cam${cameraId}`;
-                
-                // Genera evento
-                const event = engine.generateEvent(crabProfile, cameraId);
-                events.push(event);
-
-                // Rendering con palette già configurata
-                renderers[i].renderEvent(event, i === 0);
-                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
-
-                // Calcola Hillas
-                const hillas = hillasAnalyzer.analyze(event);
-                if (hillas && hillas.valid) {
-                    hillasParams.push(hillas);
-                    hillasMap[camKey] = hillas;
-                    renderers[i].renderHillasOverlay(hillas);
-                }
-
-                console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
-            }
-
-            // Ricostruzione stereoscopica avanzata
-            const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas && hillasParams.length >= 2) {
-                if (typeof window.renderStereoReconstruction === 'function') {
-                    // Usa nuova stereo reconstruction
-                    console.log('🔺 Rendering ricostruzione stereoscopica avanzata');
-                    window.renderStereoReconstruction(stereoCanvas, hillasMap, {
-                        showGeometry: true,
-                        showCameraPositions: true,
-                        showArrows: true,
-                        showArrivalDirection: true
-                    });
-                } else {
-                    // Fallback a stereo semplice locale
-                    const stereoResult = combineStereoscopicEvents(events);
-                    renderStereoReconstructionSimple(stereoResult);
-                }
-            }
-
-            // Mostra parametri Hillas
-            displayHillasParameters(hillasParams);
-
-            // Mostra comparazione
-            if (hillasParams.length >= 2) {
-                const comparison = compareHillasAcrossCameras(hillasParams);
-                displayCoherence(comparison);
-            }
-        }
-
-        /**
-         * Renderizza ricostruzione stereoscopica semplice (fallback)
-         */
-        function renderStereoReconstructionSimple(stereoResult) {
-            const canvas = document.getElementById('stereo');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#000814';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Disegna direzioni da ogni camera
-            const colors = ['#ff4444', '#44ff44', '#4444ff'];
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-
-            stereoResult.events.forEach((event, idx) => {
-                const hillas = hillasAnalyzer.analyze(event);
-                if (!hillas) return;
-
-                const theta = hillas.theta * Math.PI / 180;
-                const length = 200;
-
-                ctx.strokeStyle = colors[idx];
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(
-                    centerX + length * Math.cos(theta),
-                    centerY + length * Math.sin(theta)
-                );
-                ctx.stroke();
-
-                // Label
-                ctx.fillStyle = colors[idx];
-                ctx.font = 'bold 14px "Courier New"';
-                ctx.fillText(`Cam${idx+1}`, centerX + length * Math.cos(theta) + 10, centerY + length * Math.sin(theta));
-            });
-
-            // Punto di intersezione stimato
-            ctx.fillStyle = '#ffff00';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
-            ctx.fill();
-
-            // Info
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '16px "Courier New"';
-            ctx.fillText('Ricostruzione Stereoscopica', 20, 30);
-            ctx.font = '14px "Courier New"';
-            ctx.fillText(`Coerenza: ${(stereoResult.coherence * 100).toFixed(1)}%`, 20, 55);
-            ctx.fillText(`Camere: ${stereoResult.numCameras}`, 20, 75);
-        }
-
-        /**
-         * Mostra parametri Hillas nel pannello
-         */
-        function displayHillasParameters(hillasArray) {
-            const container = document.getElementById('hillasDisplay');
-            if (!container || hillasArray.length === 0) return;
-
-            let html = '<h4>Parametri di Hillas per Camera</h4>';
-            
-            hillasArray.forEach((hillas, idx) => {
-                html += `
-                    <div style="margin-bottom: 20px; padding: 12px; background: rgba(0, 40, 80, 0.3); border-radius: 8px;">
-                        <h5 style="color: #00d9ff; margin-bottom: 10px;">📷 Camera ${idx + 1}</h5>
-                        <table style="width: 100%; font-family: 'Courier New', monospace; font-size: 13px;">
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>Length:</strong></td>
-                                <td>${hillas.length.toFixed(3)}° (${hillas.lengthPx.toFixed(1)} px)</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>Width:</strong></td>
-                                <td>${hillas.width.toFixed(3)}° (${hillas.widthPx.toFixed(1)} px)</td>
-                            </tr>
-                            <tr style="background: rgba(255, 200, 0, 0.1);">
-                                <td style="padding: 4px 8px;"><strong>Size:</strong></td>
-                                <td><span style="color: #ffc800;">${hillas.size.toFixed(0)} p.e.</span></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>Alpha:</strong></td>
-                                <td>${hillas.alpha.toFixed(1)}°</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>L/W Ratio:</strong></td>
-                                <td>${hillas.elongation.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>Miss:</strong></td>
-                                <td>${hillas.miss.toFixed(2)}°</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 4px 8px;"><strong>Fotoni:</strong></td>
-                                <td>${hillas.numPhotons}</td>
-                            </tr>
-                        </table>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        /**
-         * Mostra coerenza inter-camera
-         */
-        function displayCoherence(comparison) {
-            const container = document.getElementById('hillasDisplay');
-            if (!container) return;
-
-            const coherenceColor = comparison.coherence > 90 ? '#00ff88' : 
-                                    comparison.coherence > 80 ? '#ffaa00' : '#ff4444';
-
-            container.innerHTML += `
-                <div style="margin-top: 24px; padding: 16px; background: rgba(0, 80, 40, 0.3); border-radius: 8px; border: 2px solid ${coherenceColor};">
-                    <h4 style="color: ${coherenceColor};">📊 Analisi Stereoscopica</h4>
-                    <p><strong>Coerenza Inter-Camera:</strong> <span style="color: ${coherenceColor}; font-size: 20px;">${comparison.coherence.toFixed(1)}%</span></p>
-                    <p style="font-size: 13px; color: var(--text-secondary);">
-                        ${comparison.coherence > 90 ? '✅ Eccellente - Evento gamma altamente probabile' :
-                          comparison.coherence > 80 ? '⚠️ Buona - Probabile evento gamma' :
-                          '❌ Bassa - Possibile contaminazione adronica'}
-                    </p>
-                    <table style="width: 100%; margin-top: 12px; font-family: 'Courier New', monospace; font-size: 13px;">
-                        <tr style="background: rgba(255,255,255,0.05);">
-                            <th style="padding: 6px; text-align: left;">Parametro</th>
-                            <th style="padding: 6px;">Media</th>
-                            <th style="padding: 6px;">Varianza</th>
-                        </tr>
-                        <tr>
-                            <td style="padding: 6px;">Length</td>
-                            <td style="padding: 6px; text-align: center;">${comparison.average.length.toFixed(3)}°</td>
-                            <td style="padding: 6px; text-align: center;">±${comparison.variance.length.toFixed(3)}°</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 6px;">Width</td>
-                            <td style="padding: 6px; text-align: center;">${comparison.average.width.toFixed(3)}°</td>
-                            <td style="padding: 6px; text-align: center;">±${comparison.variance.width.toFixed(3)}°</td>
-                        </tr>
-                        <tr style="background: rgba(255,200,0,0.1);">
-                            <td style="padding: 6px;">Size</td>
-                            <td style="padding: 6px; text-align: center;"><strong>${comparison.average.size.toFixed(0)} p.e.</strong></td>
-                            <td style="padding: 6px; text-align: center;">±${comparison.variance.size.toFixed(0)} p.e.</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 6px;">Alpha</td>
-                            <td style="padding: 6px; text-align: center;">${comparison.average.alpha.toFixed(1)}°</td>
-                            <td style="padding: 6px; text-align: center;">±${comparison.variance.alpha.toFixed(1)}°</td>
-                        </tr>
-                    </table>
-                </div>
-            `;
-        }
-
-        /**
-         * Pulisce tutti i canvas
-         */
-        function clearAllCanvases() {
-            renderers.forEach(r => r.clear());
-            
-            const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas) {
-                const ctx = stereoCanvas.getContext('2d');
-                ctx.fillStyle = '#000814';
-                ctx.fillRect(0, 0, stereoCanvas.width, stereoCanvas.height);
-            }
-
-            document.getElementById('hillasDisplay').innerHTML = 
-                '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Genera un evento per visualizzare i parametri di Hillas</p>';
-            
-            console.log('🧹 Canvas puliti');
-        }
-    </script>
 </body>
 </html>
