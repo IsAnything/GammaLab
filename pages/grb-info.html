@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamma-Ray Bursts - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-image {
+            width: 100%;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .content-with-image.reverse {
+            grid-template-columns: 1fr 1.5fr;
+        }
+        
+        .content-with-image.reverse .text-content {
+            order: 2;
+        }
+        
+        .content-with-image.reverse .image-content {
+            order: 1;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .type-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #f5576c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .type-card h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        .type-card p {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .animated-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+        
+        .animated-section img {
+            max-width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .stat-box .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .content-with-image,
+            .content-with-image.reverse,
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-with-image.reverse .text-content,
+            .content-with-image.reverse .image-content {
+                order: initial;
+            }
+            
+            .image-content {
+                position: static;
+            }
+            
+            .animated-section img {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💥 Gamma-Ray Bursts (GRB)</h1>
+        <p style="text-align: center; font-size: 1.1rem; color: #666;">Le esplosioni più violente e luminose dell'Universo</p>
+    </header>
+    
+    <main>
+        <section class="hero-section">
+            <img src="../grb materials/STScI-01EVVEQAX8TDEFFPNHHP7SSSJ0 (1).jpg" alt="Gamma-Ray Burst" class="hero-image">
+        </section>
+
+        <section id="introduzione">
+            <h2>📖 Cosa sono i Gamma-Ray Bursts?</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>I <strong>Gamma-Ray Bursts (GRB)</strong> sono improvvisi lampi di raggi gamma che rappresentano gli eventi più energetici dell'Universo dopo il Big Bang. Per pochi secondi o minuti, un singolo GRB può emettere più energia di quella che il Sole produrrà in tutta la sua vita di 10 miliardi di anni!</p>
+                    <p>Scoperti per caso nel 1967 dai satelliti militari americani Vela (progettati per rilevare test nucleari), i GRB sono rimasti un mistero per decenni. Oggi sappiamo che provengono da galassie lontanissime e sono associati agli eventi più catastrofici del cosmo.</p>
+                    <div class="highlight-box">
+                        <h3>⚡ Energia Estrema</h3>
+                        <p>Un GRB può rilasciare in pochi secondi più energia di quella emessa da un'intera galassia! L'energia totale può raggiungere 10<sup>44</sup> joule, equivalente a convertire diverse masse solari in pura energia.</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../grb materials/compact object.png" alt="Oggetto compatto">
+                        <figcaption>Un oggetto compatto ultra-denso al centro di un GRB</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="statistiche">
+            <h2>📊 I Numeri dei GRB</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">Durata Media</div>
+                    <div class="number">0.1-100s</div>
+                    <div class="label">Brevi o Lunghi</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Frequenza</div>
+                    <div class="number">~1/giorno</div>
+                    <div class="label">Nell'Universo osservabile</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Energia Picco</div>
+                    <div class="number">0.1-1 MeV</div>
+                    <div class="label">Raggi gamma</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Distanza Tipica</div>
+                    <div class="number">> 1 Gpc</div>
+                    <div class="label">Miliardi di anni luce</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tipologie">
+            <h2>🔍 Due Tipologie Principali</h2>
+            
+            <div class="comparison-grid">
+                <div class="type-card">
+                    <h3>⏱️ GRB Brevi (Short GRB)</h3>
+                    <p><strong>Durata:</strong> < 2 secondi</p>
+                    <p><strong>Origine:</strong> Fusione di stelle di neutroni o di una stella di neutroni con un buco nero</p>
+                    <p><strong>Caratteristiche:</strong></p>
+                    <ul>
+                        <li>Spettro più duro (energie più alte)</li>
+                        <li>Associati a galassie ellittiche vecchie</li>
+                        <li>Onde gravitazionali rilevabili!</li>
+                        <li>Producono elementi pesanti (oro, platino)</li>
+                    </ul>
+                </div>
+                
+                <div class="type-card">
+                    <h3>⏳ GRB Lunghi (Long GRB)</h3>
+                    <p><strong>Durata:</strong> > 2 secondi (fino a minuti)</p>
+                    <p><strong>Origine:</strong> Collasso di stelle massicce (>25 masse solari) - Ipernove o Collapsar</p>
+                    <p><strong>Caratteristiche:</strong></p>
+                    <ul>
+                        <li>Spettro più morbido</li>
+                        <li>Associati a galassie con formazione stellare</li>
+                        <li>Seguiti da supernova</li>
+                        <li>Creano buchi neri stellari</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="meccanismo">
+            <h2>⚙️ Il Meccanismo dei GRB</h2>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <h3>Il Modello del "Fireball"</h3>
+                    <p>Il meccanismo che genera un GRB segue questo processo:</p>
+                    <ol>
+                        <li><strong>Evento Catastrofico:</strong> Collasso di una stella massiccia o fusione di oggetti compatti</li>
+                        <li><strong>Formazione del Buco Nero:</strong> Si forma un buco nero rapidamente rotante circondato da un disco di accrescimento</li>
+                        <li><strong>Getti Relativistici:</strong> Vengono espulsi due getti di materia ai poli, che viaggiano quasi alla velocità della luce (γ > 100)</li>
+                        <li><strong>Emissione Prompt:</strong> I getti producono il lampo gamma iniziale per collisioni interne</li>
+                        <li><strong>Afterglow:</strong> L'interazione con il mezzo circostante produce emissioni più deboli e durature in raggi X, ottico e radio</li>
+                    </ol>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../grb materials/Gamma-ray-burst-Mechanism.jpg" alt="Meccanismo di un GRB">
+                        <figcaption>Schema del meccanismo di formazione di un Gamma-Ray Burst con i getti relativistici</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="animazioni" class="animated-section">
+            <h2>🎬 Visualizzazioni NASA</h2>
+            <p>Ecco come gli astronomi visualizzano l'evoluzione di un Gamma-Ray Burst:</p>
+            
+            <div style="margin: 2rem 0;">
+                <img src="../grb materials/NASA's_Guide_to_Visiting_a_Gamma-Ray_Burst_(SVS14355_-_ShortGRB).gif" alt="NASA Short GRB Animation">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Animazione NASA di un Short GRB prodotto dalla fusione di stelle di neutroni</p>
+            </div>
+            
+            <div style="margin: 3rem 0;">
+                <img src="../grb materials/biLuD.gif" alt="GRB Animation">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Visualizzazione della propagazione dei getti relativistici</p>
+            </div>
+            
+            <div style="margin: 3rem 0;">
+                <img src="../grb materials/aniHubble_0.gif" alt="Hubble GRB Observation">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Osservazioni Hubble dell'afterglow di un GRB</p>
+            </div>
+        </section>
+
+        <section id="importanza">
+            <h2>🌟 Perché Studiare i GRB?</h2>
+            <div class="type-card">
+                <h3>Importanza Scientifica</h3>
+                <p>I Gamma-Ray Bursts sono fondamentali per la ricerca astrofisica moderna:</p>
+                <ul>
+                    <li><strong>Cosmologia:</strong> Fungono da "fari" per studiare l'Universo primordiale grazie alla loro luminosità estrema</li>
+                    <li><strong>Fisica Estrema:</strong> Permettono di testare la fisica in condizioni impossibili da riprodurre sulla Terra</li>
+                    <li><strong>Nucleosintesi:</strong> I short GRB producono elementi pesanti attraverso il processo r (rapid neutron capture)</li>
+                    <li><strong>Onde Gravitazionali:</strong> GW170817 (2017) ha confermato che i short GRB sono associati a fusioni di stelle di neutroni</li>
+                    <li><strong>Fine della Vita Stellare:</strong> Rivelano i destini finali delle stelle più massicce</li>
+                </ul>
+            </div>
+            
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <h3>🔬 Missioni Dedicate</h3>
+                <p><strong>Swift</strong> (NASA, 2004-presente): Satellite specializzato nel rilevamento rapido e osservazione multi-lunghezza d'onda dei GRB</p>
+                <p><strong>Fermi</strong> (NASA, 2008-presente): Osserva GRB alle alte energie con lo strumento GBM (Gamma-ray Burst Monitor)</p>
+                <p><strong>INTEGRAL</strong> (ESA, 2002-presente): Telescopio spaziale per raggi gamma che ha osservato centinaia di GRB</p>
+            </div>
+        </section>
+
+        <section id="record">
+            <h2>🏆 GRB Record</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">GRB più distante</div>
+                    <div class="number">GRB 090429B</div>
+                    <div class="label">z = 9.4 (13.1 miliardi di anni luce)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB più luminoso</div>
+                    <div class="number">GRB 080916C</div>
+                    <div class="label">10<sup>54</sup> erg di energia totale</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB più lungo</div>
+                    <div class="number">GRB 111209A</div>
+                    <div class="label">Durata: ~7 ore!</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB più vicino (con onde gravitazionali)</div>
+                    <div class="number">GRB 170817A</div>
+                    <div class="label">130 milioni di anni luce</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>📚 Pagina creata per studenti di quinta liceo scientifico | GammaLab 2025</p>
+    </footer>
+</body>
+</html>
