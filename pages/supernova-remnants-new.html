@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resti di Supernova - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-images {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-images img {
+            width: 32%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .content-with-image.reverse {
+            grid-template-columns: 1fr 1.5fr;
+        }
+        
+        .content-with-image.reverse .text-content {
+            order: 2;
+        }
+        
+        .content-with-image.reverse .image-content {
+            order: 1;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #ff6644 0%, #ff8866 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(255, 102, 68, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #ff6644;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-images {
+                flex-direction: column;
+            }
+            
+            .hero-images img {
+                width: 100%;
+            }
+            
+            .content-with-image,
+            .content-with-image.reverse {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-with-image.reverse .text-content,
+            .content-with-image.reverse .image-content {
+                order: initial;
+            }
+            
+            .image-content {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">💥 Resti di Supernova - PeVatron: Acceleratori Cosmici Estremi</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html" class="active">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb-complete.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="supernova-remnants-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore PeVatron
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <div class="hero-images">
+                <img src="../resto di supernova/tycho supernova.png" alt="Resto di Supernova Tycho">
+                <img src="../resto di supernova/Supernova.gif" alt="Animazione esplosione supernova">
+                <img src="../resto di supernova/1987A con didascalia.png" alt="Supernova 1987A">
+            </div>
+        </section>
+
+        <section id="introduzione">
+            <h2>💥 Cosa sono i Resti di Supernova?</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        In astronomia, un <strong>resto di supernova</strong> (SNR, Supernova Remnant) è il materiale 
+                        lasciato dalla gigantesca esplosione di una supernova.
+                    </p>
+                    <p>
+                        Questo può accadere in <strong>due modi</strong>:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Supernova a collasso del nucleo (Type II, Ib, Ic)</strong>: quando una stella molto 
+                            massiccia (M > 8 M☉) termina il suo combustibile nucleare e collassa su se stessa sotto 
+                            l'azione della propria forza di gravità
+                        </li>
+                        <li>
+                            <strong>Supernova termonucleare (Type Ia)</strong>: quando una nana bianca accumula abbastanza 
+                            materiale da una stella compagna da raggiungere la massa critica (~1.4 M☉, limite di Chandrasekhar) 
+                            e innesca una fusione nucleare esplosiva
+                        </li>
+                    </ul>
+                    <p>
+                        In entrambi i casi, l'esplosione risultante espelle con grande forza la maggior parte o tutta 
+                        la materia che componeva la stella, con velocità che possono raggiungere i <strong>10.000-30.000 km/s</strong>.
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h3>⚡ PeVatron: Acceleratori Cosmici Estremi</h3>
+                        <p>
+                            I resti di supernova sono tra le sorgenti di raggi gamma più energetiche della galassia. 
+                            I <strong>PeVatron</strong> sono SNR capaci di accelerare particelle fino a <strong>1 PeV 
+                            (10¹⁵ eV)</strong>, ovvero <strong>1000 TeV</strong> - mille volte l'energia tipica della 
+                            Crab Nebula! L'onda d'urto si propaga a migliaia di km/s, creando condizioni ideali per 
+                            l'accelerazione di particelle.
+                        </p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../resto di supernova/Progenitor_IA_supernova.svg.png" alt="Progenitore Supernova Tipo Ia">
+                        <figcaption>Sistema binario progenitore di una supernova di tipo Ia: una nana bianca accumula massa da una stella compagna fino a raggiungere il limite di Chandrasekhar</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="struttura">
+            <h2>🔬 Struttura di un Resto di Supernova</h2>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <h3>⚫ Resto Compatto</h3>
+                    <p>
+                        Nel caso dell'esplosione di una stella massiccia, il nucleo della stella può collassare così 
+                        rapidamente da formare un oggetto estremamente compatto formato da <strong>materia degenere</strong>. 
+                        Si tratta generalmente di una <strong>stella di neutroni</strong> o a volte di un <strong>buco nero</strong>, 
+                        a cui ci si riferisce come <strong>resto di supernova compatto</strong>.
+                    </p>
+                    
+                    <h3>💨 Resto Diffuso</h3>
+                    <p>
+                        In tutte le esplosioni, gli strati esterni della stella sono espulsi all'esterno a velocità 
+                        di migliaia di chilometri al secondo, dando luogo a una <strong>nube di gas e polveri in espansione</strong>. 
+                        Questa nube, che raccoglie anche il mezzo interstellare precedentemente esistente nella zona di 
+                        espansione, e che è spesso attraversata da <strong>onde d'urto</strong> generate dall'esplosione 
+                        stessa o dall'interazione tra la nube e il mezzo interstellare, è detta <strong>resto di supernova diffuso</strong>.
+                    </p>
+                    
+                    <h3>🎯 Posizione del Resto Compatto</h3>
+                    <p>
+                        Il resto di supernova compatto, quando esiste, dovrebbe trovarsi al centro di quello diffuso, 
+                        ed in alcuni casi è così (come nel caso della <strong>Nebulosa del Granchio</strong> e della 
+                        <strong>Nebulosa delle Vele</strong>).
+                    </p>
+                    <p>
+                        Spesso però l'esplosione è <strong>asimmetrica</strong>: il grosso del gas va da una parte e 
+                        l'oggetto compatto viene "sparato" nell'altra direzione con velocità che possono superare i 
+                        <strong>200 km/s</strong>. In tal caso l'oggetto compatto esce rapidamente (poche centinaia o 
+                        migliaia di anni) dal resto di supernova diffuso e diventa difficile mettere in relazione i due oggetti.
+                    </p>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../resto di supernova/Supernova_SN_2005cs.jpg" alt="Supernova SN 2005cs">
+                        <figcaption>Supernova SN 2005cs nella galassia M51 (Galassia Vortice), ripresa dal telescopio spaziale Hubble</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="evoluzione">
+            <h2>⏳ Evoluzione e Durata</h2>
+            <p>
+                Un resto di supernova diffuso è un oggetto <strong>effimero</strong>: in poche migliaia di anni si 
+                dissolve nel mezzo interstellare, che arricchisce degli <strong>elementi pesanti</strong> prodotti nel 
+                corso della vita della stella, e scompare.
+            </p>
+            <p>
+                Nonostante ciò, i resti osservabili sono <strong>numerosi</strong>, perché le supernovae esplodono al 
+                ritmo di una ogni qualche decina d'anni nella nostra galassia. Gli oggetti compatti, invece, sono 
+                <strong>immortali o quasi</strong>.
+            </p>
+            
+            <div class="highlight-box">
+                <h3>🌟 Supernova 1987A</h3>
+                <p>
+                    Il resto di supernova più famoso e più osservato con telescopi professionali, anche se piuttosto 
+                    difficile da osservare a causa della sua grande lontananza, è quello della <strong>Supernova 1987A</strong>, 
+                    la cui esplosione è stata visibile dalla Terra il <strong>23 febbraio 1987</strong>, nella Grande 
+                    Nube di Magellano, alla distanza di <strong>168.000 anni luce</strong>.
+                </p>
+                <p>
+                    È stata la supernova più luminosa osservata dalla Terra dall'invenzione del telescopio e ha 
+                    rappresentato un evento fondamentale per l'astrofisica moderna, permettendo di testare modelli 
+                    teorici e rilevare per la prima volta neutrini da una supernova.
+                </p>
+            </div>
+        </section>
+
+        <section id="fisica-pevatron">
+            <h2>⚡ Fisica dell'Accelerazione Estrema</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🌪️ Accelerazione da Shock</h3>
+                    <p>
+                        Il meccanismo principale è l'<strong>accelerazione di Fermi del primo ordine</strong> 
+                        (diffusive shock acceleration):
+                    </p>
+                    <ul>
+                        <li><strong>Onda d'urto</strong>: v<sub>shock</sub> ~ 3000-5000 km/s</li>
+                        <li><strong>Attraversamenti multipli</strong>: particelle rimbalzano avanti/indietro</li>
+                        <li><strong>Guadagno</strong>: ΔE/E ~ v<sub>shock</sub>/c ~ 1% per ciclo</li>
+                        <li><strong>Risultato</strong>: dopo ~100 cicli → energie PeV!</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🧲 Amplificazione Magnetica</h3>
+                    <p>
+                        Per raggiungere energie PeV serve <strong>B ~ 100-500 μG</strong> (vs ~3 μG tipico ISM):
+                    </p>
+                    <ul>
+                        <li><strong>Instabilità di streaming</strong>: raggi cosmici generano onde</li>
+                        <li><strong>Turbolenza</strong>: aumenta confinamento magnetico</li>
+                        <li><strong>Feedback</strong>: più particelle → più turbolenza → più accelerazione</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📘 Emissione Leptonica</h3>
+                    <p>
+                        Prodotta da <strong>elettroni</strong> ultra-relativistici:
+                    </p>
+                    <ul>
+                        <li><strong>Inverse Compton</strong>: e⁻ + fotone → γ ad alta energia</li>
+                        <li><strong>Bremsstrahlung</strong>: frenamento in campi nucleari</li>
+                        <li><strong>Caratteristiche</strong>: spettro "morbido", cutoff < 30 TeV</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📕 Emissione Adronica</h3>
+                    <p>
+                        Prodotta da <strong>protoni/nuclei</strong> accelerati:
+                    </p>
+                    <ul>
+                        <li><strong>Collisioni p-p</strong>: protone + protone → pioni (π⁰)</li>
+                        <li><strong>Decadimento</strong>: π⁰ → γγ (raggi gamma)</li>
+                        <li><strong>Caratteristiche</strong>: spettro "duro", fino a PeV</li>
+                        <li><strong>Firma</strong>: "bump" a ~70 MeV (massa pione/2)</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: #ff6644; font-weight: bold;">
+                        ⚡ Rilevare emissione adronica fino a PeV è la prova che gli SNR sono PeVatron!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="esempi">
+            <h2>🔭 PeVatron Confermati e Candidati</h2>
+            
+            <h3>🌟 Esempi Celebri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sorgente</th>
+                        <th>Tipo</th>
+                        <th>E<sub>max</sub></th>
+                        <th>Distanza</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>RX J1713.7-3946</strong></td>
+                        <td>SNR giovane</td>
+                        <td>>100 TeV</td>
+                        <td>~1 kpc</td>
+                        <td>Primo PeVatron candidato, shell-type</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cassiopeia A</strong></td>
+                        <td>SNR giovane</td>
+                        <td>~10 TeV</td>
+                        <td>3.4 kpc</td>
+                        <td>Resto di SN storica (1680 ca.)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tycho SNR</strong></td>
+                        <td>SNR giovane</td>
+                        <td>~10 TeV</td>
+                        <td>3 kpc</td>
+                        <td>SN osservata nel 1572 da Tycho Brahe</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HESS J1825-137</strong></td>
+                        <td>PWN estesa</td>
+                        <td>>50 TeV</td>
+                        <td>4 kpc</td>
+                        <td>Associata a PSR B1823-13</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LHAASO J2226+6057</strong></td>
+                        <td>PWN/SNR?</td>
+                        <td>~1 PeV ⚡</td>
+                        <td>?</td>
+                        <td>Rilevazione LHAASO a energie PeV!</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📊 Caratteristiche Comuni</h3>
+            <ul>
+                <li><strong>Età</strong>: Tipicamente SNR giovani (< 10.000 anni)</li>
+                <li><strong>Morfologia</strong>: Spesso "shell-type" (emissione a guscio, non centrale)</li>
+                <li><strong>Estensione</strong>: Sorgenti estese (diametri ~10-60 arcmin)</li>
+                <li><strong>Spettro duro</strong>: Indice spettrale Γ ~ 2.0-2.3 (più "piatto" della Crab Γ~2.6)</li>
+                <li><strong>Luminosità</strong>: L<sub>γ</sub> ~ 10³³-10³⁴ erg/s (0.1-1% dell'energia cinetica dell'esplosione)</li>
+            </ul>
+        </section>
+
+        <section id="firma-cherenkov">
+            <h2>📸 Firma Cherenkov dei PeVatron</h2>
+            <p>
+                Gli eventi gamma da <strong>PeVatron</strong> mostrano caratteristiche estreme nelle camere dei 
+                telescopi Cherenkov, nettamente distinguibili da sorgenti standard come la Crab Nebula.
+            </p>
+
+            <h3>Parametri di Hillas Tipici</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>Interpretazione Fisica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.30° - 0.50°<br>(30-50 px)</td>
+                        <td><strong>~0.40°</strong><br>(~40 px)</td>
+                        <td>⚡ Tracce molto più <em>lunghe</em> (alta energia)</td>
+                    </tr>
+                    <tr style="background: rgba(255, 102, 68, 0.05);">
+                        <td><strong>Width</strong></td>
+                        <td>0.10° - 0.20°<br>(10-20 px)</td>
+                        <td><strong>~0.15°</strong><br>(~15 px)</td>
+                        <td>🎯 Sciami più <em>ampi</em> (sviluppo laterale maggiore)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>2000 - 5000 p.e.</td>
+                        <td><strong>~2500 p.e.</strong> 🔥</td>
+                        <td>💡 Segnali <em>molto intensi</em> (E >> TeV), possibile saturazione</td>
+                    </tr>
+                    <tr style="background: rgba(255, 102, 68, 0.05);">
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>0° - 20°</td>
+                        <td><strong>~10°</strong></td>
+                        <td>📍 Sorgenti <em>estese</em> → α disperso, non punta al centro</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elongation (L/W)</strong></td>
+                        <td>2.0 - 3.5</td>
+                        <td><strong>~2.7</strong></td>
+                        <td>📏 Rapporto simile a Crab, ma valori assoluti maggiori</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <h3>🎯 Caratteristiche Distintive</h3>
+                <ul style="margin-top: 1rem;">
+                    <li>🔥 <strong>Size estremi</strong>: Il segnale chiave! Size regolarmente >2000 p.e., con picchi >5000 p.e. (vs ~1000 per Crab)</li>
+                    <li>🔥 <strong>Saturazione PMT</strong>: A energie multi-TeV, i fotomoltiplicatori possono saturare → segnale "tagliato"</li>
+                    <li>🔥 <strong>Tracce lunghe</strong>: Length ~40 px (0.40°), ben oltre i ~25 px della Crab</li>
+                    <li>🔥 <strong>Alpha disperso</strong>: Per SNR shell-type, α varia 5-20° (emissione dal bordo)</li>
+                    <li>🔥 <strong>Coerenza stereoscopica buona</strong>: Varianza inter-camera ~10-15% (leggermente superiore a Crab)</li>
+                    <li>🔥 <strong>Spettro duro</strong>: Maggiore frazione di eventi ad alta Size rispetto a spettri "morbidi"</li>
+                </ul>
+            </div>
+
+            <h3>🔬 Confronto con Altre Sorgenti</h3>
+            <div style="overflow-x: auto; margin-top: 1.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sorgente</th>
+                            <th>Length (px)</th>
+                            <th>Width (px)</th>
+                            <th>Size (p.e.)</th>
+                            <th>Alpha (°)</th>
+                            <th>Firma Distintiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🦀 Crab Nebula</td>
+                            <td>~25</td>
+                            <td>~8</td>
+                            <td>~1000</td>
+                            <td>~0</td>
+                            <td>⭐ Standard di riferimento</td>
+                        </tr>
+                        <tr>
+                            <td>🌀 Blazar</td>
+                            <td>~15</td>
+                            <td>~5</td>
+                            <td>~1200</td>
+                            <td>~0</td>
+                            <td>⚡ Compatto, variabile</td>
+                        </tr>
+                        <tr style="background: rgba(255, 102, 68, 0.1);">
+                            <td><strong>💥 PeVatron (SNR)</strong></td>
+                            <td><strong>~40</strong></td>
+                            <td><strong>~15</strong></td>
+                            <td><strong>~2500</strong> 🔥</td>
+                            <td><strong>~10</strong></td>
+                            <td><strong>🔥 Tracce lunghe e intense</strong></td>
+                        </tr>
+                        <tr>
+                            <td>⚡ GRB (afterglow)</td>
+                            <td>~15</td>
+                            <td>~8</td>
+                            <td>~1500</td>
+                            <td>~0</td>
+                            <td>💫 Simile a Blazar, transiente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+                <strong>Nota tecnica</strong>: I valori riportati si riferiscono a telescopi Cherenkov di classe 
+                MAGIC/H.E.S.S. con FOV ~3.5°, conversione 1°=100 px, e soglia energetica ~100 GeV. I parametri 
+                dipendono dall'angolo zenitale, dalla distanza d'impatto e dall'energia del fotone primario.
+            </p>
+        </section>
+
+        <!-- Link al Simulatore Dedicato -->
+        <section class="card" style="background: linear-gradient(135deg, rgba(255,102,68,0.1), rgba(255,136,102,0.1)); border: 2px solid #ff6644; margin-top: 3rem;">
+            <h3 style="color: #ff6644; margin-bottom: 16px;">🎮 Simulatore Dedicato</h3>
+            <p style="margin-bottom: 24px;">
+                Esplora gli eventi PeVatron con il nostro simulatore interattivo a pagina intera, 
+                con 3 telescopi in configurazione stereoscopica e analisi completa dei parametri di Hillas.
+            </p>
+            <div style="text-align: center;">
+                <a href="supernova-remnants-simulator.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px;">
+                    🚀 Avvia Simulatore PeVatron
+                </a>
+            </div>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card" style="margin-top: 3rem;">
+            <h2>🚀 Esplora Altre Sorgenti</h2>
+            <p>Hai scoperto i resti di supernova e i PeVatron. Continua il tuo viaggio nell'astronomia gamma:</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="crab-nebula.html" class="btn btn-primary">🦀 Nebulosa del Granchio</a>
+                <a href="blazars.html" class="btn btn-secondary">🌀 Blazar</a>
+                <a href="grb-complete.html" class="btn btn-secondary">⚡ GRB</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Confronto</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/navigation.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+In astronomia, un resto di supernova (SNR dalla dizione inglese Supernova remnant) è il materiale lasciato dalla gigantesca esplosione di una supernova.
+
+Descrizione
+Questo può accadere in due modi: quando una stella molto massiccia termina il suo combustibile nucleare, e collassa su se stessa sotto l'azione della propria forza di gravità, oppure quando una nana bianca accumula abbastanza materiale da una stella compagna da raggiungere la massa critica e fa la stessa fine. In entrambi i casi, l'esplosione risultante espelle con molta forza la maggior parte o forse tutta la materia che componeva la stella.
+
+Nel caso dell'esplosione di una stella massiccia, il nucleo della stella può collassare così rapidamente da formare un oggetto estremamente compatto formato da materia degenere. Si tratta generalmente di una stella di neutroni o a volte di un buco nero, a cui ci si riferisce come resto di supernova compatto. In tutte le esplosioni, gli strati esterni della stella sono espulsi all'esterno ad una velocità di migliaia di chilometri al secondo, dando luogo a una nube di gas e polveri in espansione. Questa nube, che raccoglie anche il mezzo interstellare precedentemente esistente nella zona di espansione, e che è spesso attraversata da onde d'urto generate dall'esplosione stessa o dall'interazione tra la nube e il mezzo interstellare, è detta resto di supernova diffuso.
+
+
+Un resto di supernova nella Grande Nube di Magellano, immagine che combina riprese ai raggi-x e luce visibile.
+Il resto di supernova compatto, quando esiste, dovrebbe trovarsi al centro di quello diffuso, ed in alcuni casi è così (come nel caso della Nebulosa del Granchio e della Nebulosa delle Vele). Spesso però l'esplosione è asimmetrica: il grosso del gas va da una parte e l'oggetto compatto viene "sparato" nell'altra direzione con velocità che possono superare i 200 km/s. In tal caso l'oggetto compatto esce rapidamente (poche centinaia o migliaia di anni) dal resto di supernova diffuso e diventa difficile mettere in relazione i due oggetti.
+
+Un resto di supernova diffuso è un oggetto effimero: in poche migliaia di anni si dissolve nel mezzo interstellare, che arricchisce degli elementi pesanti prodotti nel corso della vita della stella, e scompare. Nonostante ciò, i resti osservabili sono numerosi, perché le supernovae esplodono al ritmo di una ogni qualche decina d'anni nella nostra galassia. Gli oggetti compatti, invece, sono immortali o quasi.
+
+Il resto di supernova più famoso e più osservato con telescopi professionali, anche se piuttosto difficile da osservare a causa della sua grande lontananza, è quello della Supernova 1987a, la cui esplosione è stata visibile dalla Terra il 23 febbraio 1987, nella Grande Nube di Magellano, alla distanza di 168 000 anni luce. 
