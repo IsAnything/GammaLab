@@ -117,6 +117,16 @@
             max-width: 80%;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: inline-block;
+            background: #f0f0f0;
+        }
+        
+        .animated-section .gif-container {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .stats-grid {
@@ -284,17 +294,19 @@
             <h2>🎬 Visualizzazioni NASA</h2>
             <p>Ecco come gli astronomi visualizzano l'evoluzione di un Gamma-Ray Burst:</p>
             
-            <div style="margin: 2rem 0;">
-                <img src="../grb materials/NASA's_Guide_to_Visiting_a_Gamma-Ray_Burst_(SVS14355_-_ShortGRB).gif" alt="NASA Short GRB Animation">
+            <div class="gif-container">
+                <img src="../grb materials/NASA's_Guide_to_Visiting_a_Gamma-Ray_Burst_(SVS14355_-_ShortGRB).gif" 
+                     alt="NASA Short GRB Animation" 
+                     onerror="this.style.border='2px solid red'; this.alt='Immagine non caricata: ' + this.src;">
                 <p style="margin-top: 1rem; color: #666; font-style: italic;">Animazione NASA di un Short GRB prodotto dalla fusione di stelle di neutroni</p>
             </div>
             
-            <div style="margin: 3rem 0;">
+            <div class="gif-container">
                 <img src="../grb materials/biLuD.gif" alt="GRB Animation">
                 <p style="margin-top: 1rem; color: #666; font-style: italic;">Visualizzazione della propagazione dei getti relativistici</p>
             </div>
             
-            <div style="margin: 3rem 0;">
+            <div class="gif-container">
                 <img src="../grb materials/aniHubble_0.gif" alt="Hubble GRB Observation">
                 <p style="margin-top: 1rem; color: #666; font-style: italic;">Osservazioni Hubble dell'afterglow di un GRB</p>
             </div>
