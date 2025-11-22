@@ -265,11 +265,33 @@
 </head>
 <body>
     <header>
-        <h1>🌌 La Nebulosa del Granchio</h1>
-        <p style="text-align: center; font-size: 1.1rem; color: #666;">Un laboratorio cosmico per studiare l'Universo estremo</p>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">🦀 Nebulosa del Granchio - Un Laboratorio Cosmico</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html" class="active">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb-complete.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="crab-nebula-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore Crab Nebula
+                </a>
+            </div>
+        </div>
     </header>
-    
-    <main>
+
+    <main class="container">
         <section class="hero-section">
             <img src="../crab nebula materials/heart of crab nebula.png" alt="Il cuore della Nebulosa del Granchio" class="hero-image">
         </section>
@@ -662,10 +684,38 @@
                 </div>
             </div>
         </section>
+        
+        <!-- Link al Simulatore -->
+        <section class="card" style="background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); border: 2px solid #667eea; margin-top: 3rem;">
+            <h3 style="color: #667eea; margin-bottom: 16px;">🎮 Simulatore Dedicato</h3>
+            <p style="margin-bottom: 24px;">
+                Esplora la Nebulosa del Granchio con il nostro simulatore interattivo.
+                Osserva le caratteristiche uniche della sorgente gamma più studiata dell'Universo.
+            </p>
+            <div style="text-align: center;">
+                <a href="crab-nebula-simulator.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px;">
+                    🚀 Avvia Simulatore Crab Nebula
+                </a>
+            </div>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card" style="margin-top: 3rem;">
+            <h2>🚀 Esplora Altre Sorgenti</h2>
+            <p>Hai scoperto la Nebulosa del Granchio. Continua il tuo viaggio nell'astronomia gamma:</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="supernova-remnants.html" class="btn btn-primary">💥 Resti di Supernova</a>
+                <a href="blazars.html" class="btn btn-secondary">🌀 Blazar</a>
+                <a href="grb-complete.html" class="btn btn-secondary">⚡ GRB</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Confronto</a>
+            </div>
+        </section>
     </main>
     
-    <footer>
-        <p>📚 Pagina creata per studenti di quinta liceo scientifico | GammaLab 2025</p>
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
     </footer>
+
+    <script src="../js/navigation.js"></script>
 </body>
 </html>
