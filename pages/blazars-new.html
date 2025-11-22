@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blazar - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-images {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-images img {
+            width: 32%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-images {
+                flex-direction: column;
+            }
+            
+            .hero-images img {
+                width: 100%;
+            }
+            
+            .content-with-image {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-content {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">🌀 Blazar - Cannoni Cosmici Puntati Verso la Terra</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html" class="active">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb-complete.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="blazars-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore Blazar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <div class="hero-images">
+                <img src="../blazars/blaz.png" alt="Struttura di un Blazar">
+                <img src="../blazars/Quasar_with_jet_and_magnetic_lines.jpg" alt="Quasar con getto e linee magnetiche">
+                <img src="../blazars/su201341_blazar.jpg" alt="Illustrazione artistica di un Blazar">
+            </div>
+        </section>
+
+        <section id="introduzione">
+            <h2>🌀 Cosa sono i Blazar?</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        Un <strong>blazar</strong> è un nucleo galattico attivo (AGN, Active Galactic Nucleus) 
+                        caratterizzato da un <strong>getto relativistico</strong> – un fascio di materia ionizzata 
+                        che viaggia quasi alla velocità della luce – orientato quasi direttamente verso l'osservatore.
+                    </p>
+                    <p>
+                        Il <strong>beaming relativistico</strong> della radiazione elettromagnetica emessa dal getto 
+                        rende i blazar molto più luminosi di quanto apparirebbero se il getto fosse orientato in 
+                        un'altra direzione. I blazar sono potenti sorgenti di emissione su tutto lo spettro 
+                        elettromagnetico e sono osservati come sorgenti di fotoni gamma ad alta energia.
+                    </p>
+                    <p>
+                        I blazar sono <strong>sorgenti altamente variabili</strong>, che mostrano fluttuazioni rapide 
+                        e drammatiche nella luminosità su scale temporali brevi (ore o giorni). Alcuni getti di blazar 
+                        sembrano esibire <strong>moto superluminale</strong>, un'altra conseguenza del materiale nel 
+                        getto che viaggia verso l'osservatore a velocità prossime a quella della luce.
+                    </p>
+                    <div class="highlight-box">
+                        <h3>🎯 Importanza Scientifica</h3>
+                        <p>
+                            I blazar sono argomenti importanti di ricerca in astronomia e astrofisica ad alta energia. 
+                            La ricerca sui blazar include l'investigazione delle proprietà dei dischi di accrescimento 
+                            e dei getti, dei buchi neri supermassicci centrali e delle galassie ospiti, e dell'emissione 
+                            di fotoni ad alta energia, raggi cosmici e neutrini.
+                        </p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../blazars/Relativistic_Beaming.png" alt="Beaming Relativistico">
+                        <figcaption>Effetto del beaming relativistico: la luce da una sorgente relativistica diventa più diretta e blue-shifted nella direzione del moto all'aumentare della velocità v (β = v/c)</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="struttura">
+            <h2>🔬 Struttura di un Blazar</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        I blazar, come tutti i nuclei galattici attivi (AGN), sono alimentati da materia che cade 
+                        in un <strong>buco nero supermassiccio</strong> nel nucleo della galassia ospite.
+                    </p>
+                    
+                    <h3>⚫ Il Nucleo Centrale</h3>
+                    <p>
+                        Gas, polvere e occasionalmente stelle vengono catturati e spiraleggiano verso questo buco 
+                        nero centrale, creando un <strong>disco di accrescimento caldo</strong> che genera enormi 
+                        quantità di energia sotto forma di fotoni, elettroni, positroni e altre particelle elementari. 
+                        Questa regione è relativamente piccola, circa <strong>10⁻³ parsec</strong> di dimensione.
+                    </p>
+                    
+                    <h3>🌪️ Il Toroide Opaco</h3>
+                    <p>
+                        Esiste un toroide opaco più grande che si estende per diversi parsec dal buco nero, contenente 
+                        gas caldo con regioni incorporate di densità maggiore. Queste "nubi" possono assorbire e 
+                        riemettere energia dalle regioni più vicine al buco nero.
+                    </p>
+                    
+                    <h3>🚀 I Getti Relativistici</h3>
+                    <p>
+                        Perpendicolarmente al disco di accrescimento, una coppia di <strong>getti relativistici</strong> 
+                        trasporta plasma altamente energetico lontano dall'AGN. Il getto è collimato da una combinazione 
+                        di intensi campi magnetici e potenti venti provenienti dal disco di accrescimento e dal toroide.
+                    </p>
+                    <p>
+                        All'interno del getto, fotoni e particelle ad alta energia interagiscono tra loro e con il 
+                        forte campo magnetico. Questi getti relativistici possono estendersi fino a molte decine di 
+                        <strong>kiloparsec</strong> dal buco nero centrale.
+                    </p>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../blazars/con didascalia.png" alt="Struttura dettagliata di un AGN">
+                        <figcaption>Schema della struttura di un nucleo galattico attivo con disco di accrescimento, toroide di polvere e getti relativistici</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="emissione">
+            <h2>💡 Emissione e Spettro</h2>
+            <p>
+                Tutte queste regioni possono produrre una varietà di energia osservata, per lo più sotto forma di 
+                uno <strong>spettro non termico</strong> che va dalle frequenze radio molto basse ai raggi gamma 
+                estremamente energetici, con un'alta polarizzazione (tipicamente alcuni percento) ad alcune frequenze.
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>📻 Emissione Sincrotrone</h3>
+                    <p>
+                        Radiazione prodotta da elettroni relativistici che spiraleggiano nei campi magnetici. 
+                        Copre la banda <strong>radio → X-ray</strong>.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⚡ Compton Inverso</h3>
+                    <p>
+                        Elettroni ad alta energia trasferiscono energia a fotoni di bassa energia. 
+                        Produce emissione nella banda <strong>X-ray → gamma</strong>.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🎯 Spettro Non Termico</h3>
+                    <p>
+                        Lo spettro osservato è caratterizzato da due "gobbe" (double-humped): 
+                        una a basse energie (sincrotrone) e una ad alte energie (Compton inverso).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="beaming">
+            <h2>🌟 Beaming Relativistico</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        L'emissione osservata da un blazar è enormemente amplificata dagli <strong>effetti relativistici</strong> 
+                        nel getto, un processo chiamato <strong>beaming relativistico</strong>.
+                    </p>
+                    
+                    <h3>⚡ Velocità del Getto</h3>
+                    <p>
+                        La velocità di bulk del plasma che costituisce il getto può raggiungere il <strong>99.5% 
+                        della velocità della luce</strong>, anche se le particelle individuali si muovono a velocità 
+                        ancora maggiori in varie direzioni.
+                    </p>
+                    
+                    <h3>💫 Amplificazione della Luminosità</h3>
+                    <p>
+                        Ad esempio, consideriamo un getto con un angolo rispetto alla linea di vista θ = 5° e una 
+                        velocità del 99.9% della velocità della luce. La luminosità osservata dalla Terra è 
+                        <strong>70 volte maggiore</strong> della luminosità emessa nel sistema di riferimento del getto.
+                    </p>
+                    <p>
+                        Tuttavia, se θ è al valore minimo di 0°, il getto apparirà <strong>600 volte più luminoso</strong> 
+                        dalla Terra!
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h3>🔄 Getto in Allontanamento</h3>
+                        <p>
+                            Il beaming relativistico ha un'altra conseguenza critica: un contro-getto che si allontana 
+                            dalla Terra apparirà più debole a causa degli stessi effetti relativistici. Pertanto, 
+                            getti bipolari intrinsecamente identici appariranno significativamente asimmetrici.
+                        </p>
+                        <p>
+                            Nell'esempio sopra citato, qualsiasi getto con θ > 35° sarà osservato sulla Terra come 
+                            meno luminoso di quanto sarebbe nel sistema di riferimento del getto.
+                        </p>
+                    </div>
+                    
+                    <h3>🌌 "Favoritism Doppler"</h3>
+                    <p>
+                        Una conseguenza ulteriore è che, a causa del "favoritism Doppler", una popolazione di AGN 
+                        intrinsecamente identici distribuiti nello spazio con orientazioni casuali dei getti apparirà 
+                        come una popolazione molto <strong>eterogenea</strong> sulla Terra.
+                    </p>
+                    <p>
+                        I pochi oggetti dove θ è piccolo avranno un getto molto luminoso, mentre il resto avrà 
+                        apparentemente getti considerevolmente più deboli.
+                    </p>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../blazars/giphy-6.gif" alt="Animazione moto superluminale">
+                        <figcaption>Moto superluminale apparente nei getti di blazar: effetto prospettico causato dal materiale che si muove a velocità relativistiche verso l'osservatore</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="moto-superluminale">
+            <h2>🚀 Moto Superluminale</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        Alcuni getti di blazar mostrano un fenomeno affascinante: componenti del getto che sembrano 
+                        muoversi a velocità <strong>apparentemente superiori alla velocità della luce</strong>.
+                    </p>
+                    <p>
+                        Questo <strong>moto superluminale</strong> è un effetto prospettico causato dal materiale 
+                        nel getto che viaggia verso l'osservatore a velocità prossime a quella della luce. Non viola 
+                        la relatività speciale – è solo un'illusione ottica dovuta alla geometria della situazione.
+                    </p>
+                    
+                    <h3>📐 Come Funziona</h3>
+                    <p>
+                        Quando un blob di plasma nel getto si muove quasi direttamente verso di noi a velocità 
+                        relativistica, i fotoni emessi successivamente devono percorrere una distanza leggermente 
+                        più corta per raggiungerci. Questo comprime l'intervallo di tempo apparente tra le emissioni, 
+                        facendo sembrare il blob più veloce di quanto sia realmente.
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h3>🔢 La Formula</h3>
+                        <p>
+                            La velocità apparente può essere espressa come:
+                        </p>
+                        <p style="text-align: center; font-size: 1.1rem; margin: 1rem 0;">
+                            <strong>v<sub>app</sub> = (v sin θ) / (1 - v cos θ / c)</strong>
+                        </p>
+                        <p>
+                            Dove v è la velocità reale, θ è l'angolo rispetto alla linea di vista, e c è la velocità della luce. 
+                            Per v → c e θ → 0, v<sub>app</sub> può essere molte volte c!
+                        </p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../blazars/Superluminalmotion.gif" alt="Simulazione moto superluminale">
+                        <figcaption>Simulazione del moto superluminale: l'effetto prospettico fa apparire le componenti del getto più veloci della luce</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="firma-cherenkov">
+            <h2>📸 Firma Cherenkov dei Blazar</h2>
+            <p>
+                I blazar sono sorgenti <strong>puntiformi extragalattiche</strong> che producono tracce Cherenkov 
+                caratteristiche nelle camere dei telescopi. Mostrano somiglianze con la Crab Nebula ma con alcune 
+                differenze chiave legate alla loro maggiore distanza e variabilità estrema.
+            </p>
+
+            <h3>Parametri di Hillas Tipici</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>Interpretazione Fisica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.10° - 0.20°<br>(10-20 px)</td>
+                        <td><strong>~0.15°</strong><br>(~15 px)</td>
+                        <td>⚡ Tracce più <em>compatte</em> della Crab (sorgente puntiforme distante)</td>
+                    </tr>
+                    <tr style="background: rgba(79, 172, 254, 0.05);">
+                        <td><strong>Width</strong></td>
+                        <td>0.04° - 0.07°<br>(4-7 px)</td>
+                        <td><strong>~0.05°</strong><br>(~5 px)</td>
+                        <td>🎯 Sciami molto <em>sottili</em>, estremamente collimati</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>1000 - 1500 p.e.</td>
+                        <td><strong>~1200 p.e.</strong></td>
+                        <td>💡 Intensità simile a Crab ma con <em>maggiore variabilità</em></td>
+                    </tr>
+                    <tr style="background: rgba(79, 172, 254, 0.05);">
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>0° - 3°</td>
+                        <td><strong>~0°</strong> ⭐</td>
+                        <td>📍 Sorgente <em>puntiforme</em>: picco molto stretto a α~0°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elongation (L/W)</strong></td>
+                        <td>2.5 - 4.5</td>
+                        <td><strong>~3.0</strong></td>
+                        <td>📏 Ellissi molto allungate, leggermente più della Crab</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <h3>🎯 Caratteristiche Distintive</h3>
+                <ul style="margin-top: 1rem;">
+                    <li>✨ <strong>Tracce compatte</strong>: Length ~15 px (vs ~25 px Crab) – sorgenti più lontane appaiono più "piccole"</li>
+                    <li>✨ <strong>Width estremamente sottili</strong>: ~5 px, tra le più strette di tutte le sorgenti</li>
+                    <li>✨ <strong>Alpha concentrato</strong>: Picco a α~0° più stretto della Crab (σ<sub>α</sub> ~ 1-2°)</li>
+                    <li>✨ <strong>Coerenza stereoscopica eccellente</strong>: Varianza inter-camera ~5% (come Crab o migliore)</li>
+                    <li>✨ <strong>Variabilità temporale estrema</strong>: Durante flare, Size può aumentare 2-5× in poche ore!</li>
+                    <li>✨ <strong>Spettro relativamente duro</strong>: Indice spettrale Γ ~ 2.0-2.5 durante i flare</li>
+                </ul>
+            </div>
+
+            <h3>🔬 Confronto con Altre Sorgenti</h3>
+            <div style="overflow-x: auto; margin-top: 1.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sorgente</th>
+                            <th>Length (px)</th>
+                            <th>Width (px)</th>
+                            <th>Size (p.e.)</th>
+                            <th>Alpha (°)</th>
+                            <th>Firma Distintiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🦀 Crab Nebula</td>
+                            <td>~25</td>
+                            <td>~8</td>
+                            <td>~1000</td>
+                            <td>~0</td>
+                            <td>⭐ Standard di riferimento</td>
+                        </tr>
+                        <tr style="background: rgba(79, 172, 254, 0.1);">
+                            <td><strong>🌀 Blazar</strong></td>
+                            <td><strong>~15</strong></td>
+                            <td><strong>~5</strong></td>
+                            <td><strong>~1200</strong></td>
+                            <td><strong>~0</strong></td>
+                            <td><strong>⚡ Più compatto, altamente variabile</strong></td>
+                        </tr>
+                        <tr>
+                            <td>💥 PeVatron (SNR)</td>
+                            <td>~40</td>
+                            <td>~15</td>
+                            <td>~2500</td>
+                            <td>~10</td>
+                            <td>🔥 Tracce lunghe e intense</td>
+                        </tr>
+                        <tr>
+                            <td>⚡ GRB (afterglow)</td>
+                            <td>~15</td>
+                            <td>~8</td>
+                            <td>~1500</td>
+                            <td>~0</td>
+                            <td>💫 Simile a Blazar, transiente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>⚠️ Variabilità Estrema</h3>
+            <p>
+                I blazar sono le sorgenti più <strong>variabili</strong> del cielo gamma. Esempi notevoli:
+            </p>
+            <ul>
+                <li><strong>PKS 2155-304 (2006)</strong>: Flare con tempo di variabilità t<sub>var</sub> ~ 200 secondi, L ~ 10⁴⁶ erg/s</li>
+                <li><strong>Mrk 501 (1997)</strong>: Flusso aumentato di 10× in 24 ore</li>
+                <li><strong>Mrk 421</strong>: Variabilità intra-notte con ΔF/F > 50%</li>
+                <li><strong>3C 279 (2015)</strong>: Rilevato da Fermi con E > 20 GeV durante flare intenso</li>
+            </ul>
+            <p>
+                Durante i flare, i parametri Size possono raggiungere 2000-3000 p.e., sovrapponendosi ai PeVatron 
+                (ma con Length/Width molto diversi: blazar mantiene tracce compatte!).
+            </p>
+
+            <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+                <strong>Nota tecnica</strong>: I valori riportati si riferiscono a telescopi Cherenkov di classe 
+                MAGIC/H.E.S.S. con FOV ~3.5°, conversione 1°=100 px, e soglia energetica ~100 GeV. I parametri 
+                dipendono dall'angolo zenitale, dalla distanza d'impatto e dall'energia del fotone primario.
+            </p>
+        </section>
+
+        <!-- Link al Simulatore Dedicato -->
+        <section class="card" style="background: linear-gradient(135deg, rgba(79,172,254,0.1), rgba(0,242,254,0.1)); border: 2px solid #4facfe; margin-top: 3rem;">
+            <h3 style="color: #4facfe; margin-bottom: 16px;">🎮 Simulatore Dedicato</h3>
+            <p style="margin-bottom: 24px;">
+                Esplora le caratteristiche uniche dei blazar con il nostro simulatore interattivo.
+                Osserva le tracce Cherenkov compatte e la variabilità estrema di queste sorgenti extragalattiche.
+            </p>
+            <div style="text-align: center;">
+                <a href="blazars-simulator.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px;">
+                    🚀 Avvia Simulatore Blazar
+                </a>
+            </div>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card" style="margin-top: 3rem;">
+            <h2>🚀 Esplora Altre Sorgenti</h2>
+            <p>Hai scoperto i blazar. Continua il tuo viaggio nell'astronomia gamma:</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="crab-nebula.html" class="btn btn-primary">🦀 Nebulosa del Granchio</a>
+                <a href="supernova-remnants.html" class="btn btn-secondary">💥 Resti di Supernova</a>
+                <a href="grb-complete.html" class="btn btn-secondary">⚡ GRB</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Confronto</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/navigation.js"></script>
+</body>
+</html>
