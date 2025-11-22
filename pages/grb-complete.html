@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRB (Gamma-Ray Burst) - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-image {
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: #ffffff;
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .content-with-image.reverse {
+            grid-template-columns: 1fr 1.5fr;
+        }
+        
+        .content-with-image.reverse .text-content {
+            order: 2;
+        }
+        
+        .content-with-image.reverse .image-content {
+            order: 1;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            background: #ffffff;
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .highlight-box ul {
+            color: white;
+        }
+        
+        .type-card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #f5576c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .type-card h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        .type-card p {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .type-card ul {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .type-card ul li {
+            margin: 0.5rem 0;
+            color: #000;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .animated-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+        
+        .animated-section img {
+            max-width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: inline-block;
+            background: #f0f0f0;
+        }
+        
+        .animated-section .gif-container {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .stat-box .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .content-with-image,
+            .content-with-image.reverse,
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-with-image.reverse .text-content,
+            .content-with-image.reverse .image-content {
+                order: initial;
+            }
+            
+            .image-content {
+                position: static;
+            }
+            
+            .animated-section img {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">⚡ GRB - Gamma-Ray Burst: Le Esplosioni più Violente dell'Universo</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb.html" class="active">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="grb-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore GRB
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <img src="../grb materials/compact object.png" alt="Oggetto compatto ultra-denso" class="hero-image">
+        </section>
+
+        <!-- Introduzione Ampliata -->
+        <section class="card">
+            <h2>💥 Cosa sono i Gamma-Ray Bursts?</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>I <strong>Gamma-Ray Bursts (GRB)</strong> sono improvvisi lampi di raggi gamma che rappresentano gli eventi più energetici dell'Universo dopo il Big Bang. Per pochi secondi o minuti, un singolo GRB può emettere più energia di quella che il Sole produrrà in tutta la sua vita di 10 miliardi di anni!</p>
+                    <p>Scoperti per caso nel 1967 dai satelliti militari americani Vela (progettati per rilevare test nucleari), i GRB sono rimasti un mistero per decenni. Oggi sappiamo che provengono da galassie lontanissime e sono associati agli eventi più catastrofici del cosmo.</p>
+                    <div class="highlight-box">
+                        <h3>⚡ Energia Estrema</h3>
+                        <p>Un GRB può rilasciare in pochi secondi più energia di quella emessa da un'intera galassia! L'energia totale può raggiungere 10<sup>51-54</sup> erg, equivalente a convertire diverse masse solari in pura energia.</p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../grb materials/STScI-01EVVEQAX8TDEFFPNHHP7SSSJ0 (1).jpg" alt="Gamma-Ray Burst">
+                        <figcaption>Rappresentazione artistica di un Gamma-Ray Burst</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistiche -->
+        <section id="statistiche" class="card">
+            <h2>📊 I Numeri dei GRB</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">Durata Media</div>
+                    <div class="number">0.1-100s</div>
+                    <div class="label">Brevi o Lunghi</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Frequenza</div>
+                    <div class="number">~1/giorno</div>
+                    <div class="label">Nell'Universo osservabile</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Energia Picco</div>
+                    <div class="number">0.1-1 MeV</div>
+                    <div class="label">Raggi gamma</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Distanza Tipica</div>
+                    <div class="number">> 1 Gpc</div>
+                    <div class="label">Miliardi di anni luce</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tipologie Dettagliate -->
+        <section id="tipologie" class="card">
+            <h2>🔍 Due Tipologie Principali</h2>
+            
+            <div class="comparison-grid">
+                <div class="type-card">
+                    <h3>⏱️ GRB Brevi (Short GRB)</h3>
+                    <p><strong>Durata:</strong> < 2 secondi (T₉₀)</p>
+                    <p><strong>Origine:</strong> Fusione di stelle di neutroni o di una stella di neutroni con un buco nero</p>
+                    <p><strong>Caratteristiche:</strong></p>
+                    <ul>
+                        <li>Spettro più duro (energie più alte, ~500 keV-1 MeV)</li>
+                        <li>Associati a galassie ellittiche vecchie</li>
+                        <li>Onde gravitazionali rilevabili! (GW170817)</li>
+                        <li>Producono elementi pesanti (oro, platino) tramite r-process</li>
+                        <li>Fenomeno associato: <strong>Kilonova</strong></li>
+                        <li>Frequenza: ~30% dei GRB osservati</li>
+                    </ul>
+                </div>
+                
+                <div class="type-card">
+                    <h3>⏳ GRB Lunghi (Long GRB)</h3>
+                    <p><strong>Durata:</strong> > 2 secondi (tipicamente 10-100 s)</p>
+                    <p><strong>Origine:</strong> Collasso di stelle massicce (>25 masse solari) - Ipernove o Collapsar</p>
+                    <p><strong>Caratteristiche:</strong></p>
+                    <ul>
+                        <li>Spettro più morbido (~100-300 keV)</li>
+                        <li>Associati a galassie con formazione stellare attiva</li>
+                        <li>Seguiti da supernova di tipo Ib/Ic</li>
+                        <li>Creano buchi neri stellari</li>
+                        <li>Redshift tipico: z ~ 1-3</li>
+                        <li>Frequenza: ~70% dei GRB osservati</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Confronto Long vs Short GRB</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Proprietà</th>
+                        <th>GRB Lunghi</th>
+                        <th>GRB Corti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Durata T₉₀</strong></td>
+                        <td>> 2 s (10-100 s)</td>
+                        <td>< 2 s (0.1-1 s)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>E_peak</strong></td>
+                        <td>~200 keV</td>
+                        <td>~500 keV</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Progenitore</strong></td>
+                        <td>Stella massiccia</td>
+                        <td>NS-NS / NS-BH</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Associazione</strong></td>
+                        <td>Supernova Ib/Ic</td>
+                        <td>Kilonova + GW</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Redshift</strong></td>
+                        <td>z ~ 1-3 (tipico)</td>
+                        <td>z ~ 0.1-1 (più vicini)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Meccanismo -->
+        <section id="meccanismo" class="card">
+            <h2>⚙️ Il Meccanismo dei GRB</h2>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <h3>Il Modello del "Fireball"</h3>
+                    <p>Il meccanismo che genera un GRB segue questo processo:</p>
+                    <ol>
+                        <li><strong>Evento Catastrofico:</strong> Collasso di una stella massiccia o fusione di oggetti compatti</li>
+                        <li><strong>Formazione del Buco Nero:</strong> Si forma un buco nero rapidamente rotante (M ~ 3-10 M☉) circondato da un disco di accrescimento con tasso Ṁ ~ 0.01-1 M☉/s</li>
+                        <li><strong>Getti Relativistici:</strong> Vengono espulsi due getti di materia ai poli, che viaggiano quasi alla velocità della luce (Γ ~ 100-1000, v > 0.999c)</li>
+                        <li><strong>Emissione Prompt:</strong> I getti producono il lampo gamma iniziale per collisioni interne (shock interni)</li>
+                        <li><strong>Afterglow:</strong> L'interazione con il mezzo circostante produce emissioni più deboli e durature in raggi X, ottico e radio</li>
+                    </ol>
+                    <p><strong>Potenza:</strong> L ~ 10⁴⁹-10⁵¹ erg/s per pochi secondi</p>
+                    <p><strong>Collimazione:</strong> Apertura θ_jet ~ 2-20° (fascio stretto)</p>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../grb materials/Gamma-ray-burst-Mechanism.jpg" alt="Meccanismo di un GRB">
+                        <figcaption>Schema del meccanismo di formazione di un Gamma-Ray Burst con i getti relativistici</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- Animazioni NASA -->
+        <section id="animazioni" class="animated-section card">
+            <h2>🎬 Visualizzazioni NASA</h2>
+            <p>Ecco come gli astronomi visualizzano l'evoluzione di un Gamma-Ray Burst:</p>
+            
+            <div class="gif-container">
+                <img src="../grb materials/NASA_Guide_to_Visiting_a_GammaRay_Burst_SVS14355_ShortGRB.gif" 
+                     alt="NASA Short GRB Animation" 
+                     onerror="this.style.border='2px solid red'; this.alt='Immagine non caricata: ' + this.src;">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Animazione NASA di un Short GRB prodotto dalla fusione di stelle di neutroni</p>
+            </div>
+            
+            <div class="gif-container">
+                <img src="../grb materials/biLuD.gif" alt="GRB Animation">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Visualizzazione della propagazione dei getti relativistici</p>
+            </div>
+            
+            <div class="gif-container">
+                <img src="../grb materials/aniHubble_0.gif" alt="Hubble GRB Observation">
+                <p style="margin-top: 1rem; color: #666; font-style: italic;">Osservazioni Hubble dell'afterglow di un GRB</p>
+            </div>
+        </section>
+
+        <!-- GRB ad Alta Energia con Telescopi Cherenkov -->
+        <section class="card">
+            <h2>🔬 GRB ad Alta Energia (> GeV)</h2>
+            
+            <h3>🛰️ Rilevazioni Fermi-LAT</h3>
+            <p>Il satellite <strong>Fermi</strong> ha rivoluzionato lo studio dei GRB ad alta energia:</p>
+            <ul>
+                <li><strong>~200 GRB</strong> rilevati a E > 100 MeV dal 2008</li>
+                <li><strong>Fotoni GeV</strong>: Alcuni eventi con E > 10-100 GeV</li>
+                <li><strong>Ritardo temporale</strong>: I fotoni GeV spesso arrivano secondi/minuti dopo i keV</li>
+                <li><strong>Durata estesa</strong>: Emissione GeV può durare ore dopo la fase prompt</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h3>🔭 GRB 190114C - Prima Rilevazione TeV con MAGIC</h3>
+                <p><strong>14 gennaio 2019</strong> - Il telescopio Cherenkov MAGIC (Maiorca, Spagna) ha rilevato per la prima volta nella storia emissione di raggi gamma a energie TeV (tera-elettronvolt) da un GRB, appena 50-60 secondi dopo l'esplosione!</p>
+                <p><strong>Dettagli della scoperta:</strong></p>
+                <ul style="color: white; margin-top: 1rem;">
+                    <li>📍 Distanza: ~4.5 miliardi di anni luce (redshift z = 0.4245)</li>
+                    <li>⚡ Energia rilevata: >0.3 TeV (300 miliardi di elettronvolt!)</li>
+                    <li>⏱️ Durata dell'emissione TeV: ~20 minuti</li>
+                    <li>🎯 Allerta automatica da Swift satellite → MAGIC si è orientato in 27 secondi</li>
+                    <li>🔬 Confermato che i GRB accelerano elettroni a energie relativistiche estreme</li>
+                    <li><strong>Significatività</strong>: >50σ nei primi 20 minuti</li>
+                    <li><strong>Energia massima</strong>: Fotoni fino a ~1 TeV rilevati</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>Importanza:</strong> Questa scoperta ha aperto una nuova finestra osservativa sui GRB e confermato i modelli teorici sull'accelerazione di particelle in shock relativistici. L'emissione TeV proviene probabilmente dall'interazione del getto con il mezzo interstellare circostante (afterglow).</p>
+            </div>
+            
+            <div class="highlight-box" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h3>🌟 GRB 180720B - Secondo Rilevamento TeV con H.E.S.S.</h3>
+                <p><strong>20 luglio 2018</strong> - H.E.S.S. (High Energy Stereoscopic System) in Namibia ha rilevato emissione TeV da questo GRB oltre 10 ore dopo l'esplosione iniziale!</p>
+                <p><strong>Caratteristiche uniche:</strong></p>
+                <ul style="color: white; margin-top: 1rem;">
+                    <li>📍 Distanza: ~6 miliardi di anni luce (z = 0.654)</li>
+                    <li>⚡ Energia: 100-440 GeV</li>
+                    <li>⏱️ Rilevato 10-12 ore dopo il burst iniziale</li>
+                    <li>🔬 Afterglow più lungo mai osservato a energie così alte</li>
+                </ul>
+            </div>
+
+            <h3>⚡ GRB 221009A: Il BOAT (Brightest Of All Time)</h3>
+            <p>Il 9 ottobre 2022, un GRB eccezionale ha illuminato il cielo:</p>
+            <ul>
+                <li><strong>Luminosità record</strong>: E_iso ~ 10⁵⁵ erg (più luminoso mai osservato)</li>
+                <li><strong>Energia TeV</strong>: Fotoni fino a ~18 TeV rilevati da LHAASO</li>
+                <li><strong>Durata</strong>: Emissione ad alta energia persistente per >10 ore</li>
+                <li><strong>Vicinanza</strong>: z = 0.151 (uno dei più vicini tra i Long GRB luminosi)</li>
+                <li><strong>Impatto</strong>: Ha ionizzato la ionosfera terrestre!</li>
+            </ul>
+        </section>
+
+        <!-- Parametri IACT -->
+        <section class="card">
+            <h2>📸 Firma Cherenkov dei GRB</h2>
+            <p>Osservare un GRB con IACT è <strong>molto difficile</strong> a causa della necessità di puntare rapidamente il telescopio. Le caratteristiche Cherenkov dipendono dalla fase dell'afterglow e dall'energia dei fotoni:</p>
+
+            <h3>Parametri di Hillas Tipici (Fase Afterglow TeV)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>Interpretazione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.10° - 0.20°</td>
+                        <td>~0.15°</td>
+                        <td>Tracce compatte (sorgente puntiforme distante)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Width</strong></td>
+                        <td>0.05° - 0.10°</td>
+                        <td>~0.08°</td>
+                        <td>Sciami collimati</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>1200 - 2000 p.e.</td>
+                        <td>~1500 p.e.</td>
+                        <td>Più intensi della Crab durante picchi</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>0° - 5°</td>
+                        <td>~0° (iniziale)</td>
+                        <td>Sorgente puntiforme all'inizio, poi dispersione</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L/W Ratio</strong></td>
+                        <td>1.5 - 2.5</td>
+                        <td>~1.9</td>
+                        <td>Meno allungate di blazar/Crab</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 Caratteristiche Distintive</h3>
+            <ul>
+                <li><strong>Evoluzione temporale</strong>: I parametri cambiano rapidamente (minuti-ore) seguendo il decadimento dell'afterglow</li>
+                <li><strong>Size decrescente</strong>: Inizialmente Size ~ 1500-2000 p.e., poi cala seguendo t^(-α) con α~1-1.5</li>
+                <li><strong>Alpha inizialmente concentrato</strong>: α~0° nei primi minuti, poi dispersione aumenta per espansione blast wave</li>
+                <li><strong>Variabilità</strong>: Fluttuazioni rapide (pulse) durante fase prompt/early afterglow</li>
+            </ul>
+
+            <h3>⏱️ Dipendenza Temporale</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fase</th>
+                        <th>Tempo</th>
+                        <th>Size Tipico</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Prompt</strong></td>
+                        <td>0-100 s</td>
+                        <td>-</td>
+                        <td>Troppo breve per IACT (necessario allerta)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Early Afterglow</strong></td>
+                        <td>1-10 min</td>
+                        <td>~1800 p.e.</td>
+                        <td>Picco emissione TeV se osservabile</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Afterglow</strong></td>
+                        <td>10 min - 1 h</td>
+                        <td>~1200 p.e.</td>
+                        <td>Decadimento graduale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Late Afterglow</strong></td>
+                        <td>1-10 h</td>
+                        <td>~600 p.e.</td>
+                        <td>Difficile da rilevare</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Importanza Scientifica -->
+        <section class="card">
+            <h2>🌟 Perché Studiare i GRB?</h2>
+            
+            <h3>🌌 Cosmologia</h3>
+            <ul>
+                <li><strong>Candele standard</strong>: I GRB sono visibili fino a z>9, tracciatori dell'universo primordiale</li>
+                <li><strong>Storia formazione stellare</strong>: Il rate di GRB lunghi segue la formazione di stelle massive</li>
+                <li><strong>Parametri cosmologici</strong>: Relazioni Eγ-Epeak usate per vincolare H₀, ΩM</li>
+            </ul>
+
+            <h3>⚛️ Fisica Fondamentale</h3>
+            <ul>
+                <li><strong>Test di relatività</strong>: Ritardi energetici dei fotoni → limiti su violazione invarianza di Lorentz</li>
+                <li><strong>EBL</strong>: Spettri GRB vincolano la densità della luce di fondo extragalattica</li>
+                <li><strong>Fisica delle particelle</strong>: Accelerazione a energie estreme, produzione di coppie</li>
+                <li><strong>Raggi cosmici</strong>: I GRB potrebbero accelerare particelle a energie ultra-alte (>10²⁰ eV)</li>
+            </ul>
+
+            <h3>🌐 Astronomia Multi-Messenger</h3>
+            <ul>
+                <li><strong>Onde gravitazionali</strong>: GW170817 + GRB 170817A → conferma fusione NS-NS</li>
+                <li><strong>Neutrini</strong>: Ricerca emissione ad alta energia da GRB (finora solo limiti superiori)</li>
+                <li><strong>Nucleosintesi</strong>: I short GRB producono elementi pesanti attraverso il processo r (rapid neutron capture)</li>
+            </ul>
+
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <h3>🔬 Missioni Dedicate</h3>
+                <p><strong>Swift</strong> (NASA, 2004-presente): Satellite specializzato nel rilevamento rapido e osservazione multi-lunghezza d'onda dei GRB</p>
+                <p><strong>Fermi</strong> (NASA, 2008-presente): Osserva GRB alle alte energie con lo strumento GBM (Gamma-ray Burst Monitor)</p>
+                <p><strong>INTEGRAL</strong> (ESA, 2002-presente): Telescopio spaziale per raggi gamma che ha osservato centinaia di GRB</p>
+                <p><strong>MAGIC</strong> (2004-presente): Telescopio Cherenkov a La Palma, Isole Canarie - Prima rilevazione TeV di un GRB (2019)</p>
+                <p><strong>H.E.S.S.</strong> (2004-presente): High Energy Stereoscopic System in Namibia - Osservazioni di afterglow TeV prolungati</p>
+                <p><strong>CTA</strong> (in costruzione): Cherenkov Telescope Array - Futura generazione per rilevare più GRB a energie TeV</p>
+            </div>
+        </section>
+
+        <!-- GRB Record -->
+        <section id="record" class="card">
+            <h2>🏆 GRB Record e Scoperte Rivoluzionarie</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">GRB più distante</div>
+                    <div class="number">GRB 090429B</div>
+                    <div class="label">z = 9.4 (13.1 miliardi di anni luce)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB più luminoso</div>
+                    <div class="number">GRB 221009A</div>
+                    <div class="label">10<sup>55</sup> erg - "BOAT"</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB più lungo</div>
+                    <div class="number">GRB 111209A</div>
+                    <div class="label">Durata: ~7 ore!</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">GRB con onde gravitazionali</div>
+                    <div class="number">GRB 170817A</div>
+                    <div class="label">130 milioni di anni luce</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Confronto con altre sorgenti -->
+        <section class="card">
+            <h2>⚖️ GRB vs Altre Sorgenti</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caratteristica</th>
+                        <th>GRB</th>
+                        <th>Blazar (flare)</th>
+                        <th>Crab</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Durata</strong></td>
+                        <td>Minuti-ore (decadimento) ⏱️</td>
+                        <td>Ore-giorni</td>
+                        <td>Stabile (anni)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>~0.15°</td>
+                        <td>~0.15°</td>
+                        <td>~0.25°</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>~1500 p.e. (decadente)</td>
+                        <td>~1200 p.e.</td>
+                        <td>~1000 p.e.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L/W</strong></td>
+                        <td>~1.9 (meno allungato) ⭐</td>
+                        <td>~3.0</td>
+                        <td>~3.1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evoluzione</strong></td>
+                        <td>Rapida (∝ t⁻¹) ⚡</td>
+                        <td>Moderata</td>
+                        <td>Nessuna</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Link al Simulatore -->
+        <section class="card" style="background: linear-gradient(135deg, rgba(255,200,100,0.1), rgba(200,160,80,0.1)); border: 2px solid #ffcc44;">
+            <h3 style="color: #ffdd66; margin-bottom: 16px;">🎮 Simulatore Dedicato</h3>
+            <p style="margin-bottom: 24px;">
+                Esplora gli eventi GRB con il nostro simulatore interattivo, 
+                con L/W ratio basso (~2) caratteristico e evoluzione temporale.
+            </p>
+            <div style="text-align: center;">
+                <a href="grb-simulator.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px;">
+                    🚀 Avvia Simulatore GRB
+                </a>
+            </div>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card">
+            <h2>🚀 Completa la Collezione</h2>
+            <p>Hai esplorato le esplosioni più violente. Ora scopri l'ultima sorgente galattica:</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="galactic-center.html" class="btn btn-primary">⭐ Centro Galattico</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Confronto Completo</a>
+                <a href="hadronic-background.html" class="btn btn-secondary">⚛️ Background Adronico</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/navigation.js"></script>
+</body>
+</html>
