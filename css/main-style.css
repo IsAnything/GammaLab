@@ -294,10 +294,10 @@ nav {
 
 .cameras-grid {
   display: grid;
-  grid-template-columns: 1fr; /* 1 colonna invece di 3 */
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr); /* 3 colonne per layout orizzontale */
+  gap: 16px;
   margin-bottom: 24px;
-  max-width: 1200px; /* Larghezza ottimale per singola colonna */
+  max-width: 1400px; /* Larghezza ottimale per 3 colonne */
   margin-left: auto;
   margin-right: auto;
 }
@@ -1016,7 +1016,7 @@ table tr:hover {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .cameras-grid {
     grid-template-columns: 1fr;
   }

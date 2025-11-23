@@ -884,9 +884,11 @@ class SimulationEngine {
     renderEvent(event, canvas, colorPalette) {
         const ctx = canvas.getContext('2d');
         
-        // Clear canvas
+        // Clear canvas usando dimensioni reali del canvas
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
         ctx.fillStyle = '#000814';
-        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         
         // Ordina tracce per intensità (render dal più debole al più forte)
         const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
@@ -919,28 +921,28 @@ class SimulationEngine {
         });
         
         // Aggiungi griglia di riferimento (opzionale)
-        this._drawGrid(ctx);
+        this._drawGrid(ctx, canvasWidth, canvasHeight);
     }
 
     /**
      * Disegna griglia di riferimento
      */
-    _drawGrid(ctx) {
+    _drawGrid(ctx, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT) {
         ctx.strokeStyle = 'rgba(100, 150, 200, 0.1)';
         ctx.lineWidth = 1;
         
         // Griglia ogni 1° (100 pixel)
-        for (let x = 0; x < CANVAS_WIDTH; x += 100) {
+        for (let x = 0; x < canvasWidth; x += 100) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
-            ctx.lineTo(x, CANVAS_HEIGHT);
+            ctx.lineTo(x, canvasHeight);
             ctx.stroke();
         }
         
-        for (let y = 0; y < CANVAS_HEIGHT; y += 100) {
+        for (let y = 0; y < canvasHeight; y += 100) {
             ctx.beginPath();
             ctx.moveTo(0, y);
-            ctx.lineTo(CANVAS_WIDTH, y);
+            ctx.lineTo(canvasWidth, y);
             ctx.stroke();
         }
         
@@ -948,12 +950,12 @@ class SimulationEngine {
         ctx.strokeStyle = 'rgba(255, 100, 100, 0.3)';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(CANVAS_WIDTH / 2 - 20, CANVAS_HEIGHT / 2);
-        ctx.lineTo(CANVAS_WIDTH / 2 + 20, CANVAS_HEIGHT / 2);
+        ctx.moveTo(canvasWidth / 2 - 20, canvasHeight / 2);
+        ctx.lineTo(canvasWidth / 2 + 20, canvasHeight / 2);
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
-        ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+        ctx.moveTo(canvasWidth / 2, canvasHeight / 2 - 20);
+        ctx.lineTo(canvasWidth / 2, canvasHeight / 2 + 20);
         ctx.stroke();
     }
 
