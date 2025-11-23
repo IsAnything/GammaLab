@@ -273,58 +273,56 @@ function setupSourceSimulator(sourceType, options = {}) {
 
     let engine, renderers, hillasAnalyzer, colorPalette;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Inizializza componenti
-        engine = new SimulationEngine();
-        hillasAnalyzer = new HillasAnalyzer();
-        colorPalette = new EnergyColorPalette();
-        engine.colorPalette = colorPalette;
+    // Inizializza componenti immediatamente
+    engine = new SimulationEngine();
+    hillasAnalyzer = new HillasAnalyzer();
+    colorPalette = new EnergyColorPalette();
+    engine.colorPalette = colorPalette;
 
-        // Inizializza renderers per 3 camere
-        renderers = [
-            new CanvasRenderer('cam1', 'cam1-overlay'),
-            new CanvasRenderer('cam2', 'cam2-overlay'),
-            new CanvasRenderer('cam3', 'cam3-overlay')
-        ];
+    // Inizializza renderers per 3 camere
+    renderers = [
+        new CanvasRenderer('cam1', 'cam1-overlay'),
+        new CanvasRenderer('cam2', 'cam2-overlay'),
+        new CanvasRenderer('cam3', 'cam3-overlay')
+    ];
 
-        // Assegna nuova palette a tutti i renderers
-        renderers.forEach(renderer => {
-            renderer.colorPalette = colorPalette;
-            renderer.respectExactHillas = true;
-            renderer.subpixelEnabled = false;
+    // Assegna nuova palette a tutti i renderers
+    renderers.forEach(renderer => {
+        renderer.colorPalette = colorPalette;
+        renderer.respectExactHillas = true;
+        renderer.subpixelEnabled = false;
 
-            if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
-                renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
-            }
-        });
-
-        if (typeof window.configureRendererHoverEllipses === 'function') {
-            window.configureRendererHoverEllipses(renderers);
-        }
-
-        console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
-
-        // Event listeners
-        const generateBtn = document.getElementById(generateBtnId);
-        const clearBtn = document.getElementById(clearBtnId);
-
-        if (generateBtn) {
-            generateBtn.addEventListener('click', () => generateEvent());
-        }
-
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => clearAll());
-        }
-        console.log(`✅ Simulatore ${sourceType} inizializzato`);
-        
-        // Auto-genera primo evento dopo caricamento pagina
-        if (options.autoGenerate !== false) {  // default true
-            setTimeout(() => {
-                console.log('🎬 Auto-generating initial event...');
-                generateEvent();
-            }, 500);
+        if (renderer.canvas && typeof renderer.hideHoverZoomUntilExit === 'function') {
+            renderer.canvas.addEventListener('click', () => renderer.hideHoverZoomUntilExit());
         }
     });
+
+    if (typeof window.configureRendererHoverEllipses === 'function') {
+        window.configureRendererHoverEllipses(renderers);
+    }
+
+    console.log('🎨 Nuova palette 5 colori assegnata ai renderers');
+
+    // Event listeners
+    const generateBtn = document.getElementById(generateBtnId);
+    const clearBtn = document.getElementById(clearBtnId);
+
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => generateEvent());
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => clearAll());
+    }
+    console.log(`✅ Simulatore ${sourceType} inizializzato`);
+    
+    // Auto-genera primo evento dopo caricamento pagina
+    if (options.autoGenerate !== false) {  // default true
+        setTimeout(() => {
+            console.log('🎬 Auto-generating initial event...');
+            generateEvent();
+        }, 200);
+    }
 
     /**
      * Genera evento per la sorgente
