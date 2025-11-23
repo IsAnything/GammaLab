@@ -647,7 +647,7 @@ class SimulationEngine {
         
         // Adroni: più fotoni ma distribuiti in modo più disperso
         const densityFactor = 0.8 + Math.random() * 1.0;
-        const numPhotons = Math.min(Math.floor(params.size * densityFactor), 2500); // Ridotto da 4000
+        const numPhotons = Math.min(Math.floor(params.size * densityFactor), 1200); // Ridotto da 2500
         
         // Centro traccia principale
         const dispersionX = canvasWidth * 0.15;

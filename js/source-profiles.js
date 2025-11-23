@@ -326,8 +326,8 @@ const HADRON_BACKGROUND_PROFILE = {
     name: 'Hadronic Background',
     displayName: 'Fondo Adronico (CR)',
     
-    length: { min: 0.25, max: 0.45 },  // 25-45 pixel
-    width: { min: 0.15, max: 0.30 },   // 15-30 pixel - LARGO! (avg 22px)
+    length: { min: 0.15, max: 0.25 },  // 15-25 pixel - RIDOTTO
+    width: { min: 0.08, max: 0.15 },   // 8-15 pixel - RIDOTTO (avg 22px)
     size: { min: 500, max: 3000 },     // Molto variabile
     alpha: { 
         type: 'uniform',

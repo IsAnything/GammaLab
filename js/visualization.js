@@ -1338,11 +1338,13 @@ class CanvasRenderer {
             }
         });
 
-        // Renderizza le tracce senza clipping esagonale per evitare che vengano tagliate
+        // Renderizza le tracce con clipping esagonale per mostrare solo quelle dentro la camera
         if (!this.showEllipseOnly) {
-            const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
-            sortedTracks.forEach(track => {
-                this.renderPhoton(track);
+            this._withHexClip(() => {
+                const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
+                sortedTracks.forEach(track => {
+                    this.renderPhoton(track);
+                });
             });
         }
 
@@ -1397,10 +1399,12 @@ class CanvasRenderer {
         let currentIndex = 0;
 
         const renderBatch = () => {
-            // Renderizza le tracce senza clipping esagonale
-            const batch = sortedTracks.slice(currentIndex, currentIndex + batchSize);
-            batch.forEach(track => {
-                this.renderPhoton(track);
+            // Renderizza le tracce con clipping esagonale
+            this._withHexClip(() => {
+                const batch = sortedTracks.slice(currentIndex, currentIndex + batchSize);
+                batch.forEach(track => {
+                    this.renderPhoton(track);
+                });
             });
 
             currentIndex += batchSize;
