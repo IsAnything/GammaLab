@@ -1335,7 +1335,9 @@ class CanvasRenderer {
                 this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
             }
 
-            this.renderEnergyHistogram(event);
+            if (showLegend) {
+                this.renderEnergyHistogram(event);
+            }
         });
 
         // Bordo in primo piano
