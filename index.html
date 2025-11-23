@@ -1,126 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GammaLab IACT — Stereoscopia con dettagli generati</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
-  <style>
-    /* minimal layout to make canvases visible */
-    body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#071019;color:#e6eef8;margin:0;padding:16px}
-    .card{background:#071827;border-radius:8px;padding:12px;margin-bottom:12px}
-    .cameras{display:flex;gap:12px;align-items:flex-start}
-    .thumb{width:300px;height:200px;background:#000;border:1px solid rgba(255,255,255,0.04)}
-    .detail-row{display:flex;gap:12px;margin-top:12px}
-    .detail-block{position:relative}
-    .viewer{width:320px;height:240px;display:block}
-    .viewerOverlay{position:absolute;left:0;top:0;pointer-events:none;width:320px;height:240px}
-    .camera-controls{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
-    button{background:#0b3b5a;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0; url=homepage.html">
+    <title>GammaLab - Simulatore Cherenkov</title>
+    <meta name="description" content="Simulatore educativo interattivo di telescopi Cherenkov atmosferici per lo studio di raggi gamma e fisica astroparticellare">
+    <meta name="keywords" content="Cherenkov, telescopi, raggi gamma, astroparticelle, fisica, educazione, simulatore">
+    <meta name="author" content="GammaLab">
+    <meta property="og:title" content="GammaLab - Simulatore Cherenkov">
+    <meta property="og:description" content="Simulatore educativo di telescopi Cherenkov atmosferici">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <h1 style="margin:0 0 6px 0">GammaLab — IACT stereoscopica</h1>
-      <p style="margin:0;color:#9fb8d6">3 camere · dettagli generati · zoom/pan</p>
-    </div>
-  </header>
-
-  <main>
-    <section id="iact-panel" class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <label for="iactEnergy">Energia (GeV)</label>
-        <input id="iactEnergy" type="number" value="500" style="width:100px" />
-        <label for="iactPrim">Primario</label>
-        <select id="iactPrim"><option value="gamma">gamma</option><option value="proton">proton</option></select>
-        <button id="iactSimBtn">Simula Flash</button>
-        <button id="exportHillas">Esporta Hillas</button>
-      </div>
-
-      <div class="cameras">
-        <div>
-          <canvas id="cameraC1" class="thumb" width="320" height="240"></canvas>
-        </div>
-        <div>
-          <canvas id="cameraC2" class="thumb" width="320" height="240"></canvas>
-        </div>
-        <div>
-          <canvas id="cameraC3" class="thumb" width="320" height="240"></canvas>
-        </div>
-      </div>
-
-      <div class="camera-controls">
-        <button class="exportCam" data-cam="C1">Export C1 PNG</button>
-        <button class="viewHighRes" data-cam="C1">View C1 High‑Res</button>
-        <button class="exportCam" data-cam="C2">Export C2 PNG</button>
-        <button class="viewHighRes" data-cam="C2">View C2 High‑Res</button>
-        <button class="exportCam" data-cam="C3">Export C3 PNG</button>
-        <button class="viewHighRes" data-cam="C3">View C3 High‑Res</button>
-      </div>
-
-      <div style="margin-top:10px" id="hillasText">Nessuna Hillas</div>
-
-      <div class="detail-row" aria-hidden="false">
-        <div class="detail-block">
-          <canvas id="viewer1Base" class="viewer" width="320" height="240"></canvas>
-          <canvas id="viewer1Overlay" class="viewerOverlay" width="320" height="240"></canvas>
-        </div>
-        <div class="detail-block">
-          <canvas id="viewer2Base" class="viewer" width="320" height="240"></canvas>
-          <canvas id="viewer2Overlay" class="viewerOverlay" width="320" height="240"></canvas>
-        </div>
-        <div class="detail-block">
-          <canvas id="viewer3Base" class="viewer" width="320" height="240"></canvas>
-          <canvas id="viewer3Overlay" class="viewerOverlay" width="320" height="240"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <section id="mission-panel" class="card">
-      <h3 style="margin-top:0">Missione</h3>
-      <p id="missionText">Premi Genera per iniziare una missione.</p>
-      <div style="display:flex;gap:8px">
-        <button id="generateBtn">Genera</button>
-        <button id="hintBtn">Suggerimento</button>
-      </div>
-      <p id="progressiveHint" style="margin-top:8px;color:#9fb8d6"></p>
-    </section>
-
-    <section id="answer-panel" class="card">
-      <h3 style="margin-top:0">Indovina la sorgente</h3>
-      <div id="options" role="radiogroup" aria-label="Opzioni sorgente"></div>
-      <div style="margin-top:8px">
-        <button id="submitAnswer">Invia</button>
-        <span id="feedback" style="margin-left:12px"></span>
-      </div>
-    </section>
-  </main>
-
-  <footer style="margin-top:12px">
-    <small>Versione didattica — stereoscopia semplificata</small>
-  </footer>
-
-  <!-- High-res modal (hidden by default) -->
-  <div id="highResModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;">
-    <div style="position:relative;width:90%;height:90%;max-width:3200px;max-height:2200px;background:#0b0b0b;border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,0.6);overflow:auto;display:flex;flex-direction:column;">
-      <button id="highResClose" aria-label="Chiudi" style="position:absolute;right:8px;top:8px;background:rgba(255,255,255,0.06);border:none;color:#fff;padding:6px 10px;border-radius:4px;cursor:pointer;z-index:20;">✕</button>
-      <div id="highResContainer" style="flex:1;display:flex;align-items:center;justify-content:center;padding:8px;"></div>
-    </div>
-  </div>
-
-  <script>
-    // small wiring: export/view buttons (also present in script.js but safe to double-wire)
-    window.addEventListener('load', ()=>{
-      document.querySelectorAll('.exportCam').forEach(btn=> btn.addEventListener('click', ()=> document.getElementById(btn.dataset.cam==='C1'?'cameraC1':btn.dataset.cam==='C2'?'cameraC2':'cameraC3').toDataURL && (function(a){ a.href = document.getElementById(btn.dataset.cam==='C1'?'cameraC1':btn.dataset.cam==='C2'?'cameraC2':'cameraC3').toDataURL('image/png'); a.download = btn.dataset.cam + '_thumb.png'; document.body.appendChild(a); a.click(); a.remove(); })(document.createElement('a')) ));
-      document.querySelectorAll('.viewHighRes').forEach(btn=> btn.addEventListener('click', ()=> {
-        const ev = new Event('click');
-        const dataset = { cam: btn.dataset.cam };
-        // call existing openHighResHex if present
-        if(typeof openHighResHex === 'function') openHighResHex(btn.dataset.cam);
-      }));
-    });
-  </script>
+    <p>Reindirizzamento a <a href="homepage.html">GammaLab</a>...</p>
+    <script>
+        window.location.href = 'homepage.html';
+    </script>
 </body>
 </html>
