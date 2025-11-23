@@ -649,9 +649,9 @@ class SimulationEngine {
         const densityFactor = 0.8 + Math.random() * 1.0;
         const numPhotons = Math.min(Math.floor(params.size * densityFactor), 1200); // Ridotto da 2500
         
-        // Centro traccia principale - ULTERIORMENTE RIDOTTO per contenere entro esagono
-        const dispersionX = canvasWidth * 0.02;  // Da 0.05 a 0.02
-        const dispersionY = canvasHeight * 0.02; // Da 0.05 a 0.02
+        // Centro traccia principale - RIDOTTO ma non eccessivamente
+        const dispersionX = canvasWidth * 0.035;  // Da 0.02 a 0.035
+        const dispersionY = canvasHeight * 0.035; // Da 0.02 a 0.035
         let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
         let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
 
@@ -682,9 +682,9 @@ class SimulationEngine {
             if (!isFinite(gx) || !isFinite(gy)) continue;
             
             // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
-            // ULTERIORMENTE RIDOTTO per contenere entro esagono
-            let dx = gx * lengthPx * 0.3;  // Da 0.5 a 0.3
-            let dy = gy * widthPx * 0.15;   // Da 0.25 a 0.15
+            // RIDOTTO ma bilanciato per visibilità
+            let dx = gx * lengthPx * 0.4;  // Da 0.3 a 0.4
+            let dy = gy * widthPx * 0.2;   // Da 0.15 a 0.2
             
             if (!isFinite(dx) || !isFinite(dy)) continue;
             
@@ -709,10 +709,10 @@ class SimulationEngine {
             let x = centerX + rotX;
             let y = centerY + rotY;
             
-            // Verifica se il punto è dentro l'esagono, altrimenti scarta
-            if (!this._isPointInHexagon(x, y, canvasWidth, canvasHeight)) {
-                continue; // Scarta punti fuori dall'esagono
-            }
+            // Forza il punto a rimanere entro l'esagono (clamp invece di scarto)
+            const clamped = this._clampToHexagon(x, y, canvasWidth, canvasHeight);
+            x = clamped.x;
+            y = clamped.y;
             
             // 20% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
             if (Math.random() < 0.2) {
@@ -721,12 +721,10 @@ class SimulationEngine {
                 const newX = x + Math.cos(subAngle) * subDist;
                 const newY = y + Math.sin(subAngle) * subDist;
                 
-                // Verifica anche il sub-shower
-                if (this._isPointInHexagon(newX, newY, canvasWidth, canvasHeight)) {
-                    x = newX;
-                    y = newY;
-                }
-                // Altrimenti mantieni il punto originale
+                // Clamp anche il sub-shower
+                const clampedSub = this._clampToHexagon(newX, newY, canvasWidth, canvasHeight);
+                x = clampedSub.x;
+                y = clampedSub.y;
             }
             
             if (!isFinite(x) || !isFinite(y)) continue;
@@ -1011,22 +1009,49 @@ class SimulationEngine {
     }
 
     /**
-     * Verifica se un punto (x,y) è dentro l'esagono della camera
+     * Forza un punto a rimanere entro l'esagono spostandolo verso il centro se necessario
      */
-    _isPointInHexagon(x, y, canvasWidth, canvasHeight) {
-        // Vertici dell'esagono basato sul clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)
-        const w = canvasWidth;
-        const h = canvasHeight;
-        const vertices = [
-            {x: 0.3 * w, y: 0},
-            {x: 0.7 * w, y: 0},
-            {x: w, y: 0.5 * h},
-            {x: 0.7 * w, y: h},
-            {x: 0.3 * w, y: h},
-            {x: 0, y: 0.5 * h}
-        ];
+    _clampToHexagon(x, y, canvasWidth, canvasHeight) {
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
         
-        return this._pointInPolygon(x, y, vertices);
+        // Se il punto è già dentro, restituiscilo
+        if (this._isPointInHexagon(x, y, canvasWidth, canvasHeight)) {
+            return { x, y };
+        }
+        
+        // Altrimenti, sposta il punto verso il centro lungo la linea dal centro al punto
+        // fino a raggiungere il bordo dell'esagono
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance === 0) {
+            return { x: centerX, y: centerY };
+        }
+        
+        // Trova il punto sul bordo nella direzione del punto originale
+        // Usa binary search per trovare il raggio massimo in quella direzione
+        let minRadius = 0;
+        let maxRadius = Math.max(canvasWidth, canvasHeight);
+        let clampedX = x;
+        let clampedY = y;
+        
+        for (let i = 0; i < 10; i++) { // 10 iterazioni per precisione sufficiente
+            const testRadius = (minRadius + maxRadius) / 2;
+            const testX = centerX + (dx / distance) * testRadius;
+            const testY = centerY + (dy / distance) * testRadius;
+            
+            if (this._isPointInHexagon(testX, testY, canvasWidth, canvasHeight)) {
+                minRadius = testRadius;
+                clampedX = testX;
+                clampedY = testY;
+            } else {
+                maxRadius = testRadius;
+            }
+        }
+        
+        return { x: clampedX, y: clampedY };
     }
 
     /**
