@@ -649,9 +649,9 @@ class SimulationEngine {
         const densityFactor = 0.8 + Math.random() * 1.0;
         const numPhotons = Math.min(Math.floor(params.size * densityFactor), 1200); // Ridotto da 2500
         
-        // Centro traccia principale
-        const dispersionX = canvasWidth * 0.05;
-        const dispersionY = canvasHeight * 0.05;
+        // Centro traccia principale - ULTERIORMENTE RIDOTTO per contenere entro esagono
+        const dispersionX = canvasWidth * 0.02;  // Da 0.05 a 0.02
+        const dispersionY = canvasHeight * 0.02; // Da 0.05 a 0.02
         let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
         let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
 
@@ -682,8 +682,9 @@ class SimulationEngine {
             if (!isFinite(gx) || !isFinite(gy)) continue;
             
             // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
-            let dx = gx * lengthPx * 0.5;  // ULTERIORMENTE RIDOTTO
-            let dy = gy * widthPx * 0.25;   // ULTERIORMENTE RIDOTTO
+            // ULTERIORMENTE RIDOTTO per contenere entro esagono
+            let dx = gx * lengthPx * 0.3;  // Da 0.5 a 0.3
+            let dy = gy * widthPx * 0.15;   // Da 0.25 a 0.15
             
             if (!isFinite(dx) || !isFinite(dy)) continue;
             
@@ -708,12 +709,24 @@ class SimulationEngine {
             let x = centerX + rotX;
             let y = centerY + rotY;
             
+            // Verifica se il punto è dentro l'esagono, altrimenti scarta
+            if (!this._isPointInHexagon(x, y, canvasWidth, canvasHeight)) {
+                continue; // Scarta punti fuori dall'esagono
+            }
+            
             // 20% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
             if (Math.random() < 0.2) {
                 const subAngle = Math.random() * 2 * Math.PI;
                 const subDist = Math.random() * lengthPx * 0.2;
-                x += Math.cos(subAngle) * subDist;
-                y += Math.sin(subAngle) * subDist;
+                const newX = x + Math.cos(subAngle) * subDist;
+                const newY = y + Math.sin(subAngle) * subDist;
+                
+                // Verifica anche il sub-shower
+                if (this._isPointInHexagon(newX, newY, canvasWidth, canvasHeight)) {
+                    x = newX;
+                    y = newY;
+                }
+                // Altrimenti mantieni il punto originale
             }
             
             if (!isFinite(x) || !isFinite(y)) continue;
@@ -995,6 +1008,44 @@ class SimulationEngine {
         const u2 = Math.random();
         const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
         return mean + z0 * std;
+    }
+
+    /**
+     * Verifica se un punto (x,y) è dentro l'esagono della camera
+     */
+    _isPointInHexagon(x, y, canvasWidth, canvasHeight) {
+        // Vertici dell'esagono basato sul clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)
+        const w = canvasWidth;
+        const h = canvasHeight;
+        const vertices = [
+            {x: 0.3 * w, y: 0},
+            {x: 0.7 * w, y: 0},
+            {x: w, y: 0.5 * h},
+            {x: 0.7 * w, y: h},
+            {x: 0.3 * w, y: h},
+            {x: 0, y: 0.5 * h}
+        ];
+        
+        return this._pointInPolygon(x, y, vertices);
+    }
+
+    /**
+     * Algoritmo ray casting per verificare se un punto è dentro un poligono
+     */
+    _pointInPolygon(x, y, vertices) {
+        let inside = false;
+        const n = vertices.length;
+        
+        for (let i = 0, j = n - 1; i < n; j = i++) {
+            const xi = vertices[i].x, yi = vertices[i].y;
+            const xj = vertices[j].x, yj = vertices[j].y;
+            
+            if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+                inside = !inside;
+            }
+        }
+        
+        return inside;
     }
 }
 
