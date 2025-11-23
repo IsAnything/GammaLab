@@ -650,8 +650,8 @@ class SimulationEngine {
         const numPhotons = Math.min(Math.floor(params.size * densityFactor), 2500); // Ridotto da 4000
         
         // Centro traccia principale
-        const dispersionX = canvasWidth * 0.25;
-        const dispersionY = canvasHeight * 0.25;
+        const dispersionX = canvasWidth * 0.15;
+        const dispersionY = canvasHeight * 0.15;
         let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
         let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
 
@@ -682,8 +682,8 @@ class SimulationEngine {
             if (!isFinite(gx) || !isFinite(gy)) continue;
             
             // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
-            let dx = gx * lengthPx * 1.0;  // Ridotto da 1.5 per contenere meglio
-            let dy = gy * widthPx * 0.5;   // Ridotto da 0.8 per contenere meglio
+            let dx = gx * lengthPx * 0.6;  // Ridotto ulteriormente
+            let dy = gy * widthPx * 0.3;   // Ridotto ulteriormente
             
             if (!isFinite(dx) || !isFinite(dy)) continue;
             
@@ -711,7 +711,7 @@ class SimulationEngine {
             // 20% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
             if (Math.random() < 0.2) {
                 const subAngle = Math.random() * 2 * Math.PI;
-                const subDist = Math.random() * lengthPx * 0.4;
+                const subDist = Math.random() * lengthPx * 0.2;
                 x += Math.cos(subAngle) * subDist;
                 y += Math.sin(subAngle) * subDist;
             }
