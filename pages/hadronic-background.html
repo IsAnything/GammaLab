@@ -105,57 +105,59 @@
             </p>
 
             <h3>📊 Confronto Morfologico</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Proprietà</th>
-                        <th>Eventi Gamma (γ)</th>
-                        <th>Eventi Adronici (p/He)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Forma traccia</strong></td>
-                        <td>Ellisse regolare, smooth</td>
-                        <td>Irregolare, con grumi (clumpiness)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Singolarità</strong></td>
-                        <td>Un solo "core" centrale</td>
-                        <td>Spesso multipli sub-sciami</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Width</strong></td>
-                        <td>Stretto (~0.05-0.15°)</td>
-                        <td>Più largo (~0.10-0.30°)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Length/Width</strong></td>
-                        <td>Alto (2.5-4.0)</td>
-                        <td>Più basso (1.5-3.0)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Compattezza</strong></td>
-                        <td>Alta (luminosità concentrata)</td>
-                        <td>Bassa (luce dispersa)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Asimmetria</strong></td>
-                        <td>Bassa</td>
-                        <td>Alta (forma asimmetrica)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Coerenza stereo</strong></td>
-                        <td>Eccellente (parametri simili tra camere)</td>
-                        <td>Moderata (parametri più dispersi)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Presenza muoni</strong></td>
-                        <td>Nessuna / trascurabile</td>
-                        <td>Significativa (anelli Cherenkov muonici)</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Proprietà</th>
+                            <th>Eventi Gamma (γ)</th>
+                            <th>Eventi Adronici (p/He)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Forma traccia</strong></td>
+                            <td>Ellisse regolare, smooth</td>
+                            <td>Irregolare, con grumi (clumpiness)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Singolarità</strong></td>
+                            <td>Un solo "core" centrale</td>
+                            <td>Spesso multipli sub-sciami</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Width</strong></td>
+                            <td>Stretto (~0.05-0.15°)</td>
+                            <td>Più largo (~0.10-0.30°)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Length/Width</strong></td>
+                            <td>Alto (2.5-4.0)</td>
+                            <td>Più basso (1.5-3.0)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compattezza</strong></td>
+                            <td>Alta (luminosità concentrata)</td>
+                            <td>Bassa (luce dispersa)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Asimmetria</strong></td>
+                            <td>Bassa</td>
+                            <td>Alta (forma asimmetrica)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coerenza stereo</strong></td>
+                            <td>Eccellente (parametri simili tra camere)</td>
+                            <td>Moderata (parametri più dispersi)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Presenza muoni</strong></td>
+                            <td>Nessuna / trascurabile</td>
+                            <td>Significativa (anelli Cherenkov muonici)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <h3>🎯 Parametri Discriminanti Chiave</h3>
             <ul>
@@ -240,54 +242,56 @@
             <h2>📈 Performance nella Pratica</h2>
             
             <h3>Catena di Analisi Tipica (H.E.S.S., MAGIC, VERITAS)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Stage</th>
-                        <th>Eventi Gamma Residui</th>
-                        <th>Eventi Adronici Residui</th>
-                        <th>Rapporto γ/hadron</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Raw data</strong></td>
-                        <td>100% (baseline)</td>
-                        <td>100% (~1000× più frequenti)</td>
-                        <td>~1:1000</td>
-                    </tr>
-                    <tr>
-                        <td><strong>+ Trigger hardware</strong></td>
-                        <td>~95%</td>
-                        <td>~80%</td>
-                        <td>~1:800</td>
-                    </tr>
-                    <tr>
-                        <td><strong>+ Cleaning/calibrazione</strong></td>
-                        <td>~90%</td>
-                        <td>~60%</td>
-                        <td>~1:650</td>
-                    </tr>
-                    <tr>
-                        <td><strong>+ Hillas cuts</strong></td>
-                        <td>~70%</td>
-                        <td>~5%</td>
-                        <td>~1:70</td>
-                    </tr>
-                    <tr>
-                        <td><strong>+ Stereoscopia</strong></td>
-                        <td>~65%</td>
-                        <td>~2%</td>
-                        <td>~1:30</td>
-                    </tr>
-                    <tr>
-                        <td><strong>+ ML/Alpha cuts</strong></td>
-                        <td>~60%</td>
-                        <td>~0.5-1%</td>
-                        <td>~1:8 - 1:16</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Eventi Gamma Residui</th>
+                            <th>Eventi Adronici Residui</th>
+                            <th>Rapporto γ/hadron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Raw data</strong></td>
+                            <td>100% (baseline)</td>
+                            <td>100% (~1000× più frequenti)</td>
+                            <td>~1:1000</td>
+                        </tr>
+                        <tr>
+                            <td><strong>+ Trigger hardware</strong></td>
+                            <td>~95%</td>
+                            <td>~80%</td>
+                            <td>~1:800</td>
+                        </tr>
+                        <tr>
+                            <td><strong>+ Cleaning/calibrazione</strong></td>
+                            <td>~90%</td>
+                            <td>~60%</td>
+                            <td>~1:650</td>
+                        </tr>
+                        <tr>
+                            <td><strong>+ Hillas cuts</strong></td>
+                            <td>~70%</td>
+                            <td>~5%</td>
+                            <td>~1:70</td>
+                        </tr>
+                        <tr>
+                            <td><strong>+ Stereoscopia</strong></td>
+                            <td>~65%</td>
+                            <td>~2%</td>
+                            <td>~1:30</td>
+                        </tr>
+                        <tr>
+                            <td><strong>+ ML/Alpha cuts</strong></td>
+                            <td>~60%</td>
+                            <td>~0.5-1%</td>
+                            <td>~1:8 - 1:16</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <h3>📊 Quality Factor</h3>
             <p>
@@ -327,60 +331,62 @@
             <h2>📸 Caratteristiche Cherenkov del Background Adronico</h2>
             
             <h3>Parametri di Hillas Tipici (Eventi Adronici)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parametro</th>
-                        <th>Range Tipico</th>
-                        <th>Valore Medio</th>
-                        <th>vs Eventi Gamma</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Length</strong></td>
-                        <td>0.25° - 0.45°</td>
-                        <td>~0.35°</td>
-                        <td>Simile o maggiore</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Width</strong></td>
-                        <td>0.15° - 0.30°</td>
-                        <td>~0.22°</td>
-                        <td>Significativamente maggiore ⚠️</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Size</strong></td>
-                        <td>500 - 3000 p.e.</td>
-                        <td>~1200 p.e.</td>
-                        <td>Sovrapposizione ampia</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Alpha</strong></td>
-                        <td>0° - 90°</td>
-                        <td>~45° (uniforme)</td>
-                        <td>Distribuito, non picco a 0° 🔑</td>
-                    </tr>
-                    <tr>
-                        <td><strong>L/W Ratio</strong></td>
-                        <td>1.2 - 2.5</td>
-                        <td>~1.6</td>
-                        <td>Più basso (meno allungato)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Asimmetria</strong></td>
-                        <td>0.3 - 0.8</td>
-                        <td>~0.5</td>
-                        <td>Molto maggiore (irregolare)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Varianza inter-camera</strong></td>
-                        <td>20-40%</td>
-                        <td>~30%</td>
-                        <td>3-6× maggiore che per gamma</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parametro</th>
+                            <th>Range Tipico</th>
+                            <th>Valore Medio</th>
+                            <th>vs Eventi Gamma</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Length</strong></td>
+                            <td>0.25° - 0.45°</td>
+                            <td>~0.35°</td>
+                            <td>Simile o maggiore</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Width</strong></td>
+                            <td>0.15° - 0.30°</td>
+                            <td>~0.22°</td>
+                            <td>Significativamente maggiore ⚠️</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Size</strong></td>
+                            <td>500 - 3000 p.e.</td>
+                            <td>~1200 p.e.</td>
+                            <td>Sovrapposizione ampia</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Alpha</strong></td>
+                            <td>0° - 90°</td>
+                            <td>~45° (uniforme)</td>
+                            <td>Distribuito, non picco a 0° 🔑</td>
+                        </tr>
+                        <tr>
+                            <td><strong>L/W Ratio</strong></td>
+                            <td>1.2 - 2.5</td>
+                            <td>~1.6</td>
+                            <td>Più basso (meno allungato)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Asimmetria</strong></td>
+                            <td>0.3 - 0.8</td>
+                            <td>~0.5</td>
+                            <td>Molto maggiore (irregolare)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Varianza inter-camera</strong></td>
+                            <td>20-40%</td>
+                            <td>~30%</td>
+                            <td>3-6× maggiore che per gamma</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <h3>🎯 Firme Distintive del Background</h3>
             <ul>
@@ -499,42 +505,44 @@
         <!-- Confronto Finale -->
         <section class="card">
             <h2>⚖️ Background Adronico vs Sorgenti Gamma</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parametro</th>
-                        <th>⚛️ Background Adronico</th>
-                        <th>Sorgenti Gamma (range)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Width (px)</strong></td>
-                        <td>~22 (molto largo) 🔴</td>
-                        <td>5-15 (sottile/medio)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>L/W</strong></td>
-                        <td>~1.6 (basso) 🔴</td>
-                        <td>1.9-3.1 (alto)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Alpha</strong></td>
-                        <td>Uniforme 0-90° 🔴</td>
-                        <td>Concentrato 0-15°</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Irregolarità</strong></td>
-                        <td>Alta (grumosa) 🔴</td>
-                        <td>Bassa (smooth)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Coerenza stereo</strong></td>
-                        <td>~70% (bassa) 🔴</td>
-                        <td>85-95% (alta)</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parametro</th>
+                            <th>⚛️ Background Adronico</th>
+                            <th>Sorgenti Gamma (range)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Width (px)</strong></td>
+                            <td>~22 (molto largo) 🔴</td>
+                            <td>5-15 (sottile/medio)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>L/W</strong></td>
+                            <td>~1.6 (basso) 🔴</td>
+                            <td>1.9-3.1 (alto)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Alpha</strong></td>
+                            <td>Uniforme 0-90° 🔴</td>
+                            <td>Concentrato 0-15°</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Irregolarità</strong></td>
+                            <td>Alta (grumosa) 🔴</td>
+                            <td>Bassa (smooth)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coerenza stereo</strong></td>
+                            <td>~70% (bassa) 🔴</td>
+                            <td>85-95% (alta)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <!-- Prossimi Passi -->

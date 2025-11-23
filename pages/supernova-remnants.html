@@ -331,54 +331,56 @@
             <h2>🔭 PeVatron Confermati e Candidati</h2>
             
             <h3>🌟 Esempi Celebri</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Sorgente</th>
-                        <th>Tipo</th>
-                        <th>E<sub>max</sub></th>
-                        <th>Distanza</th>
-                        <th>Note</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>RX J1713.7-3946</strong></td>
-                        <td>SNR giovane</td>
-                        <td>>100 TeV</td>
-                        <td>~1 kpc</td>
-                        <td>Primo PeVatron candidato, shell-type</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Cassiopeia A</strong></td>
-                        <td>SNR giovane</td>
-                        <td>~10 TeV</td>
-                        <td>3.4 kpc</td>
-                        <td>Resto di SN storica (1680 ca.)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tycho SNR</strong></td>
-                        <td>SNR giovane</td>
-                        <td>~10 TeV</td>
-                        <td>3 kpc</td>
-                        <td>SN osservata nel 1572 da Tycho Brahe</td>
-                    </tr>
-                    <tr>
-                        <td><strong>HESS J1825-137</strong></td>
-                        <td>PWN estesa</td>
-                        <td>>50 TeV</td>
-                        <td>4 kpc</td>
-                        <td>Associata a PSR B1823-13</td>
-                    </tr>
-                    <tr>
-                        <td><strong>LHAASO J2226+6057</strong></td>
-                        <td>PWN/SNR?</td>
-                        <td>~1 PeV ⚡</td>
-                        <td>?</td>
-                        <td>Rilevazione LHAASO a energie PeV!</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sorgente</th>
+                            <th>Tipo</th>
+                            <th>E<sub>max</sub></th>
+                            <th>Distanza</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>RX J1713.7-3946</strong></td>
+                            <td>SNR giovane</td>
+                            <td>>100 TeV</td>
+                            <td>~1 kpc</td>
+                            <td>Primo PeVatron candidato, shell-type</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cassiopeia A</strong></td>
+                            <td>SNR giovane</td>
+                            <td>~10 TeV</td>
+                            <td>3.4 kpc</td>
+                            <td>Resto di SN storica (1680 ca.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tycho SNR</strong></td>
+                            <td>SNR giovane</td>
+                            <td>~10 TeV</td>
+                            <td>3 kpc</td>
+                            <td>SN osservata nel 1572 da Tycho Brahe</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HESS J1825-137</strong></td>
+                            <td>PWN estesa</td>
+                            <td>>50 TeV</td>
+                            <td>4 kpc</td>
+                            <td>Associata a PSR B1823-13</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LHAASO J2226+6057</strong></td>
+                            <td>PWN/SNR?</td>
+                            <td>~1 PeV ⚡</td>
+                            <td>?</td>
+                            <td>Rilevazione LHAASO a energie PeV!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <h3>📊 Caratteristiche Comuni</h3>
             <ul>
@@ -525,48 +527,50 @@
             </p>
 
             <h3>Parametri di Hillas Tipici</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parametro</th>
-                        <th>Range Tipico</th>
-                        <th>Valore Medio</th>
-                        <th>Interpretazione Fisica</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Length</strong></td>
-                        <td>0.30° - 0.50°<br>(30-50 px)</td>
-                        <td><strong>~0.40°</strong><br>(~40 px)</td>
-                        <td>⚡ Tracce molto più <em>lunghe</em> (alta energia)</td>
-                    </tr>
-                    <tr style="background: rgba(255, 102, 68, 0.05);">
-                        <td><strong>Width</strong></td>
-                        <td>0.10° - 0.20°<br>(10-20 px)</td>
-                        <td><strong>~0.15°</strong><br>(~15 px)</td>
-                        <td>🎯 Sciami più <em>ampi</em> (sviluppo laterale maggiore)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Size</strong></td>
-                        <td>2000 - 5000 p.e.</td>
-                        <td><strong>~2500 p.e.</strong> 🔥</td>
-                        <td>💡 Segnali <em>molto intensi</em> (E >> TeV), possibile saturazione</td>
-                    </tr>
-                    <tr style="background: rgba(255, 102, 68, 0.05);">
-                        <td><strong>Alpha (α)</strong></td>
-                        <td>0° - 20°</td>
-                        <td><strong>~10°</strong></td>
-                        <td>📍 Sorgenti <em>estese</em> → α disperso, non punta al centro</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Elongation (L/W)</strong></td>
-                        <td>2.0 - 3.5</td>
-                        <td><strong>~2.7</strong></td>
-                        <td>📏 Rapporto simile a Crab, ma valori assoluti maggiori</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parametro</th>
+                            <th>Range Tipico</th>
+                            <th>Valore Medio</th>
+                            <th>Interpretazione Fisica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Length</strong></td>
+                            <td>0.30° - 0.50°<br>(30-50 px)</td>
+                            <td><strong>~0.40°</strong><br>(~40 px)</td>
+                            <td>⚡ Tracce molto più <em>lunghe</em> (alta energia)</td>
+                        </tr>
+                        <tr style="background: rgba(255, 102, 68, 0.05);">
+                            <td><strong>Width</strong></td>
+                            <td>0.10° - 0.20°<br>(10-20 px)</td>
+                            <td><strong>~0.15°</strong><br>(~15 px)</td>
+                            <td>🎯 Sciami più <em>ampi</em> (sviluppo laterale maggiore)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Size</strong></td>
+                            <td>2000 - 5000 p.e.</td>
+                            <td><strong>~2500 p.e.</strong> 🔥</td>
+                            <td>💡 Segnali <em>molto intensi</em> (E >> TeV), possibile saturazione</td>
+                        </tr>
+                        <tr style="background: rgba(255, 102, 68, 0.05);">
+                            <td><strong>Alpha (α)</strong></td>
+                            <td>0° - 20°</td>
+                            <td><strong>~10°</strong></td>
+                            <td>📍 Sorgenti <em>estese</em> → α disperso, non punta al centro</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elongation (L/W)</strong></td>
+                            <td>2.0 - 3.5</td>
+                            <td><strong>~2.7</strong></td>
+                            <td>📏 Rapporto simile a Crab, ma valori assoluti maggiori</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="highlight-box" style="margin-top: 2rem;">
                 <h3>🎯 Caratteristiche Distintive</h3>
@@ -581,7 +585,7 @@
             </div>
 
             <h3>🔬 Confronto con Altre Sorgenti</h3>
-            <div style="overflow-x: auto; margin-top: 1.5rem;">
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>

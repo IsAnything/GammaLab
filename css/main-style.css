@@ -997,6 +997,23 @@ table tr:hover {
   .hillas-parameters {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  /* Tipografia responsive - Tablet */
+  .site-title {
+    font-size: 2.2em;
+  }
+  
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .card h2 {
+    font-size: 1.6em;
+  }
+  
+  .card h3 {
+    font-size: 1.3em;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1062,6 +1079,111 @@ table tr:hover {
     padding: 12px 16px;
     border-radius: 6px;
     margin-bottom: 4px;
+  }
+  
+  /* Tipografia responsive - Mobile */
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .hero-text {
+    font-size: 1rem;
+  }
+  
+  .card h2 {
+    font-size: 1.4em;
+  }
+  
+  .card h3 {
+    font-size: 1.2em;
+  }
+  
+  .card p {
+    font-size: 0.95rem;
+  }
+  
+  /* Pulsanti responsive */
+  .btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  /* Card responsive */
+  .card {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .hero-section {
+    padding: 32px 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Tipografia responsive - Small mobile */
+  .site-title {
+    font-size: 1.8em;
+  }
+  
+  .hero-title {
+    font-size: 1.6rem;
+  }
+  
+  .hero-text {
+    font-size: 0.95rem;
+  }
+  
+  .card h2 {
+    font-size: 1.3em;
+  }
+  
+  .card h3 {
+    font-size: 1.1em;
+  }
+  
+  .card p {
+    font-size: 0.9rem;
+  }
+  
+  /* Pulsanti responsive - Small */
+  .btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  /* Card responsive - Small */
+  .card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .hero-section {
+    padding: 24px 16px !important;
+  }
+  
+  /* Tabelle responsive */
+  table {
+    font-size: 0.85rem;
+  }
+  
+  table th,
+  table td {
+    padding: 8px;
+  }
+}
+
+/* ==================== TABELLE RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  /* Wrapper per tabelle responsive */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+  }
+  
+  .table-responsive table {
+    min-width: 600px; /* Larghezza minima per evitare compressione eccessiva */
   }
 }
 
