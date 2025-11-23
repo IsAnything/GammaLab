@@ -1317,28 +1317,34 @@ class CanvasRenderer {
         }
 
         this._withHexClip(() => {
-            const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
+            if (this.showEllipseOnly) {
+                this.renderEllipseOnlyMode(event, showLegend, { clipProvided: true });
+            } else {
+                if (this.lightStyle && !this.suppressNoise) {
+                    this.renderBackgroundNoise();
+                }
 
+                if (event.showGrid) {
+                    this.drawGrid();
+                }
+
+                if (showLegend) {
+                    this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
+                }
+
+                if (showLegend) {
+                    this.renderEnergyHistogram(event);
+                }
+            }
+        });
+
+        // Renderizza le tracce senza clipping esagonale per evitare che vengano tagliate
+        if (!this.showEllipseOnly) {
+            const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
             sortedTracks.forEach(track => {
                 this.renderPhoton(track);
             });
-
-            if (this.lightStyle && !this.suppressNoise) {
-                this.renderBackgroundNoise();
-            }
-
-            if (event.showGrid) {
-                this.drawGrid();
-            }
-
-            if (showLegend) {
-                this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
-            }
-
-            if (showLegend) {
-                this.renderEnergyHistogram(event);
-            }
-        });
+        }
 
         // Bordo in primo piano
         this.drawCameraBorder();
@@ -1391,12 +1397,10 @@ class CanvasRenderer {
         let currentIndex = 0;
 
         const renderBatch = () => {
+            // Renderizza le tracce senza clipping esagonale
             const batch = sortedTracks.slice(currentIndex, currentIndex + batchSize);
-
-            this._withHexClip(() => {
-                batch.forEach(track => {
-                    this.renderPhoton(track);
-                });
+            batch.forEach(track => {
+                this.renderPhoton(track);
             });
 
             currentIndex += batchSize;
