@@ -3,6 +3,188 @@
  * Utilities condivise per navigazione e integrazione simulatori
  */
 
+// === ANIMAZIONI E MICRO-INTERAZIONI ===
+
+/**
+ * Inizializza animazioni di scorrimento e micro-interazioni
+ */
+function initAnimations() {
+    // Intersection Observer per animazioni di scorrimento
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, observerOptions);
+
+    // Osserva tutti gli elementi con classe scroll-fade-in
+    document.querySelectorAll('.scroll-fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Animazioni per i canvas dei simulatori
+    document.querySelectorAll('.camera-canvas, .viewer-canvas, .stereo-canvas').forEach(canvas => {
+        canvas.addEventListener('mouseenter', () => {
+            canvas.classList.add('gpu-accelerated');
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            canvas.classList.remove('gpu-accelerated');
+        });
+    });
+
+    // Effetto ripple per i bottoni
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Animazioni per le opzioni del quiz
+    document.querySelectorAll('.quiz-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Rimuovi animazioni precedenti
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('success-animation', 'error-animation');
+            });
+
+            // Aggiungi animazione di selezione
+            this.classList.add('success-animation');
+        });
+    });
+
+    // Effetto typing per titoli importanti
+    document.querySelectorAll('.typing-effect').forEach(element => {
+        const text = element.textContent;
+        element.textContent = '';
+        element.style.width = '0';
+
+        setTimeout(() => {
+            element.style.width = '100%';
+        }, 500);
+    });
+
+    // Animazioni per i parametri Hillas
+    document.querySelectorAll('.param-value').forEach(value => {
+        const originalText = value.textContent;
+        value.textContent = '0';
+
+        setTimeout(() => {
+            animateNumber(value, 0, parseFloat(originalText.replace(/[^\d.-]/g, '')), 1000);
+        }, 500);
+    });
+
+    // Loading states per i canvas
+    document.querySelectorAll('.camera-canvas').forEach(canvas => {
+        canvas.classList.add('canvas-loading');
+
+        // Simula caricamento completato dopo 1 secondo
+        setTimeout(() => {
+            canvas.classList.remove('canvas-loading');
+        }, 1000);
+    });
+}
+
+/**
+ * Anima un numero da start a end
+ */
+function animateNumber(element, start, end, duration) {
+    const startTime = performance.now();
+    const isFloat = end % 1 !== 0;
+
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function (ease-out)
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const current = start + (end - start) * eased;
+
+        if (isFloat) {
+            element.textContent = current.toFixed(2);
+        } else {
+            element.textContent = Math.round(current);
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    requestAnimationFrame(update);
+}
+
+/**
+ * Aggiunge effetto shimmer durante il caricamento
+ */
+function addLoadingShimmer(element) {
+    element.classList.add('loading-shimmer');
+
+    return {
+        remove: () => element.classList.remove('loading-shimmer')
+    };
+}
+
+/**
+ * Effetto di scroll fluido per anchor links
+ */
+function initSmoothScrolling() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
+/**
+ * Gestisce le preferenze di riduzione del movimento
+ */
+function handleReducedMotion() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+        // Disabilita animazioni pesanti
+        document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+    }
+}
+
+// Inizializza tutto al caricamento della pagina
+document.addEventListener('DOMContentLoaded', () => {
+    initAnimations();
+    initSmoothScrolling();
+    handleReducedMotion();
+});
+
 // === GESTIONE NAVIGAZIONE ===
 
 /**
