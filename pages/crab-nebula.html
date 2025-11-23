@@ -246,21 +246,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
-        @media (max-width: 768px) {
-            .content-with-image,
-            .content-with-image.reverse {
-                grid-template-columns: 1fr;
-            }
-            
-            .content-with-image.reverse .text-content,
-            .content-with-image.reverse .image-content {
-                order: initial;
-            }
-            
-            .image-content {
-                position: static;
-            }
-        }
     </style>
 </head>
 <body>
@@ -270,6 +255,7 @@
             <p class="site-subtitle">🦀 Nebulosa del Granchio - Un Laboratorio Cosmico</p>
             
             <nav>
+                <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
                 <ul class="nav-menu">
                     <li><a href="../homepage.html">🏠 Home</a></li>
                     <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
@@ -868,5 +854,26 @@
     </footer>
 
     <script src="../js/navigation.js"></script>
+    
+    <script>
+        // Mobile Navigation Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                });
+                
+                // Chiudi menu quando si clicca fuori
+                document.addEventListener('click', function(e) {
+                    if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                        navMenu.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

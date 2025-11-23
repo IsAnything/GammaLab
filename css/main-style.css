@@ -28,6 +28,13 @@
   --energy-intense: #ff8800;
   --energy-extreme: #ff0000;
   --energy-saturated: #ffffff;
+
+  /* Breakpoints mobili-first */
+  --mobile: 480px;
+  --tablet: 768px;
+  --desktop: 1024px;
+  --wide: 1200px;
+  --ultra-wide: 1600px;
 }
 
 body {
@@ -40,9 +47,100 @@ body {
 
 /* Container principale */
 .container {
-  max-width: 1400px;
+  width: 100%;
+  max-width: var(--ultra-wide);
   margin: 0 auto;
   padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+}
+
+/* ==================== IMMAGINI RESPONSIVE ==================== */
+
+/* Immagini responsive universali */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Immagini nei contenuti */
+.image-content img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Hero images */
+.hero-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+  .hero-image {
+    max-height: 250px;
+  }
+}
+
+/* ==================== LAYOUT CONTENT ==================== */
+
+/* Layout con immagini responsive */
+.content-with-image {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+  align-items: start;
+}
+
+.content-with-image.reverse {
+  grid-template-columns: 1fr 1fr;
+}
+
+.content-with-image.reverse .text-content {
+  order: 2;
+}
+
+.content-with-image.reverse .image-content {
+  order: 1;
+}
+
+.image-content {
+  position: sticky;
+  top: 20px;
+}
+
+@media (max-width: 768px) {
+  .content-with-image,
+  .content-with-image.reverse {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .content-with-image.reverse .text-content,
+  .content-with-image.reverse .image-content {
+    order: initial;
+  }
+  
+  .image-content {
+    position: static;
+  }
 }
 
 /* ==================== HEADER E NAVIGAZIONE ==================== */
@@ -78,6 +176,22 @@ header {
 /* Menu navigazione */
 nav {
   margin-top: 12px;
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.nav-toggle:hover {
+  background: var(--bg-elevated);
 }
 
 .nav-menu {
@@ -904,6 +1018,50 @@ table tr:hover {
   
   .hillas-parameters {
     grid-template-columns: 1fr;
+  }
+
+  /* Hero images responsive */
+  .hero-images {
+    flex-direction: column;
+  }
+  
+  .hero-images img {
+    width: 100%;
+  }
+
+  /* Menu mobile */
+  .nav-toggle {
+    display: block;
+  }
+  
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 20px var(--shadow);
+    z-index: 1000;
+  }
+  
+  .nav-menu.active {
+    display: flex;
+  }
+  
+  .nav-menu li {
+    width: 100%;
+  }
+  
+  .nav-menu li a {
+    display: block;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 4px;
   }
 }
 
