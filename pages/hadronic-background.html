@@ -411,6 +411,8 @@
             <h2>📷 Camere IACT Interattive - Background Adronico</h2>
             <p>
                 Queste simulazioni mostrano eventi adronici tipici (protoni, nuclei He) catturati da tre telescopi IACT.
+                <strong>Ora tutte e tre le camere mostrano la stessa traccia fisica</strong> vista da posizioni leggermente diverse,
+                permettendo una <strong>vera ricostruzione stereoscopica</strong> con elevata coerenza tra le camere.
                 Nota le <strong>tracce irregolari e larghe</strong>, con <strong>Alpha distribuito 
                 uniformemente</strong> e <strong>scarsa coerenza stereoscopica</strong>.
             </p>
@@ -573,7 +575,7 @@
     <script>
         // Inizializza simulatore
         document.addEventListener('DOMContentLoaded', function() {
-            setupSourceSimulator('hadron');
+            setupSourceSimulator('hadron', { stereoscopic: true });
         });
     </script>
 </body>

@@ -650,8 +650,8 @@ class SimulationEngine {
         const numPhotons = Math.min(Math.floor(params.size * densityFactor), 1200); // Ridotto da 2500
         
         // Centro traccia principale
-        const dispersionX = canvasWidth * 0.10;
-        const dispersionY = canvasHeight * 0.10;
+        const dispersionX = canvasWidth * 0.05;
+        const dispersionY = canvasHeight * 0.05;
         let centerX = canvasWidth / 2 + (Math.random() - 0.5) * dispersionX;
         let centerY = canvasHeight / 2 + (Math.random() - 0.5) * dispersionY;
 
@@ -682,8 +682,8 @@ class SimulationEngine {
             if (!isFinite(gx) || !isFinite(gy)) continue;
             
             // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
-            let dx = gx * lengthPx * 0.7;  // RIDOTTO per contenere nell'esagono
-            let dy = gy * widthPx * 0.35;   // RIDOTTO per contenere nell'esagono
+            let dx = gx * lengthPx * 0.5;  // ULTERIORMENTE RIDOTTO
+            let dy = gy * widthPx * 0.25;   // ULTERIORMENTE RIDOTTO
             
             if (!isFinite(dx) || !isFinite(dy)) continue;
             

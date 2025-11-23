@@ -257,21 +257,20 @@ window.configureRendererHoverEllipses = function(renderers) {
 
 // === SIMULATORE UNIVERSALE ===
 
-/**
- * Setup simulatore universale per pagine sorgenti
- * @param {String} sourceType - Tipo sorgente ('crab', 'pevatron', ecc.)
- * @param {Object} options - Opzioni aggiuntive
- */
-function setupSourceSimulator(sourceType, options = {}) {
-    const {
-        generateBtnId = 'generateBtn',
-        clearBtnId = 'clearBtn',
-        hillasDisplayId = 'hillasDisplay',
-        showStereo = true,
-        showLegend = true
-    } = options;
-
-    let engine, renderers, hillasAnalyzer, colorPalette;
+    /**
+     * Setup simulatore universale per pagine sorgenti
+     * @param {String} sourceType - Tipo sorgente ('crab', 'pevatron', ecc.)
+     * @param {Object} options - Opzioni aggiuntive
+     */
+    function setupSourceSimulator(sourceType, options = {}) {
+        const {
+            generateBtnId = 'generateBtn',
+            clearBtnId = 'clearBtn',
+            hillasDisplayId = 'hillasDisplay',
+            showStereo = true,
+            showLegend = true,
+            stereoscopic = false  // NUOVA OPZIONE: eventi coerenti per stereoscopia
+        } = options;    let engine, renderers, hillasAnalyzer, colorPalette;
 
     // Inizializza componenti immediatamente
     engine = new SimulationEngine();
@@ -338,54 +337,130 @@ function setupSourceSimulator(sourceType, options = {}) {
         // Dimensioni canvas per le pagine sorgenti (ridotte per migliore visualizzazione)
         const canvasSize = { width: 900, height: 600 };
 
-        // Genera per 3 camere
-        for (let i = 0; i < 3; i++) {
-            const cameraId = i + 1;
-            const camKey = `cam${cameraId}`;
+        if (stereoscopic) {
+            // MODALITÀ STEREOSCOPICA: genera un singolo evento coerente visto da 3 camere
+            console.log('📷 Modalità stereoscopica: evento coerente su 3 camere');
             
-            const event = engine.generateEvent(profile, cameraId, canvasSize);
-            events.push(event);
-
-            const canvas = document.getElementById(`cam${cameraId}`);
-
-            // Calcola Hillas PRIMA del rendering in modo da poter disegnare il
-            // riempimento dell'ellisse sotto i fotoni e poi i fotoni sopra.
-            const hillas = hillasAnalyzer.analyze(event);
-            if (hillas && hillas.valid) {
-                // Espandi l'ellisse per includere tutti i fotoni renderizzati
-                try {
+            // Genera evento base con parametri fissi (senza varianza inter-camera)
+            const baseParams = engine._sampleFromProfile(profile);
+            baseParams.sourceType = profile.type;
+            
+            // Energia fissa per coerenza
+            const energy = engine._sampleEnergy(profile.energyRange);
+            
+            // Angolo zenitale fisso
+            const zenithAngle = engine._randomInRange(0, 30);
+            if (zenithAngle > 0) {
+                engine._applyZenithEffects(baseParams, zenithAngle, energy);
+            }
+            
+            // Genera per 3 camere con variazioni minime per simulare visione da posizioni diverse
+            for (let i = 0; i < 3; i++) {
+                const cameraId = i + 1;
+                const camKey = `cam${cameraId}`;
+                
+                // Parametri leggermente variati per simulare visione da angolazioni diverse
+                const cameraParams = { ...baseParams };
+                
+                // Variazione minima posizione (±5% per simulare parallasse)
+                const parallaxVariation = 0.05;
+                cameraParams.length *= (1 + (Math.random() - 0.5) * parallaxVariation);
+                cameraParams.width *= (1 + (Math.random() - 0.5) * parallaxVariation);
+                cameraParams.alpha += (Math.random() - 0.5) * 5; // ±2.5° variazione
+                
+                // Genera tracce con parametri leggermente variati
+                const tracks = engine._generateTracks(cameraParams, energy, canvasSize.width, canvasSize.height, { sourceType });
+                
+                const event = {
+                    sourceType: profile.type,
+                    cameraId: cameraId,
+                    energy: energy,
+                    zenithAngle: zenithAngle,
+                    params: cameraParams,
+                    tracks: tracks,
+                    canvasWidth: canvasSize.width,
+                    canvasHeight: canvasSize.height,
+                    timestamp: Date.now(),
+                    signatureHint: cameraParams.signatureHint || ''
+                };
+                
+                events.push(event);
+                
+                // Analisi Hillas per questa camera
+                const canvas = document.getElementById(`cam${cameraId}`);
+                const hillas = hillasAnalyzer.analyze(event);
+                if (hillas && hillas.valid) {
                     renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
-                } catch (e) {
-                    console.warn('Errore durante l\'adjustHillasToContainTracks', e);
-                }
-
-                hillasParams.push(hillas);
-                hillasMap[camKey] = hillas;
-
-                // Disegna il riempimento diffuso DENTRO l'ellisse sul canvas principale
-                try {
+                    hillasParams.push(hillas);
+                    hillasMap[camKey] = hillas;
+                    
                     renderers[i].fillEllipseBackground(hillas, event.tracks);
-                } catch (e) {
-                    console.warn('Errore durante fillEllipseBackground', e);
                 }
-            }
-
-            // Rendering con palette già configurata (fotoni sopra il riempimento)
-            if (canvas && renderers[i]) {
-                renderers[i].renderEvent(event, i === 0 && showLegend);
-                console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
-            }
-
-            // Ora disegniamo l'overlay Hillas sopra i fotoni
-            if (hillas && hillas.valid) {
-                try {
+                
+                // Rendering
+                if (canvas && renderers[i]) {
+                    renderers[i].renderEvent(event, i === 0 && showLegend);
+                    console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+                }
+                
+                // Overlay Hillas
+                if (hillas && hillas.valid) {
                     renderers[i].renderHillasOverlay(hillas);
-                } catch (e) {
-                    console.warn('Errore durante renderHillasOverlay', e);
                 }
+                
+                console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
             }
+        } else {
+            // MODALITÀ ORIGINALE: eventi indipendenti per camera
+            // Genera per 3 camere
+            for (let i = 0; i < 3; i++) {
+                const cameraId = i + 1;
+                const camKey = `cam${cameraId}`;
+                
+                const event = engine.generateEvent(profile, cameraId, canvasSize);
+                events.push(event);
 
-            console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
+                const canvas = document.getElementById(`cam${cameraId}`);
+
+                // Calcola Hillas PRIMA del rendering in modo da poter disegnare il
+                // riempimento dell'ellisse sotto i fotoni e poi i fotoni sopra.
+                const hillas = hillasAnalyzer.analyze(event);
+                if (hillas && hillas.valid) {
+                    // Espandi l'ellisse per includere tutti i fotoni renderizzati
+                    try {
+                        renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
+                    } catch (e) {
+                        console.warn('Errore durante l\'adjustHillasToContainTracks', e);
+                    }
+
+                    hillasParams.push(hillas);
+                    hillasMap[camKey] = hillas;
+
+                    // Disegna il riempimento diffuso DENTRO l'ellisse sul canvas principale
+                    try {
+                        renderers[i].fillEllipseBackground(hillas, event.tracks);
+                    } catch (e) {
+                        console.warn('Errore durante fillEllipseBackground', e);
+                    }
+                }
+
+                // Rendering con palette già configurata (fotoni sopra il riempimento)
+                if (canvas && renderers[i]) {
+                    renderers[i].renderEvent(event, i === 0 && showLegend);
+                    console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+                }
+
+                // Ora disegniamo l'overlay Hillas sopra i fotoni
+                if (hillas && hillas.valid) {
+                    try {
+                        renderers[i].renderHillasOverlay(hillas);
+                    } catch (e) {
+                        console.warn('Errore durante renderHillasOverlay', e);
+                    }
+                }
+
+                console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
+            }
         }
 
         // Ricostruzione stereoscopica avanzata
