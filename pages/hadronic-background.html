@@ -53,6 +53,31 @@
             </p>
         </section>
 
+        <!-- Anteprima Camere -->
+        <section class="card">
+            <h3 style="text-align: center; color: var(--accent-cyan); margin-bottom: 16px;">📷 Anteprima delle Camere IACT</h3>
+            <div class="cameras-preview-grid">
+                <div class="camera-preview-container">
+                    <div class="camera-preview-label">📷 Camera 1</div>
+                    <canvas id="cam1-preview" class="camera-preview-canvas" width="300" height="200"></canvas>
+                    <canvas id="cam1-preview-overlay" class="camera-preview-canvas overlay-canvas" width="300" height="200"></canvas>
+                </div>
+                <div class="camera-preview-container">
+                    <div class="camera-preview-label">📷 Camera 2</div>
+                    <canvas id="cam2-preview" class="camera-preview-canvas" width="300" height="200"></canvas>
+                    <canvas id="cam2-preview-overlay" class="camera-preview-canvas overlay-canvas" width="300" height="200"></canvas>
+                </div>
+                <div class="camera-preview-container">
+                    <div class="camera-preview-label">📷 Camera 3</div>
+                    <canvas id="cam3-preview" class="camera-preview-canvas" width="300" height="200"></canvas>
+                    <canvas id="cam3-preview-overlay" class="camera-preview-canvas overlay-canvas" width="300" height="200"></canvas>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9em; margin-top: 12px;">
+                💡 Usa il simulatore più avanti per generare eventi adronici e vedere le differenze con le sorgenti gamma
+            </p>
+        </section>
+
         <!-- Origine Fisica -->
         <section class="card">
             <h2>🌌 Origine del Background Adronico</h2>
@@ -424,7 +449,7 @@
                 <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
             </div>
 
-            <!-- 3 Camere -->
+            <!-- 3 Camere (ora più grandi per simulazione interattiva) -->
             <div class="cameras-grid">
                 <div class="camera-container">
                     <div class="camera-label">📷 Camera 1 (Nord)</div>
@@ -571,7 +596,66 @@
     <script src="../js/navigation.js"></script>
     <script src="../js/lightbox.js"></script>
     <script>
-        setupSourceSimulator('hadron');
+        // Inizializza anteprima delle camere
+        document.addEventListener('DOMContentLoaded', function() {
+            initCameraPreviews();
+            setupSourceSimulator('hadron');
+        });
+
+        // Mostra eventi di esempio nelle anteprime piccole
+        function initCameraPreviews() {
+            // Aggiungi classe loading alle anteprime
+            document.querySelectorAll('.camera-preview-canvas').forEach(canvas => {
+                canvas.classList.add('camera-preview-loading');
+            });
+
+            // Inizializza componenti per anteprime
+            const engine = new SimulationEngine();
+            const hillasAnalyzer = new HillasAnalyzer();
+            const colorPalette = new EnergyColorPalette();
+            engine.colorPalette = colorPalette;
+
+            // Renderers per anteprime (dimensioni ridotte)
+            const previewRenderers = [
+                new CanvasRenderer('cam1-preview', 'cam1-preview-overlay'),
+                new CanvasRenderer('cam2-preview', 'cam2-preview-overlay'),
+                new CanvasRenderer('cam3-preview', 'cam3-preview-overlay')
+            ];
+
+            // Configura renderers per anteprime
+            previewRenderers.forEach(renderer => {
+                renderer.colorPalette = colorPalette;
+                renderer.respectExactHillas = true;
+                renderer.subpixelEnabled = false;
+            });
+
+            // Genera eventi di esempio per anteprime
+            const hadronProfile = getSourceProfile('hadron');
+            const canvasSize = { width: 300, height: 200 }; // Dimensioni ridotte per anteprime
+
+            previewRenderers.forEach((renderer, index) => {
+                const event = engine.generateEvent(hadronProfile, index + 1, canvasSize);
+                const hillas = hillasAnalyzer.analyze(event);
+
+                if (hillas && hillas.valid) {
+                    renderer.adjustHillasToContainTracks(hillas, event.tracks);
+                    renderer.fillEllipseBackground(hillas, event.tracks);
+                }
+
+                renderer.renderEvent(event, false); // false = no legend per anteprime
+
+                if (hillas && hillas.valid) {
+                    renderer.renderHillasOverlay(hillas);
+                }
+            });
+
+            // Rimuovi classe loading dopo un breve delay
+            setTimeout(() => {
+                document.querySelectorAll('.camera-preview-canvas').forEach(canvas => {
+                    canvas.classList.remove('camera-preview-loading');
+                });
+            }, 500);
+        }
     </script>
 </body>
 </html>
