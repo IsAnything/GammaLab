@@ -1345,7 +1345,7 @@ class CanvasRenderer {
                 sortedTracks.forEach(track => {
                     this.renderPhoton(track);
                 });
-            });
+            }, 0); // Ridotto inset per esagono più grande
         }
 
         // Bordo in primo piano
@@ -1405,7 +1405,7 @@ class CanvasRenderer {
                 batch.forEach(track => {
                     this.renderPhoton(track);
                 });
-            });
+            }, 0); // Ridotto inset per esagono più grande
 
             currentIndex += batchSize;
 
