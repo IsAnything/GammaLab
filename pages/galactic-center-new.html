@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Galattico - GammaLab</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .hero-section {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-images {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-images img {
+            width: 32%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .content-with-image {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+        
+        .content-with-image.reverse {
+            grid-template-columns: 1fr 1.5fr;
+        }
+        
+        .content-with-image.reverse .text-content {
+            order: 2;
+        }
+        
+        .content-with-image.reverse .image-content {
+            order: 1;
+        }
+        
+        .image-content {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .image-content img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .image-content figcaption {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #aa66ff 0%, #cc88ff 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(170, 102, 255, 0.3);
+        }
+        
+        .highlight-box h3 {
+            margin-top: 0;
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #aa66ff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        .feature-card p,
+        .feature-card ul,
+        .feature-card li {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-images {
+                flex-direction: column;
+            }
+            
+            .hero-images img {
+                width: 100%;
+            }
+            
+            .content-with-image,
+            .content-with-image.reverse {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-with-image.reverse .text-content,
+            .content-with-image.reverse .image-content {
+                order: initial;
+            }
+            
+            .image-content {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">⭐ Centro Galattico - Il Cuore Turbolento della Via Lattea</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../homepage.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="crab-nebula.html">🦀 Crab Nebula</a></li>
+                    <li><a href="supernova-remnants.html">💥 Resti di Supernova</a></li>
+                    <li><a href="blazars.html">🌀 Blazar (AGN)</a></li>
+                    <li><a href="grb-complete.html">⚡ GRB</a></li>
+                    <li><a href="galactic-center.html" class="active">⭐ Centro Galattico</a></li>
+                    <li><a href="comparison.html">📊 Confronto</a></li>
+                    <li><a href="hadronic-background.html">⚛️ Background Adronico</a></li>
+                    <li><a href="quiz.html">🎮 Quiz</a></li>
+                </ul>
+            </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="galactic-center-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore Centro Galattico
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <div class="hero-images">
+                <img src="../galactic center/milkyway-large.jpeg" alt="Via Lattea">
+                <img src="../galactic center/nucleo.jpg" alt="Nucleo galattico">
+                <img src="../galactic center/HESTIA_MW_AIP.png" alt="Struttura Via Lattea">
+            </div>
+        </section>
+
+        <section id="introduzione">
+            <h2>⭐ Il Centro Galattico della Via Lattea</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        Il <strong>centro galattico della Via Lattea</strong> rappresenta uno dei laboratori naturali 
+                        più estremi e complessi dell'astrofisica moderna. In questa regione, a circa <strong>8 kiloparsec 
+                        (~26.000 anni luce)</strong> dalla Terra, si concentrano fenomeni di alta energia, una densità 
+                        stellare e di gas elevatissima, campi magnetici intensi e, soprattutto, il buco nero supermassiccio 
+                        <strong>Sagittarius A* (Sgr A*)</strong>.
+                    </p>
+                    <p>
+                        Negli ultimi decenni, grazie a osservazioni <strong>multi-banda e multi-messaggero</strong>, il 
+                        centro galattico è divenuto il fulcro di studi sulla produzione di raggi gamma, la propagazione 
+                        dei raggi cosmici, la natura della materia oscura e i processi di feedback galattico.
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h3>🎯 Punto di Rotazione della Galassia</h3>
+                        <p>
+                            Il centro della Via Lattea, noto anche come centro galattico, è il <strong>punto di rotazione 
+                            della nostra galassia</strong> e si trova nella direzione della costellazione del Sagittario.
+                        </p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/our galaxy.png" alt="La nostra galassia">
+                        <figcaption>Rappresentazione artistica della Via Lattea con il Sole e il Centro Galattico evidenziati</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="struttura">
+            <h2>🏗️ Struttura del Centro Galattico</h2>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <p>
+                        La struttura del centro galattico è dominata da <strong>tre componenti principali</strong>:
+                    </p>
+                    
+                    <h3>🌐 Bulge Galattico</h3>
+                    <p>
+                        Una regione <strong>sferoidale o triassiale</strong>, estesa per alcuni kiloparsec, composta 
+                        prevalentemente da stelle vecchie e da una significativa quantità di gas e polveri.
+                    </p>
+                    
+                    <h3>💿 Disco Galattico</h3>
+                    <p>
+                        Il disco sottile e spesso, che si estende dal bulge verso l'esterno, contiene la maggior parte 
+                        delle stelle giovani, i bracci a spirale e il gas molecolare. La regione centrale del disco, 
+                        nota come <strong>Central Molecular Zone (CMZ)</strong>, è particolarmente ricca di gas molecolare 
+                        (fino a 10⁸ M☉) e rappresenta un ambiente favorevole alla formazione stellare.
+                    </p>
+                    
+                    <h3>🔥 Nucleo Galattico</h3>
+                    <p>
+                        Una regione compatta di circa <strong>400 parsec</strong>, caratterizzata da:
+                    </p>
+                    <ul>
+                        <li>Elevata densità stellare</li>
+                        <li>Presenza di giovani ammassi stellari</li>
+                        <li>Sede del buco nero supermassiccio Sagittarius A*</li>
+                    </ul>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/struttura.png" alt="Struttura del centro galattico">
+                        <figcaption>Schema della struttura del centro galattico con bulge, disco e nucleo</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="sagittarius-a">
+            <h2>⚫ Sagittarius A* - Il Buco Nero Supermassiccio</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <p>
+                        <strong>Sagittarius A* (Sgr A*)</strong> è una sorgente radio molto luminosa, identificata come 
+                        il buco nero supermassiccio al centro della Via Lattea.
+                    </p>
+                    
+                    <h3>📊 Proprietà Fisiche</h3>
+                    <ul>
+                        <li><strong>Massa</strong>: circa <strong>4 × 10⁶ M☉</strong>, determinata tramite il monitoraggio 
+                        delle orbite di stelle vicine (es. S2)</li>
+                        <li><strong>Dimensioni</strong>: il raggio di Schwarzschild è di circa 11,8 milioni di km, mentre 
+                        il diametro osservato tramite Event Horizon Telescope (EHT) è di circa 23,6 milioni di km</li>
+                        <li><strong>Luminosità</strong>: Sgr A* è sorprendentemente <strong>debole</strong> rispetto ai 
+                        nuclei galattici attivi (AGN)</li>
+                        <li><strong>Stato di accrescimento</strong>: la maggior parte del tempo Sgr A* si trova in uno 
+                        stato <strong>quiescente</strong>, ma mostra brillamenti (flare) su scale temporali di minuti-ore 
+                        in banda X e NIR (Near InfraRed)</li>
+                    </ul>
+                    
+                    <h3>🔬 Prima Immagine Diretta</h3>
+                    <p>
+                        Nel <strong>2022</strong>, l'Event Horizon Telescope (EHT) ha ottenuto la prima immagine dell'ombra 
+                        di Sgr A*, confermando la presenza di un buco nero supermassiccio e fornendo vincoli sulla geometria 
+                        del disco di accrescimento e sul campo magnetico.
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h3>🧲 Riconnessione Magnetica</h3>
+                        <p>
+                            I flare osservati sono attribuiti a processi di accrescimento e <strong>riconnessione magnetica</strong> 
+                            - un processo fisico che avviene in plasmi fortemente conduttivi, in cui la topologia magnetica 
+                            viene riarrangiata e l'energia magnetica è convertita in energia cinetica, energia termica e 
+                            accelerazione delle particelle.
+                        </p>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/Reconnection.gif" alt="Riconnessione magnetica">
+                        <figcaption>Animazione del processo di riconnessione magnetica che produce i flare osservati in Sgr A*</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="emissione-gamma">
+            <h2>💡 Produzione di Raggi Gamma nel Centro Galattico</h2>
+            <p>
+                La produzione di raggi gamma nel centro galattico avviene attraverso <strong>molteplici meccanismi</strong>, 
+                spesso coesistenti e difficili da distinguere osservativamente.
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>⚛️ Meccanismo Adronico</h3>
+                    <p>
+                        <strong>Interazione tra raggi cosmici e materia</strong>
+                    </p>
+                    <p>
+                        I raggi cosmici (principalmente protoni e nuclei pesanti), accelerati da sorgenti come supernovae, 
+                        resti di supernova (SNR), pulsar wind nebulae (PWN) o dallo stesso Sgr A*, interagiscono con il 
+                        gas interstellare (principalmente idrogeno molecolare e atomico).
+                    </p>
+                    <p style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                        <strong>p + p → π⁰ → γ + γ</strong>
+                    </p>
+                    <ul>
+                        <li>Produzione di pioni neutri che decadono in fotoni gamma</li>
+                        <li>Spettro tipicamente <strong>duro</strong> fino a decine di TeV</li>
+                        <li>Connessione con neutrini astrofisici (pioni carichi)</li>
+                        <li>Osservato da H.E.S.S. e HAWC</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🌑 Annichilazione di Materia Oscura</h3>
+                    <p>
+                        Un'ipotesi di grande interesse è che i raggi gamma osservati siano prodotti dall'<strong>annichilazione 
+                        di particelle di materia oscura</strong> (DM), come i WIMP (Weakly Interacting Massive Particles).
+                    </p>
+                    <p style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                        <strong>DM + DM → pioni/leptoni → γ</strong>
+                    </p>
+                    <ul>
+                        <li>Densità elevata di DM nel bulge favorisce le collisioni</li>
+                        <li>Distribuzione DM appiattita e irregolare</li>
+                        <li><strong>Galactic Center Excess (GCE)</strong>: eccesso di raggi gamma compatibile con annichilazione DM</li>
+                        <li>Uno degli indizi più promettenti per la ricerca di materia oscura</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🕳️ Accrescimento su Buco Nero</h3>
+                    <p>
+                        Il materiale che cade su Sgr A* può essere accelerato a velocità relativistiche nel disco di 
+                        accrescimento e nei getti.
+                    </p>
+                    <ul>
+                        <li><strong>Radiazione di sincrotrone</strong>: elettroni relativistici spiraleggiano nel campo magnetico</li>
+                        <li><strong>Compton inverso (IC)</strong>: elettroni diffondono fotoni a bassa energia verso energie gamma</li>
+                        <li><strong>Synchrotron Self-Compton (SSC)</strong>: fotoni di sincrotrone diffusi a energie più alte</li>
+                        <li><strong>Riconnessione magnetica</strong>: produce flare X e gamma su scale di minuti-ore</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⚡ Accelerazione Particelle</h3>
+                    <p>
+                        Recenti osservazioni hanno suggerito la presenza di:
+                    </p>
+                    <ul>
+                        <li><strong>Disco di accrescimento</strong> attorno a Sgr A*</li>
+                        <li><strong>Getti relativistici</strong> (anche se deboli)</li>
+                        <li><strong>Campo magnetico intenso</strong> associato al buco nero</li>
+                        <li>Elementi chiave per la produzione di emissione ad alta energia</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="bolle-fermi">
+            <h2>💥 Le Bolle di Fermi</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <h3>🔍 Scoperta Rivoluzionaria</h3>
+                    <p>
+                        Due gigantesche strutture gamma, estese per <strong>~50°</strong> sopra e sotto il piano galattico, 
+                        sono state scoperte da Fermi-LAT nel 2010. Le <strong>Bolle di Fermi</strong> rappresentano la traccia 
+                        di un potente evento energetico avvenuto <strong>1-10 milioni di anni fa</strong>, probabilmente 
+                        associato a un outburst di Sgr A* o a un episodio di starburst nucleare.
+                    </p>
+                    
+                    <h3>📊 Modelli Proposti</h3>
+                    <ul>
+                        <li>
+                            <strong>Modelli adronici</strong>: emissione gamma da collisioni tra raggi cosmici e nuclei 
+                            termici, con produzione di pioni neutri
+                        </li>
+                        <li>
+                            <strong>Modelli leptonici</strong>: emissione gamma da Compton inverso di elettroni relativistici 
+                            su campi di radiazione interstellare
+                        </li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <h3>🌟 Implicazioni Astrofisiche</h3>
+                        <p>
+                            L'emissione gamma e i processi di alta energia nel centro galattico hanno profonde implicazioni 
+                            per la <strong>dinamica e l'evoluzione della galassia</strong>:
+                        </p>
+                        <ul style="margin-top: 1rem; color: white;">
+                            <li><strong>Formazione stellare e feedback</strong>: il feedback energetico regola la formazione 
+                            stellare e la distribuzione del gas</li>
+                            <li><strong>Outflow galattici</strong>: venti stellari, supernove e outflow da Sgr A*</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/fermi bubbles.jpg" alt="Bolle di Fermi">
+                        <figcaption>Le gigantesche Bolle di Fermi estese per ~50° sopra e sotto il piano galattico, scoperte nel 2010</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="osservazioni">
+            <h2>🔭 Osservazioni con Telescopi Cherenkov</h2>
+            <div class="content-with-image reverse">
+                <div class="text-content">
+                    <h3>🌟 H.E.S.S. - High Energy Stereoscopic System</h3>
+                    <p>
+                        Array di telescopi Cherenkov in Namibia, sensibile a energie tra <strong>~100 GeV e 100 TeV</strong>:
+                    </p>
+                    <ul>
+                        <li>Ha scoperto la sorgente <strong>HESS J1745-290</strong> coincidente con Sgr A*</li>
+                        <li>Mappato l'emissione diffusa della Central Molecular Zone (CMZ)</li>
+                        <li>Fornito la prima evidenza di un <strong>acceleratore di protoni (PeVatron)</strong> nel centro galattico</li>
+                        <li>Spettro gamma che si estende senza cutoff fino a decine di TeV</li>
+                    </ul>
+                    
+                    <h3>🔬 MAGIC e VERITAS</h3>
+                    <p>
+                        Telescopi Cherenkov rispettivamente alle Canarie e in Arizona, hanno contribuito a:
+                    </p>
+                    <ul>
+                        <li>Osservazioni ad alta energia</li>
+                        <li>Campagne di follow-up di transienti</li>
+                        <li>Conferma delle osservazioni H.E.S.S.</li>
+                    </ul>
+                    
+                    <h3>⚡ HAWC e LHAASO</h3>
+                    <ul>
+                        <li><strong>HAWC</strong>: osservatorio a grande altitudine in Messico, sensibile a energie >100 TeV</li>
+                        <li>Ha misurato emissione gamma ultra-energetica dal centro galattico</li>
+                        <li>Osservazioni delle bolle di Fermi</li>
+                        <li><strong>LHAASO</strong>: conferma emissione fino a energie PeV</li>
+                    </ul>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/gamma rays emission.jpg" alt="Emissione raggi gamma">
+                        <figcaption>Mappa dell'emissione di raggi gamma dal centro galattico osservata dai telescopi Cherenkov</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="ctao">
+            <h2>🚀 Il Futuro: CTAO</h2>
+            <div class="content-with-image">
+                <div class="text-content">
+                    <h3>🔭 Cherenkov Telescope Array Observatory</h3>
+                    <p>
+                        La prossima generazione di telescopi Cherenkov, con siti in Cile e Spagna, offrirà capacità senza precedenti:
+                    </p>
+                    <ul>
+                        <li><strong>Sensibilità</strong>: senza precedenti tra 20 GeV e 300 TeV</li>
+                        <li><strong>Risoluzione angolare</strong>: <0.05° - distinguerà emissione diffusa da sorgenti puntiformi</li>
+                        <li><strong>Campo visivo</strong>: ~8° - permetterà di studiare regioni estese</li>
+                        <li><strong>LST-1</strong>: il Large-Sized Telescope ha già prodotto risultati promettenti</li>
+                    </ul>
+                    
+                    <h3>🎯 Obiettivi Scientifici per il Centro Galattico</h3>
+                    <ul>
+                        <li>Risolvere la popolazione di pulsar millisecondo nel bulge</li>
+                        <li>Testare la presenza di PeVatron</li>
+                        <li>Studiare la diffusione dei raggi gamma nella regione centrale</li>
+                        <li>Distinguere tra emissione da materia oscura e processi astrofisici</li>
+                    </ul>
+                </div>
+                <div class="image-content">
+                    <figure>
+                        <img src="../galactic center/ray accelerator.png" alt="Acceleratore di raggi cosmici">
+                        <figcaption>Rappresentazione artistica dell'accelerazione di raggi cosmici nel centro galattico</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="firma-cherenkov">
+            <h2>📸 Firma Cherenkov del Centro Galattico</h2>
+            <p>
+                Il centro galattico presenta caratteristiche <strong>intermedie e variabili</strong> nelle camere dei 
+                telescopi Cherenkov, riflettendo la natura multi-componente della sorgente.
+            </p>
+
+            <h3>Parametri di Hillas Tipici</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametro</th>
+                        <th>Range Tipico</th>
+                        <th>Valore Medio</th>
+                        <th>Interpretazione Fisica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>0.20° - 0.40°<br>(20-40 px)</td>
+                        <td><strong>~0.30°</strong><br>(~30 px)</td>
+                        <td>⚡ Intermedio tra sorgente <em>puntiforme</em> ed <em>estesa</em></td>
+                    </tr>
+                    <tr style="background: rgba(170, 102, 255, 0.05);">
+                        <td><strong>Width</strong></td>
+                        <td>0.10° - 0.20°<br>(10-20 px)</td>
+                        <td><strong>~0.15°</strong><br>(~15 px)</td>
+                        <td>🎯 Sciami con <em>dispersione moderata</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size</strong></td>
+                        <td>1500 - 2200 p.e.</td>
+                        <td><strong>~1800 p.e.</strong></td>
+                        <td>💡 Energia <em>moderata-alta</em> (multi-TeV)</td>
+                    </tr>
+                    <tr style="background: rgba(170, 102, 255, 0.05);">
+                        <td><strong>Alpha (α)</strong></td>
+                        <td>0° - 15°</td>
+                        <td><strong>~8°</strong> (disperso)</td>
+                        <td>📍 Emissione <em>diffusa</em> → α non concentrato come sorgenti puntiformi</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elongation (L/W)</strong></td>
+                        <td>1.8 - 2.5</td>
+                        <td><strong>~2.0</strong></td>
+                        <td>📏 Ellissi meno allungate rispetto a Crab/Blazar</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box" style="margin-top: 2rem;">
+                <h3>🎯 Caratteristiche Distintive</h3>
+                <ul style="margin-top: 1rem; color: white;">
+                    <li>🔥 <strong>Alpha disperso</strong>: Firma chiave! α distribuito 5-15° (vs ~0° per sorgenti puntiformi)</li>
+                    <li>🔥 <strong>Parametri intermedi</strong>: Length/Width/Size tra Crab e PeVatron, nessun estremo</li>
+                    <li>🔥 <strong>Coerenza stereoscopica moderata</strong>: Varianza inter-camera ~12-18% (superiore a Crab)</li>
+                    <li>🔥 <strong>Variabilità evento-per-evento</strong>: Parametri fluttuano per contributo di componenti multiple</li>
+                    <li>🔥 <strong>Morfologia complessa</strong>: Alcuni eventi mostrano doppi picchi o irregolarità</li>
+                    <li>🔥 <strong>Size elevati</strong>: Simili a PeVatron (~1800 p.e.), ma con Length/Width più compatti</li>
+                </ul>
+            </div>
+
+            <h3>🔬 Confronto con Altre Sorgenti</h3>
+            <div style="overflow-x: auto; margin-top: 1.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sorgente</th>
+                            <th>Length (px)</th>
+                            <th>Width (px)</th>
+                            <th>Size (p.e.)</th>
+                            <th>Alpha (°)</th>
+                            <th>Firma Distintiva</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🦀 Crab Nebula</td>
+                            <td>~25</td>
+                            <td>~8</td>
+                            <td>~1000</td>
+                            <td>~0</td>
+                            <td>⭐ Standard, puntiforme</td>
+                        </tr>
+                        <tr>
+                            <td>🌀 Blazar</td>
+                            <td>~15</td>
+                            <td>~5</td>
+                            <td>~1200</td>
+                            <td>~0</td>
+                            <td>⚡ Compatto, variabile</td>
+                        </tr>
+                        <tr>
+                            <td>💥 PeVatron (SNR)</td>
+                            <td>~40</td>
+                            <td>~15</td>
+                            <td>~2500</td>
+                            <td>~10</td>
+                            <td>🔥 Tracce lunghe, intense</td>
+                        </tr>
+                        <tr style="background: rgba(170, 102, 255, 0.1);">
+                            <td><strong>⭐ Centro Galattico</strong></td>
+                            <td><strong>~30</strong></td>
+                            <td><strong>~15</strong></td>
+                            <td><strong>~1800</strong></td>
+                            <td><strong>~8</strong> 🌀</td>
+                            <td><strong>🎭 Multi-componente, α disperso</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>⚠️ Sfida Osservativa</h3>
+            <p>
+                Osservare il centro galattico con telescopi Cherenkov presenta difficoltà specifiche:
+            </p>
+            <ul>
+                <li><strong>Elevazione bassa</strong>: Per latitudini nord/temperate, il GC transita a basse altezze (Altitudine <30°)</li>
+                <li><strong>Background atmosferico</strong>: Maggiore spessore atmosferico → più rumore</li>
+                <li><strong>Contaminazione</strong>: Sorgenti vicine (SNR, PWN) complicano l'analisi</li>
+                <li><strong>Diffusione</strong>: Difficile separare componente puntiforme da diffusa</li>
+            </ul>
+
+            <p style="margin-top: 1.5rem; color: #666; font-style: italic;">
+                <strong>Nota tecnica</strong>: I valori riportati si riferiscono a telescopi Cherenkov di classe 
+                H.E.S.S./MAGIC con FOV ~3.5°, conversione 1°=100 px, e soglia energetica ~100 GeV. I parametri 
+                dipendono dall'angolo zenitale, dalla distanza d'impatto e dall'energia del fotone primario.
+            </p>
+        </section>
+
+        <section id="domande-aperte">
+            <h2>❓ Prospettive Future e Domande Aperte</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🌑 Origine dell'Eccesso Gamma (GCE)</h3>
+                    <p>
+                        La natura dell'eccesso di raggi gamma nel centro galattico rimane dibattuta:
+                    </p>
+                    <ul>
+                        <li>Pulsar millisecondo (MSP) non risolte?</li>
+                        <li>Annichilazione di materia oscura?</li>
+                        <li>Le future osservazioni CTAO e le analisi ML saranno decisive</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⚡ Sgr A* come PeVatron</h3>
+                    <p>
+                        Domande chiave:
+                    </p>
+                    <ul>
+                        <li>Conferma della presenza di un PeVatron nel centro galattico</li>
+                        <li>Determinazione della variabilità temporale</li>
+                        <li>Cruciale per comprendere l'origine dei raggi cosmici galattici</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>💫 Feedback e Formazione Stellare</h3>
+                    <p>
+                        Il legame tra feedback energetico e formazione stellare è ancora oggetto di studio:
+                    </p>
+                    <ul>
+                        <li>Outflow e bolle di Fermi</li>
+                        <li>Formazione stellare nel bulge e nella CMZ</li>
+                        <li>Implicazioni per la dinamica galattica</li>
+                        <li>Crescita dei buchi neri supermassicci</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🌌 Distribuzione della Materia Oscura</h3>
+                    <p>
+                        La morfologia e la densità della DM nel bulge e nel disco interno sono ancora incerte:
+                    </p>
+                    <ul>
+                        <li>Impatti diretti sulla ricerca indiretta di DM tramite raggi gamma</li>
+                        <li>Vincoli da osservazioni multi-banda</li>
+                        <li>Simulazioni ad alta risoluzione necessarie</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Link al Simulatore Dedicato -->
+        <section class="card" style="background: linear-gradient(135deg, rgba(170,102,255,0.1), rgba(204,136,255,0.1)); border: 2px solid #aa66ff; margin-top: 3rem;">
+            <h3 style="color: #aa66ff; margin-bottom: 16px;">🎮 Simulatore Dedicato</h3>
+            <p style="margin-bottom: 24px;">
+                Esplora gli eventi del Centro Galattico con il nostro simulatore interattivo, 
+                con α disperso (~8°±5°) e alta varianza tipica di sorgenti multi-componente.
+            </p>
+            <div style="text-align: center;">
+                <a href="galactic-center-simulator.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px;">
+                    🚀 Avvia Simulatore Centro Galattico
+                </a>
+            </div>
+        </section>
+
+        <!-- Prossimi Passi -->
+        <section class="card" style="margin-top: 3rem;">
+            <h2>🚀 Esplora Altre Sorgenti</h2>
+            <p>Hai scoperto il Centro Galattico. Continua il tuo viaggio nell'astronomia gamma:</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+                <a href="crab-nebula.html" class="btn btn-primary">🦀 Nebulosa del Granchio</a>
+                <a href="supernova-remnants.html" class="btn btn-secondary">💥 Resti di Supernova</a>
+                <a href="blazars.html" class="btn btn-secondary">🌀 Blazar</a>
+                <a href="comparison.html" class="btn btn-secondary">📊 Confronto</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Simulatore educativo di telescopi Cherenkov atmosferici</p>
+    </footer>
+
+    <script src="../js/navigation.js"></script>
+</body>
+</html>
