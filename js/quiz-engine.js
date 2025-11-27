@@ -6,7 +6,7 @@
 
 // === CONFIGURAZIONE QUIZ ===
 const QUIZ_CONFIG = {
-    totalQuestions: 10,
+    totalQuestions: 15,
     timeLimit: 60,           // secondi per domanda
     basePoints: 100,         // punti base per risposta corretta
     hintPenalties: [30, 30, 20], // penalità per hint 1, 2, 3
@@ -20,19 +20,96 @@ const QUESTION_TYPES = {
     PARTICLE_TYPE: 'particle',            // "È un gamma o un adrone?"
     ENERGY_LEVEL: 'energy',               // "Energia alta o bassa?"
     MUON_DETECTION: 'muon',               // "È un muone?"
-    SHOWER_SHAPE: 'shape'                 // "Ellisse stretta o larga?"
+    SHOWER_SHAPE: 'shape',                // "Ellisse stretta o larga?"
+    THEORETICAL: 'theoretical'            // Domanda teorica a risposta multipla
 };
 
-// Distribuzione tipi di domande per difficoltà crescente
+// Database Domande Teoriche
+const THEORETICAL_QUESTIONS = [
+    {
+        id: 'cherenkov_cause',
+        question: "Qual è la causa principale dell'emissione di luce Cherenkov nell'atmosfera?",
+        options: [
+            { value: 'vacuum', label: "Particelle più veloci della luce nel vuoto" },
+            { value: 'medium', label: "Particelle più veloci della luce nel mezzo (atmosfera)" },
+            { value: 'magnetic', label: "Interazione con il campo magnetico terrestre" },
+            { value: 'friction', label: "Attrito delle particelle con l'aria" }
+        ],
+        correctAnswer: 'medium',
+        explanation: "La luce Cherenkov viene emessa quando una particella carica attraversa un dielettrico a una velocità superiore alla velocità di fase della luce in quel mezzo (c/n)."
+    },
+    {
+        id: 'hillas_alpha',
+        question: "Cosa indica il parametro di Hillas 'Alpha' (α)?",
+        options: [
+            { value: 'energy', label: "L'energia totale dello sciame" },
+            { value: 'width', label: "La larghezza dell'ellisse" },
+            { value: 'orientation', label: "L'angolo tra l'asse maggiore e la direzione della sorgente" },
+            { value: 'altitude', label: "L'altitudine dello sciame" }
+        ],
+        correctAnswer: 'orientation',
+        explanation: "Alpha è l'angolo di orientamento dell'immagine rispetto alla posizione della sorgente. Per sorgenti puntiformi, Alpha tende a 0° (l'asse punta alla sorgente)."
+    },
+    {
+        id: 'gamma_hadron',
+        question: "Qual è la differenza principale tra sciami gamma e sciami adronici?",
+        options: [
+            { value: 'color', label: "I gamma sono rossi, gli adroni blu" },
+            { value: 'shape', label: "I gamma sono ellissi regolari, gli adroni sono irregolari/larghi" },
+            { value: 'light', label: "Gli adroni non producono luce Cherenkov" },
+            { value: 'time', label: "Gli adroni sono molto più lenti" }
+        ],
+        correctAnswer: 'shape',
+        explanation: "Gli sciami elettromagnetici (gamma) sono compatti e regolari. Gli sciami adronici (protoni) sono più larghi, irregolari e frammentati."
+    },
+    {
+        id: 'stereo_advantage',
+        question: "Qual è il vantaggio principale della tecnica stereoscopica (più telescopi)?",
+        options: [
+            { value: 'daytime', label: "Permette di osservare di giorno" },
+            { value: 'cost', label: "Riduce i costi di costruzione" },
+            { value: 'reconstruction', label: "Migliora la ricostruzione della direzione e la reiezione del fondo" },
+            { value: 'brightness', label: "Aumenta solo la luminosità dell'immagine" }
+        ],
+        correctAnswer: 'reconstruction',
+        explanation: "La stereoscopia permette di vedere lo sciame da diverse angolazioni, migliorando drasticamente la precisione geometrica e la distinzione gamma/adrone."
+    },
+    {
+        id: 'size_meaning',
+        question: "A cosa è proporzionale il parametro 'Size' (carica totale)?",
+        options: [
+            { value: 'energy', label: "All'energia del fotone primario" },
+            { value: 'distance', label: "Alla distanza della sorgente" },
+            { value: 'age', label: "All'età della sorgente" },
+            { value: 'noise', label: "Al rumore di fondo" }
+        ],
+        correctAnswer: 'energy',
+        explanation: "Il parametro Size rappresenta la quantità totale di luce raccolta ed è approssimativamente proporzionale all'energia della particella primaria."
+    }
+];
+
+// Distribuzione tipi di domande per difficoltà crescente (15 domande)
 const QUESTION_DISTRIBUTION = [
-    // Domande 1-3: facili (solo source identification)
-    [QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.SOURCE_IDENTIFICATION],
-    // Domande 4-6: medie (mix)
-    [QUESTION_TYPES.PARTICLE_TYPE, QUESTION_TYPES.SOURCE_IDENTIFICATION, QUESTION_TYPES.ENERGY_LEVEL],
-    // Domande 7-9: difficili (classificazione avanzata)
-    [QUESTION_TYPES.MUON_DETECTION, QUESTION_TYPES.SHOWER_SHAPE, QUESTION_TYPES.PARTICLE_TYPE],
-    // Domanda 10: finale (identificazione source complessa)
-    [QUESTION_TYPES.SOURCE_IDENTIFICATION]
+    // Fase 1: Intro & Basi (1-5)
+    [QUESTION_TYPES.THEORETICAL],           // 1. Teoria: Cherenkov
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION], // 2. Pratica: Identificazione facile
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION], // 3. Pratica: Identificazione facile
+    [QUESTION_TYPES.THEORETICAL],           // 4. Teoria: Hillas Alpha
+    [QUESTION_TYPES.PARTICLE_TYPE],         // 5. Pratica: Gamma vs Adrone
+
+    // Fase 2: Intermedia (6-10)
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION], // 6. Pratica: Identificazione media
+    [QUESTION_TYPES.THEORETICAL],           // 7. Teoria: Gamma vs Hadron
+    [QUESTION_TYPES.ENERGY_LEVEL],          // 8. Pratica: Energia
+    [QUESTION_TYPES.MUON_DETECTION],        // 9. Pratica: Muone
+    [QUESTION_TYPES.THEORETICAL],           // 10. Teoria: Stereoscopia
+
+    // Fase 3: Avanzata (11-15)
+    [QUESTION_TYPES.SHOWER_SHAPE],          // 11. Pratica: Forma
+    [QUESTION_TYPES.PARTICLE_TYPE],         // 12. Pratica: Gamma vs Adrone difficile
+    [QUESTION_TYPES.THEORETICAL],           // 13. Teoria: Size/Energy
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION], // 14. Pratica: Identificazione difficile
+    [QUESTION_TYPES.SOURCE_IDENTIFICATION]  // 15. Pratica: Finale
 ];
 
 // === CLASSE QUIZ ENGINE ===
@@ -74,6 +151,7 @@ class QuizEngine {
         this.currentHillasParams = [];
         this.currentQuestionType = null;
         this.currentCorrectAnswer = null;
+        this.currentTheoreticalQuestion = null;
     }
 
     /**
@@ -306,8 +384,27 @@ class QuizEngine {
      */
     _generateQuestionByType() {
         const quizCanvasSize = { width: 600, height: 600 };
+        const simulatorSection = document.querySelector('.simulator-section');
         
+        // Reset visibility (show simulator elements by default)
+        if (simulatorSection) {
+            simulatorSection.classList.remove('hidden');
+            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = '');
+            const instructionEl = document.getElementById('quizInstruction');
+            if (instructionEl) {
+                instructionEl.style.display = '';
+                instructionEl.style.fontSize = '';
+                instructionEl.style.fontWeight = '';
+                instructionEl.style.color = '';
+                instructionEl.style.textAlign = '';
+                instructionEl.style.padding = '';
+            }
+        }
+
         switch(this.currentQuestionType) {
+            case QUESTION_TYPES.THEORETICAL:
+                this._generateTheoreticalQuestion();
+                break;
             case QUESTION_TYPES.PARTICLE_TYPE:
                 this._generateParticleTypeQuestion(quizCanvasSize);
                 break;
@@ -326,14 +423,85 @@ class QuizEngine {
                 break;
         }
         
-        // Mostra parametri Hillas
-        this.displayQuizHillas();
+        // Mostra parametri Hillas (solo se non è teorica)
+        if (this.currentQuestionType !== QUESTION_TYPES.THEORETICAL) {
+            this.displayQuizHillas();
+        } else {
+            document.getElementById('quizHillasDisplay').innerHTML = '';
+        }
     }
     
+    /**
+     * Genera domanda teorica
+     */
+    _generateTheoreticalQuestion() {
+        // Nascondi simulatore
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) simulatorSection.classList.add('hidden');
+        
+        // Seleziona domanda in base all'indice corrente
+        // Mappatura basata su QUESTION_DISTRIBUTION
+        let qIndex = 0;
+        if (this.currentQuestion === 1) qIndex = 0;
+        else if (this.currentQuestion === 4) qIndex = 1;
+        else if (this.currentQuestion === 7) qIndex = 2;
+        else if (this.currentQuestion === 10) qIndex = 3;
+        else if (this.currentQuestion === 13) qIndex = 4;
+        
+        // Fallback se l'indice sfora
+        if (qIndex >= THEORETICAL_QUESTIONS.length) qIndex = 0;
+        
+        const questionData = THEORETICAL_QUESTIONS[qIndex];
+        this.currentTheoreticalQuestion = questionData;
+        this.currentCorrectAnswer = questionData.correctAnswer;
+        
+        // Update UI
+        const instructionEl = document.getElementById('quizInstruction');
+        // Poiché abbiamo nascosto il simulatore che conteneva l'istruzione, 
+        // dobbiamo assicurarci che l'istruzione sia visibile altrove o spostarla.
+        // Ma aspetta, quizInstruction è DENTRO simulator-section nel HTML originale?
+        // Controlliamo l'HTML.
+        // Sì: <div class="card simulator-section"> ... <p id="quizInstruction"> ... </div>
+        
+        // Se nascondo simulator-section, nascondo anche la domanda!
+        // Soluzione: Non nascondere simulator-section, ma nascondere il contenuto interno tranne l'istruzione.
+        if (simulatorSection) {
+            simulatorSection.classList.remove('hidden');
+            // Nascondi canvas e hillas panel
+            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = 'none');
+            // Mostra istruzione
+            instructionEl.style.display = 'block';
+        }
+        
+        instructionEl.textContent = questionData.question;
+        instructionEl.style.fontSize = '1.4em';
+        instructionEl.style.fontWeight = 'bold';
+        instructionEl.style.color = 'var(--accent-cyan)';
+        instructionEl.style.textAlign = 'center';
+        instructionEl.style.padding = '20px';
+        
+        // Set options
+        this._setAnswerOptions(questionData.options);
+        
+        // Nascondi hints per domande teoriche
+        document.getElementById('hint1Btn').style.display = 'none';
+        document.getElementById('hint2Btn').style.display = 'none';
+        document.getElementById('hint3Btn').style.display = 'none';
+    }
+
     /**
      * Domanda classica: identifica la sorgente
      */
     _generateSourceIdentificationQuestion(canvasSize) {
+        // Ripristina visibilità elementi simulatore
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = '');
+            document.getElementById('quizInstruction').style.textAlign = '';
+            document.getElementById('quizInstruction').style.padding = '';
+            document.getElementById('quizInstruction').style.color = '';
+        }
+
         // Seleziona sorgente random (escludi muon per questa domanda)
         // If quizGammaOnly is enabled, force a gamma-only profile for clearer Hillas examples
         this.currentProfile = this.quizGammaOnly ? getRandomSourceProfile(false) : getRandomSourceProfile(true);
@@ -988,23 +1156,33 @@ class QuizEngine {
         const lastAnswer = this.answerHistory[this.answerHistory.length - 1];
         
         let feedbackMsg = '';
+        let educationalNote = '';
         
         switch(this.currentQuestionType) {
+            case QUESTION_TYPES.THEORETICAL:
+                feedbackMsg = `Risposta esatta!`;
+                educationalNote = this.currentTheoreticalQuestion.explanation;
+                break;
             case QUESTION_TYPES.PARTICLE_TYPE:
                 feedbackMsg = `Hai identificato correttamente che si tratta di un <strong>${lastAnswer.userAnswer === 'gamma' ? 'Fotone Gamma' : 'Adrone'}</strong>!`;
+                educationalNote = this.getEducationalNote(profile ? profile.type : 'gamma');
                 break;
             case QUESTION_TYPES.ENERGY_LEVEL:
                 feedbackMsg = `Hai stimato correttamente l'energia come <strong>${lastAnswer.userAnswer === 'high' ? 'Alta (> 1 TeV)' : 'Bassa (< 1 TeV)'}</strong>!`;
+                educationalNote = this.getEducationalNote(profile.type);
                 break;
             case QUESTION_TYPES.MUON_DETECTION:
                 feedbackMsg = `Hai identificato correttamente ${lastAnswer.userAnswer === 'yes' ? 'la presenza' : 'l\'assenza'} di un muone!`;
+                educationalNote = "I muoni appaiono come archi o anelli perfetti.";
                 break;
             case QUESTION_TYPES.SHOWER_SHAPE:
                 feedbackMsg = `Hai analizzato correttamente la forma dell'ellisse come <strong>${lastAnswer.userAnswer === 'narrow' ? 'Stretta' : 'Larga'}</strong>!`;
+                educationalNote = this.getEducationalNote(profile ? profile.type : 'gamma');
                 break;
             case QUESTION_TYPES.SOURCE_IDENTIFICATION:
             default:
                 feedbackMsg = `Hai identificato correttamente: <strong>${profile.displayName}</strong>`;
+                educationalNote = this.getEducationalNote(profile.type);
                 break;
         }
 
@@ -1018,7 +1196,7 @@ class QuizEngine {
                 Streak: +${Math.min(this.streak * QUIZ_CONFIG.streakBonus, QUIZ_CONFIG.maxStreakBonus)})
             </p>
             <p style="margin-top: 16px; font-size: 13px;">
-                ${this.getEducationalNote(profile.type)}
+                ${educationalNote}
             </p>
         `;
     }
@@ -1036,6 +1214,10 @@ class QuizEngine {
         // Helper per ottenere il testo leggibile della risposta
         const getAnswerLabel = (type, val) => {
             switch(type) {
+                case QUESTION_TYPES.THEORETICAL:
+                    const q = this.currentTheoreticalQuestion;
+                    const opt = q.options.find(o => o.value === val);
+                    return opt ? opt.label : val;
                 case QUESTION_TYPES.PARTICLE_TYPE:
                     return val === 'gamma' ? 'Fotone Gamma' : 'Adrone';
                 case QUESTION_TYPES.ENERGY_LEVEL:
@@ -1054,6 +1236,19 @@ class QuizEngine {
         userAnswerText = getAnswerLabel(this.currentQuestionType, lastAnswer.userAnswer);
         correctAnswerText = getAnswerLabel(this.currentQuestionType, this.currentCorrectAnswer);
 
+        let suggestionHtml = '';
+        if (this.currentQuestionType === QUESTION_TYPES.THEORETICAL) {
+            suggestionHtml = `<p style="margin-top: 12px; color: var(--accent-cyan);">${this.currentTheoreticalQuestion.explanation}</p>`;
+        } else {
+            suggestionHtml = `
+            <ul style="margin-left: 20px; font-size: 13px; color: var(--text-secondary);">
+                <li>Analizza attentamente i parametri di Hillas (Length, Width, Size, Alpha)</li>
+                <li>Confronta le tracce tra le 3 camere per valutare la coerenza</li>
+                <li>Usa gli <strong>Hint</strong> se hai bisogno di aiuto!</li>
+                <li>Rivedi la pagina di <a href="comparison.html" target="_blank" style="color: #0ea5e9;">confronto sorgenti</a></li>
+            </ul>`;
+        }
+
         return `
             <p style="font-size: 16px; margin-bottom: 16px; color: #ff4444;">
                 <strong>Risposta errata!</strong>
@@ -1063,14 +1258,9 @@ class QuizEngine {
                 La risposta corretta era: <strong>${correctAnswerText}</strong>
             </p>
             <p style="margin-top: 16px; font-size: 13px; color: #ffaa00;">
-                💡 <strong>Suggerimenti:</strong>
+                💡 <strong>Spiegazione:</strong>
             </p>
-            <ul style="margin-left: 20px; font-size: 13px; color: var(--text-secondary);">
-                <li>Analizza attentamente i parametri di Hillas (Length, Width, Size, Alpha)</li>
-                <li>Confronta le tracce tra le 3 camere per valutare la coerenza</li>
-                <li>Usa gli <strong>Hint</strong> se hai bisogno di aiuto!</li>
-                <li>Rivedi la pagina di <a href="comparison.html" target="_blank" style="color: #0ea5e9;">confronto sorgenti</a></li>
-            </ul>
+            ${suggestionHtml}
             <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); font-style: italic;">
                 La risposta corretta verrà rivelata alla fine del quiz.
             </p>
