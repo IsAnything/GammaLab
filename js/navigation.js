@@ -335,7 +335,12 @@ window.configureRendererHoverEllipses = function(renderers) {
         const hillasMap = {};
         
         // Dimensioni canvas per le pagine sorgenti (ridotte per migliore visualizzazione)
-        const canvasSize = { width: 900, height: 600 };
+        // Usa dimensioni dal primo canvas se disponibile, altrimenti default
+        const firstCanvas = document.getElementById('cam1');
+        const defaultWidth = firstCanvas ? firstCanvas.width : 900;
+        const defaultHeight = firstCanvas ? firstCanvas.height : 600;
+        
+        const canvasSize = options.canvasSize || { width: defaultWidth, height: defaultHeight };
 
         if (stereoscopic) {
             // MODALITÀ STEREOSCOPICA: genera un singolo evento coerente visto da 3 camere
