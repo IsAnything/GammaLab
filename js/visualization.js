@@ -499,7 +499,8 @@ class CanvasRenderer {
 
         const listenTarget = this.canvas;
 
-        listenTarget.addEventListener('mousemove', (ev) => {
+        // Handler unificato per mouse e touch
+        const handleMove = (clientX, clientY) => {
             if (!this.showHillasOnHover || !this.currentHillasParams) {
                 return;
             }
@@ -511,8 +512,8 @@ class CanvasRenderer {
             const rect = listenTarget.getBoundingClientRect();
             const scaleX = this.canvas.width / rect.width;
             const scaleY = this.canvas.height / rect.height;
-            const x = (ev.clientX - rect.left) * scaleX;
-            const y = (ev.clientY - rect.top) * scaleY;
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
 
             this.mouseX = x;
             this.mouseY = y;
@@ -527,9 +528,9 @@ class CanvasRenderer {
                 this.isHovering = hovering;
                 this._redrawHillasOverlay();
             }
-        });
+        };
 
-        listenTarget.addEventListener('mouseleave', () => {
+        const handleExit = () => {
             if (!this.showHillasOnHover) {
                 return;
             }
@@ -544,6 +545,36 @@ class CanvasRenderer {
                 this._redrawHillasOverlay();
             }
             this._hoverZoomHiddenUntilReset = false;
+        };
+
+        // Mouse events
+        listenTarget.addEventListener('mousemove', (ev) => {
+            handleMove(ev.clientX, ev.clientY);
+        });
+
+        listenTarget.addEventListener('mouseleave', () => {
+            handleExit();
+        });
+
+        // Touch events (per mobile)
+        listenTarget.addEventListener('touchstart', (ev) => {
+            // Previene lo scroll solo se stiamo toccando l'ellisse (opzionale, qui preveniamo sempre per interattività fluida)
+            // ev.preventDefault(); 
+            if (ev.touches.length > 0) {
+                handleMove(ev.touches[0].clientX, ev.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        listenTarget.addEventListener('touchmove', (ev) => {
+            // Previene lo scroll durante l'interazione con il canvas
+            if (ev.cancelable) ev.preventDefault();
+            if (ev.touches.length > 0) {
+                handleMove(ev.touches[0].clientX, ev.touches[0].clientY);
+            }
+        }, { passive: false });
+
+        listenTarget.addEventListener('touchend', () => {
+            handleExit();
         });
     }
 

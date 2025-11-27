@@ -176,6 +176,7 @@ header {
 /* Menu navigazione */
 nav {
   margin-top: 12px;
+  position: relative; /* Necessario per il menu a tendina mobile */
 }
 
 .nav-toggle {
@@ -1894,6 +1895,30 @@ input[type="range"]::-webkit-slider-track {
 @media (max-width: 768px) {
   #quizScreen .container {
     padding: 15px;
+  }
+}
+
+/* ==================== HOMEPAGE ACTION BUTTONS ==================== */
+
+.action-buttons-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .action-buttons-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 20px;
+  }
+  
+  .action-buttons-container .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    text-align: center;
   }
 }
 
