@@ -85,6 +85,126 @@ const THEORETICAL_QUESTIONS = [
         ],
         correctAnswer: 'energy',
         explanation: "Il parametro Size rappresenta la quantità totale di luce raccolta ed è approssimativamente proporzionale all'energia della particella primaria."
+    },
+    {
+        id: 'standard_candle',
+        question: "Quale sorgente è considerata la 'candela standard' dell'astronomia gamma VHE?",
+        options: [
+            { value: 'crab', label: "Crab Nebula" },
+            { value: 'sun', label: "Il Sole" },
+            { value: 'sag_a', label: "Sagittarius A*" },
+            { value: 'moon', label: "La Luna" }
+        ],
+        correctAnswer: 'crab',
+        explanation: "La Crab Nebula è una sorgente stabile e molto luminosa, usata per calibrare i telescopi e come unità di misura (1 Crab)."
+    },
+    {
+        id: 'atmosphere_role',
+        question: "Qual è il ruolo dell'atmosfera nei telescopi Cherenkov?",
+        options: [
+            { value: 'filter', label: "Filtra i raggi cosmici dannosi" },
+            { value: 'calorimeter', label: "Agisce come calorimetro dove si sviluppa lo sciame" },
+            { value: 'lens', label: "Focalizza la luce verso il telescopio" },
+            { value: 'noise', label: "È solo una fonte di rumore da eliminare" }
+        ],
+        correctAnswer: 'calorimeter',
+        explanation: "L'atmosfera è il mezzo in cui la particella primaria interagisce creando lo sciame di particelle secondarie che emettono luce Cherenkov."
+    },
+    {
+        id: 'pmt_function',
+        question: "Cosa fa un Fotomoltiplicatore (PMT) nella camera del telescopio?",
+        options: [
+            { value: 'focus', label: "Focalizza la luce" },
+            { value: 'convert', label: "Converte singoli fotoni in un segnale elettrico amplificato" },
+            { value: 'store', label: "Memorizza l'immagine digitalmente" },
+            { value: 'cool', label: "Raffredda l'elettronica" }
+        ],
+        correctAnswer: 'convert',
+        explanation: "I PMT sono sensori estremamente sensibili capaci di rilevare singoli fotoni e convertirli in impulsi elettrici misurabili."
+    },
+    {
+        id: 'nsb_noise',
+        question: "Cos'è il 'Night Sky Background' (NSB)?",
+        options: [
+            { value: 'pollution', label: "Inquinamento luminoso delle città" },
+            { value: 'stars', label: "Luce diffusa da stelle, airglow e luce zodiacale" },
+            { value: 'clouds', label: "Riflessione delle nuvole" },
+            { value: 'electronics', label: "Rumore elettronico dei sensori" }
+        ],
+        correctAnswer: 'stars',
+        explanation: "Il NSB è la luce di fondo naturale del cielo notturno che costituisce il principale rumore per le osservazioni Cherenkov."
+    },
+    {
+        id: 'muon_ring',
+        question: "Perché i muoni appaiono spesso come anelli o archi?",
+        options: [
+            { value: 'lens_defect', label: "Difetto delle lenti del telescopio" },
+            { value: 'cone', label: "Emettono un cono di luce che viene proiettato come un anello" },
+            { value: 'spin', label: "Ruotano molto velocemente su se stessi" },
+            { value: 'diffraction', label: "È un effetto di diffrazione atmosferica" }
+        ],
+        correctAnswer: 'cone',
+        explanation: "Un muone è una singola particella carica che viaggia quasi dritta emettendo un cono di luce Cherenkov, che appare come un cerchio sulla camera."
+    },
+    {
+        id: 'impact_parameter',
+        question: "Cos'è il 'Parametro d'Impatto'?",
+        options: [
+            { value: 'force', label: "La forza con cui la particella colpisce l'atmosfera" },
+            { value: 'distance', label: "La distanza tra l'asse dello sciame e il telescopio" },
+            { value: 'size', label: "La dimensione dello specchio" },
+            { value: 'damage', label: "Il danno causato alle ottiche" }
+        ],
+        correctAnswer: 'distance',
+        explanation: "Il parametro d'impatto è la distanza perpendicolare tra la traiettoria della particella primaria (core dello sciame) e il telescopio."
+    },
+    {
+        id: 'coincidence_trigger',
+        question: "A cosa serve il 'Trigger di Coincidenza'?",
+        options: [
+            { value: 'speed', label: "A velocizzare l'acquisizione dati" },
+            { value: 'noise', label: "A scartare il rumore casuale del cielo notturno (NSB)" },
+            { value: 'align', label: "Ad allineare i telescopi" },
+            { value: 'color', label: "A distinguere i colori dei fotoni" }
+        ],
+        correctAnswer: 'noise',
+        explanation: "Richiedere che più pixel o più telescopi vedano un segnale contemporaneamente elimina i segnali casuali dovuti al fondo del cielo."
+    },
+    {
+        id: 'energy_threshold',
+        question: "Cosa determina principalmente la soglia di energia minima di un telescopio?",
+        options: [
+            { value: 'computer', label: "La potenza del computer di analisi" },
+            { value: 'mirror', label: "L'area dello specchio e l'efficienza dei sensori" },
+            { value: 'wind', label: "La velocità del vento" },
+            { value: 'moon', label: "La fase lunare" }
+        ],
+        correctAnswer: 'mirror',
+        explanation: "Specchi più grandi raccolgono più luce, permettendo di vedere sciami deboli generati da raggi gamma di bassa energia."
+    },
+    {
+        id: 'spectral_index',
+        question: "Cosa indica un indice spettrale 'duro' (es. 2.0) rispetto a uno 'molle' (es. 3.0)?",
+        options: [
+            { value: 'hard', label: "Più fotoni ad alta energia rispetto a quelli a bassa energia" },
+            { value: 'soft', label: "Meno fotoni ad alta energia" },
+            { value: 'brightness', label: "La sorgente è più luminosa in assoluto" },
+            { value: 'distance', label: "La sorgente è più vicina" }
+        ],
+        correctAnswer: 'hard',
+        explanation: "Uno spettro 'duro' (indice basso) decresce più lentamente all'aumentare dell'energia, indicando una maggiore presenza di particelle molto energetiche."
+    },
+    {
+        id: 'dead_time',
+        question: "Cos'è il 'Tempo Morto' (Dead Time) di un sistema di acquisizione?",
+        options: [
+            { value: 'off', label: "Quando il telescopio è spento di giorno" },
+            { value: 'processing', label: "Il tempo in cui il sistema è occupato a leggere un evento e non può registrarne altri" },
+            { value: 'cloud', label: "Quando una nuvola copre la sorgente" },
+            { value: 'broken', label: "Quando un sensore è rotto" }
+        ],
+        correctAnswer: 'processing',
+        explanation: "È l'intervallo di tempo subito dopo un trigger durante il quale l'elettronica sta elaborando i dati e il telescopio è 'cieco' a nuovi eventi."
     }
 ];
 
@@ -152,6 +272,7 @@ class QuizEngine {
         this.currentQuestionType = null;
         this.currentCorrectAnswer = null;
         this.currentTheoreticalQuestion = null;
+        this.selectedTheoreticalQuestions = [];
     }
 
     /**
@@ -327,6 +448,11 @@ class QuizEngine {
             this.sourceStats[key] = { attempts: 0, correct: 0 };
         });
         
+        // Seleziona 5 domande teoriche casuali per questa sessione
+        this.selectedTheoreticalQuestions = [...THEORETICAL_QUESTIONS]
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 5);
+        
         // Genera prima domanda
         this.generateQuestion();
     }
@@ -439,7 +565,7 @@ class QuizEngine {
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) simulatorSection.classList.add('hidden');
         
-        // Seleziona domanda in base all'indice corrente
+        // Seleziona domanda in base all'indice corrente (0-4)
         // Mappatura basata su QUESTION_DISTRIBUTION
         let qIndex = 0;
         if (this.currentQuestion === 1) qIndex = 0;
@@ -449,9 +575,9 @@ class QuizEngine {
         else if (this.currentQuestion === 13) qIndex = 4;
         
         // Fallback se l'indice sfora
-        if (qIndex >= THEORETICAL_QUESTIONS.length) qIndex = 0;
+        if (qIndex >= this.selectedTheoreticalQuestions.length) qIndex = 0;
         
-        const questionData = THEORETICAL_QUESTIONS[qIndex];
+        const questionData = this.selectedTheoreticalQuestions[qIndex];
         this.currentTheoreticalQuestion = questionData;
         this.currentCorrectAnswer = questionData.correctAnswer;
         
