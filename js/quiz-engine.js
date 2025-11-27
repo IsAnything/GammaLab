@@ -533,17 +533,6 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
-
-        // Render Stereo Reconstruction
-        const stereoCanvas = document.getElementById('quizStereo');
-        if (stereoCanvas && window.renderStereoReconstruction) {
-             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
-                showGeometry: true,
-                showCameraPositions: true,
-                showArrows: true,
-                showArrivalDirection: true
-            });
-        }
     }
     
     /**
@@ -576,17 +565,6 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
-
-        // Render Stereo Reconstruction
-        const stereoCanvas = document.getElementById('quizStereo');
-        if (stereoCanvas && window.renderStereoReconstruction) {
-             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
-                showGeometry: true,
-                showCameraPositions: true,
-                showArrows: true,
-                showArrivalDirection: true
-            });
-        }
     }
     
     /**
@@ -619,17 +597,6 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
-
-        // Render Stereo Reconstruction
-        const stereoCanvas = document.getElementById('quizStereo');
-        if (stereoCanvas && window.renderStereoReconstruction) {
-             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
-                showGeometry: true,
-                showCameraPositions: true,
-                showArrows: true,
-                showArrivalDirection: true
-            });
-        }
     }
     
     /**
