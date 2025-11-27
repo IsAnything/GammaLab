@@ -57,8 +57,7 @@ GammaLab/
 │   └── lightbox.js               (✨ NEW: click-to-zoom universale)
 ├── css/
 │   └── main-style.css            (stili globali + UX Week 8)
-├── homepage.html                 (✨ UPDATED: tabs system + hero)
-├── index.html
+├── index.html                 (✨ UPDATED: tabs system + hero)
 ├── PROJECT_STATE.md
 └── EVOLUTION_PLAN.md             (✨ NEW: roadmap Week 8-10)
 ```
@@ -69,7 +68,7 @@ GammaLab/
 
 ### 1. Homepage Tabs System
 
-**File:** `homepage.html` linee 52-145
+**File:** `index.html` linee 52-145
 
 **Implementazione:**
 - 3 tab collapsable: **Come Funziona** (default), **Parametri Hillas**, **Quiz Interattivo**
@@ -89,7 +88,7 @@ GammaLab/
 
 ### 2. Hero Section Enhancement
 
-**File:** `homepage.html` linee 32-50
+**File:** `index.html` linee 32-50
 
 **Modifiche:**
 - Background: `linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.1) 100%)`
