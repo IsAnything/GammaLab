@@ -518,7 +518,10 @@ class CanvasRenderer {
             this.mouseX = x;
             this.mouseY = y;
 
-            const hovering = this._isPointInsideHillas(x, y, this.currentHillasParams);
+            // Aumenta leggermente il margine di tolleranza per il touch
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const margin = isTouch ? 1.4 : 1.15;
+            const hovering = this._isPointInsideHillas(x, y, this.currentHillasParams, margin);
 
             if (this._hoverZoomHiddenUntilReset && !hovering) {
                 this._hoverZoomHiddenUntilReset = false;
@@ -573,8 +576,12 @@ class CanvasRenderer {
             }
         }, { passive: false });
 
-        listenTarget.addEventListener('touchend', () => {
-            handleExit();
+        // Su mobile, NON chiamiamo handleExit su touchend per mantenere lo zoom attivo ("sticky")
+        // Lo zoom sparirà solo se l'utente tocca fuori dall'ellisse (gestito da touchstart successivo)
+        // o se clicca per chiudere (gestito da navigation.js)
+        listenTarget.addEventListener('touchend', (ev) => {
+            // Opzionale: prevenire click fantasma
+            if (ev.cancelable) ev.preventDefault();
         });
     }
 
@@ -803,7 +810,7 @@ class CanvasRenderer {
         }
     }
 
-    _isPointInsideHillas(x, y, hillas) {
+    _isPointInsideHillas(x, y, hillas, threshold = 1.15) {
         if (!hillas || !hillas.valid) return false;
 
         const a = Math.max(hillas.lengthPx || 0, 1);
@@ -820,7 +827,7 @@ class CanvasRenderer {
         const yr = -dx * sinT + dy * cosT;
 
         const normalized = (xr * xr) / (a * a) + (yr * yr) / (b * b);
-        return normalized <= 1.15; // leggero margine per facilitare l'hover
+        return normalized <= threshold; 
     }
 
     _computePhotonCentroid(tracks) {
