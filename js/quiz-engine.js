@@ -484,6 +484,7 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
+        const hillasMap = {};
         
         for (let i = 0; i < 3; i++) {
             let event = null;
@@ -521,6 +522,7 @@ class QuizEngine {
 
             if (hillas && hillas.valid) {
                 this.currentHillasParams.push(hillas);
+                hillasMap[`cam${i+1}`] = hillas;
             }
 
             this.renderers[i].renderEvent(event, i === 0);
@@ -531,6 +533,17 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
+
+        // Render Stereo Reconstruction
+        const stereoCanvas = document.getElementById('quizStereo');
+        if (stereoCanvas && window.renderStereoReconstruction) {
+             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                showGeometry: true,
+                showCameraPositions: true,
+                showArrows: true,
+                showArrivalDirection: true
+            });
+        }
     }
     
     /**
@@ -543,6 +556,7 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
+        const hillasMap = {};
         
         for (let i = 0; i < 3; i++) {
             const event = this.engine.generateHadronicEvent(i + 1, canvasSize, customParams);
@@ -551,6 +565,7 @@ class QuizEngine {
             const hillas = this.hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
                 this.currentHillasParams.push(hillas);
+                hillasMap[`cam${i+1}`] = hillas;
             }
             
             this.renderers[i].renderEvent(event, i === 0);
@@ -561,6 +576,17 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
+
+        // Render Stereo Reconstruction
+        const stereoCanvas = document.getElementById('quizStereo');
+        if (stereoCanvas && window.renderStereoReconstruction) {
+             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                showGeometry: true,
+                showCameraPositions: true,
+                showArrows: true,
+                showArrivalDirection: true
+            });
+        }
     }
     
     /**
@@ -573,6 +599,7 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
+        const hillasMap = {};
         
         for (let i = 0; i < 3; i++) {
             const event = this.engine.generateMuonEvent(i + 1, canvasSize, customParams);
@@ -581,6 +608,7 @@ class QuizEngine {
             const hillas = this.hillasAnalyzer.analyze(event);
             if (hillas && hillas.valid) {
                 this.currentHillasParams.push(hillas);
+                hillasMap[`cam${i+1}`] = hillas;
             }
             
             this.renderers[i].renderEvent(event, i === 0);
@@ -591,6 +619,17 @@ class QuizEngine {
         }
         
         this.currentEvent = events;
+
+        // Render Stereo Reconstruction
+        const stereoCanvas = document.getElementById('quizStereo');
+        if (stereoCanvas && window.renderStereoReconstruction) {
+             window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                showGeometry: true,
+                showCameraPositions: true,
+                showArrows: true,
+                showArrivalDirection: true
+            });
+        }
     }
     
     /**
