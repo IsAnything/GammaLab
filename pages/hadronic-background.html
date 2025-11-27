@@ -30,6 +30,65 @@
     </header>
 
     <main class="container">
+        <!-- Camere IACT Interattive -->
+        <section class="card simulator-section">
+            <h2>📷 Camere IACT Interattive - Background Adronico</h2>
+            <p>
+                Queste simulazioni mostrano eventi adronici tipici (protoni, nuclei He) catturati da tre telescopi IACT.
+                <strong>Ora tutte e tre le camere mostrano la stessa traccia fisica</strong> vista da posizioni leggermente diverse,
+                permettendo una <strong>vera ricostruzione stereoscopica</strong> con elevata coerenza tra le camere.
+                Nota le <strong>tracce irregolari e larghe</strong>, con <strong>Alpha distribuito 
+                uniformemente</strong> e <strong>scarsa coerenza stereoscopica</strong>.
+            </p>
+            <p style="color: var(--text-secondary); font-size: 0.95em;">
+                💡 <strong>Impara a riconoscere</strong>: Il Width ampio (~22 px) è il segnale più 
+                affidabile. Nessuna sorgente gamma ha Width così grandi!
+            </p>
+
+            <div style="text-align: center; margin: 24px 0;">
+                <button id="generateBtn" class="btn btn-primary">⚛️ Genera Nuovo Evento Adronico</button>
+                <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
+            </div>
+
+            <!-- 3 Camere (ora più grandi per simulazione interattiva) -->
+            <div class="cameras-grid">
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 1 (Nord)</div>
+                    <canvas id="cam1" class="camera-canvas" width="450" height="300"></canvas>
+                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 2 (Est)</div>
+                    <canvas id="cam2" class="camera-canvas" width="450" height="300"></canvas>
+                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
+                </div>
+                <div class="camera-container">
+                    <div class="camera-label">📷 Camera 3 (Sud)</div>
+                    <canvas id="cam3" class="camera-canvas" width="450" height="300"></canvas>
+                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Ricostruzione Stereoscopica -->
+            <div class="stereo-container">
+                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Gli assi NON convergono in un punto preciso - segno di evento adronico
+                </p>
+                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
+            </div>
+
+            <!-- Pannello Parametri di Hillas -->
+            <div class="hillas-panel">
+                <h3>📊 Parametri di Hillas Misurati</h3>
+                <div id="hillasDisplay">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Genera un evento per visualizzare i parametri di Hillas
+                    </p>
+                </div>
+            </div>
+        </section>
+
         <!-- Introduzione -->
         <section class="card">
             <h2>⚛️ Il Problema del Background Adronico</h2>
@@ -406,64 +465,7 @@
             </ul>
         </section>
 
-        <!-- Camere IACT Interattive -->
-        <section class="card simulator-section">
-            <h2>📷 Camere IACT Interattive - Background Adronico</h2>
-            <p>
-                Queste simulazioni mostrano eventi adronici tipici (protoni, nuclei He) catturati da tre telescopi IACT.
-                <strong>Ora tutte e tre le camere mostrano la stessa traccia fisica</strong> vista da posizioni leggermente diverse,
-                permettendo una <strong>vera ricostruzione stereoscopica</strong> con elevata coerenza tra le camere.
-                Nota le <strong>tracce irregolari e larghe</strong>, con <strong>Alpha distribuito 
-                uniformemente</strong> e <strong>scarsa coerenza stereoscopica</strong>.
-            </p>
-            <p style="color: var(--text-secondary); font-size: 0.95em;">
-                💡 <strong>Impara a riconoscere</strong>: Il Width ampio (~22 px) è il segnale più 
-                affidabile. Nessuna sorgente gamma ha Width così grandi!
-            </p>
 
-            <div style="text-align: center; margin: 24px 0;">
-                <button id="generateBtn" class="btn btn-primary">⚛️ Genera Nuovo Evento Adronico</button>
-                <button id="clearBtn" class="btn btn-secondary">🗑️ Pulisci</button>
-            </div>
-
-            <!-- 3 Camere (ora più grandi per simulazione interattiva) -->
-            <div class="cameras-grid">
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 1 (Nord)</div>
-                    <canvas id="cam1" class="camera-canvas" width="450" height="300"></canvas>
-                    <canvas id="cam1-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
-                </div>
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 2 (Est)</div>
-                    <canvas id="cam2" class="camera-canvas" width="450" height="300"></canvas>
-                    <canvas id="cam2-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
-                </div>
-                <div class="camera-container">
-                    <div class="camera-label">📷 Camera 3 (Sud)</div>
-                    <canvas id="cam3" class="camera-canvas" width="450" height="300"></canvas>
-                    <canvas id="cam3-overlay" class="camera-canvas overlay-canvas" width="450" height="300"></canvas>
-                </div>
-            </div>
-
-            <!-- Ricostruzione Stereoscopica -->
-            <div class="stereo-container">
-                <h3 style="color: var(--accent-purple);">🔺 Ricostruzione Stereoscopica</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                    Gli assi NON convergono in un punto preciso - segno di evento adronico
-                </p>
-                <canvas id="stereo" class="stereo-canvas" width="960" height="720"></canvas>
-            </div>
-
-            <!-- Pannello Parametri di Hillas -->
-            <div class="hillas-panel">
-                <h3>📊 Parametri di Hillas Misurati</h3>
-                <div id="hillasDisplay">
-                    <p style="text-align: center; color: var(--text-secondary);">
-                        Genera un evento per visualizzare i parametri di Hillas
-                    </p>
-                </div>
-            </div>
-        </section>
 
         <!-- Importanza -->
         <section class="card">
