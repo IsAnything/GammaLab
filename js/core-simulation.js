@@ -1009,6 +1009,27 @@ class SimulationEngine {
     }
 
     /**
+     * Verifica se un punto è dentro l'esagono della camera
+     */
+    _isPointInHexagon(x, y, canvasWidth, canvasHeight) {
+        const radius = Math.min(canvasWidth, canvasHeight) / 2 - 5;
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+        const startAngle = -Math.PI / 3; // flat-top orientation
+        
+        const vertices = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = startAngle + i * (Math.PI / 3);
+            vertices.push({
+                x: centerX + radius * Math.cos(angle),
+                y: centerY + radius * Math.sin(angle)
+            });
+        }
+        
+        return this._pointInPolygon(x, y, vertices);
+    }
+
+    /**
      * Forza un punto a rimanere entro l'esagono spostandolo verso il centro se necessario
      */
     _clampToHexagon(x, y, canvasWidth, canvasHeight) {
