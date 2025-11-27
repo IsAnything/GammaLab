@@ -1020,9 +1020,30 @@ class QuizEngine {
         const profile = this.currentProfile;
         const lastAnswer = this.answerHistory[this.answerHistory.length - 1];
         
+        let feedbackMsg = '';
+        
+        switch(this.currentQuestionType) {
+            case QUESTION_TYPES.PARTICLE_TYPE:
+                feedbackMsg = `Hai identificato correttamente che si tratta di un <strong>${lastAnswer.userAnswer === 'gamma' ? 'Fotone Gamma' : 'Adrone'}</strong>!`;
+                break;
+            case QUESTION_TYPES.ENERGY_LEVEL:
+                feedbackMsg = `Hai stimato correttamente l'energia come <strong>${lastAnswer.userAnswer === 'high' ? 'Alta (> 1 TeV)' : 'Bassa (< 1 TeV)'}</strong>!`;
+                break;
+            case QUESTION_TYPES.MUON_DETECTION:
+                feedbackMsg = `Hai identificato correttamente ${lastAnswer.userAnswer === 'yes' ? 'la presenza' : 'l\'assenza'} di un muone!`;
+                break;
+            case QUESTION_TYPES.SHOWER_SHAPE:
+                feedbackMsg = `Hai analizzato correttamente la forma dell'ellisse come <strong>${lastAnswer.userAnswer === 'narrow' ? 'Stretta' : 'Larga'}</strong>!`;
+                break;
+            case QUESTION_TYPES.SOURCE_IDENTIFICATION:
+            default:
+                feedbackMsg = `Hai identificato correttamente: <strong>${profile.displayName}</strong>`;
+                break;
+        }
+
         return `
             <p style="font-size: 16px; margin-bottom: 16px;">
-                <strong>Hai identificato correttamente: ${profile.displayName}</strong>
+                ${feedbackMsg}
             </p>
             <p style="font-size: 14px; color: #00ff88;">
                 +${lastAnswer.points} punti (Base: ${QUIZ_CONFIG.basePoints}, 
@@ -1042,12 +1063,37 @@ class QuizEngine {
         const profile = this.currentProfile;
         const lastAnswer = this.answerHistory[this.answerHistory.length - 1];
         
+        let userAnswerText = '';
+        let correctAnswerText = '';
+
+        // Helper per ottenere il testo leggibile della risposta
+        const getAnswerLabel = (type, val) => {
+            switch(type) {
+                case QUESTION_TYPES.PARTICLE_TYPE:
+                    return val === 'gamma' ? 'Fotone Gamma' : 'Adrone';
+                case QUESTION_TYPES.ENERGY_LEVEL:
+                    return val === 'high' ? 'Alta Energia' : 'Bassa Energia';
+                case QUESTION_TYPES.MUON_DETECTION:
+                    return val === 'yes' ? 'Sì (Muone)' : 'No (Non Muone)';
+                case QUESTION_TYPES.SHOWER_SHAPE:
+                    return val === 'narrow' ? 'Stretta' : 'Larga';
+                case QUESTION_TYPES.SOURCE_IDENTIFICATION:
+                    return this.getSourceDisplayName(val);
+                default:
+                    return val;
+            }
+        };
+
+        userAnswerText = getAnswerLabel(this.currentQuestionType, lastAnswer.userAnswer);
+        correctAnswerText = getAnswerLabel(this.currentQuestionType, this.currentCorrectAnswer);
+
         return `
             <p style="font-size: 16px; margin-bottom: 16px; color: #ff4444;">
                 <strong>Risposta errata!</strong>
             </p>
             <p style="font-size: 14px; color: var(--text-secondary);">
-                Hai risposto: <strong>${this.getSourceDisplayName(lastAnswer.userAnswer)}</strong>
+                Hai risposto: <strong>${userAnswerText}</strong><br>
+                La risposta corretta era: <strong>${correctAnswerText}</strong>
             </p>
             <p style="margin-top: 16px; font-size: 13px; color: #ffaa00;">
                 💡 <strong>Suggerimenti:</strong>
