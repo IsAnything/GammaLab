@@ -99,6 +99,21 @@ class SimulationEngine {
      * @returns {Object} Evento adronico generato
      */
     generateHadronicEvent(cameraId = 1, canvasSize = null, customParams = null) {
+        // Tenta di usare il profilo 'hadron' completo se disponibile (come nel simulatore background)
+        try {
+            if (typeof getSourceProfile === 'function') {
+                const hadronProfile = getSourceProfile('hadron');
+                if (hadronProfile) {
+                    // Usa il motore di generazione standard con il profilo adronico
+                    // Questo garantisce coerenza visiva con la pagina hadronic-background.html
+                    return this.generateEvent(hadronProfile, cameraId, canvasSize, customParams);
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ Fallback a generazione adronica legacy:', e);
+        }
+
+        // === FALLBACK LEGACY (se source-profiles.js non è caricato) ===
         const canvasW = canvasSize?.width || CANVAS_WIDTH;
         const canvasH = canvasSize?.height || CANVAS_HEIGHT;
         
@@ -139,7 +154,7 @@ class SimulationEngine {
         }
         
         // Genera tracce con caratteristiche adroniche
-    const tracks = this._generateHadronicTracks(params, hadronEnergy, canvasW, canvasH, customParams || {});
+        const tracks = this._generateHadronicTracks(params, hadronEnergy, canvasW, canvasH, customParams || {});
         
         const event = {
             sourceType: 'hadron',
