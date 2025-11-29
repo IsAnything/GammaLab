@@ -2006,24 +2006,69 @@ class CanvasRenderer {
         const cosAngle = Math.cos(trackAngle);
         const sinAngle = Math.sin(trackAngle);
 
+        // --- MODIFICA: Generazione Sub-Clusters per Adroni ---
+        const subClusters = [];
+        if (isHadronic) {
+            // Crea 2-4 "isole" secondarie casuali
+            const numSubClusters = 2 + Math.floor(Math.random() * 3);
+            for (let k = 0; k < numSubClusters; k++) {
+                // Posizione relativa al centro della traccia
+                const dist = spreadRadiusLong * (0.6 + Math.random() * 0.8); // Distanza variabile
+                const ang = Math.random() * Math.PI * 2;
+                subClusters.push({
+                    dx: Math.cos(ang) * dist,
+                    dy: Math.sin(ang) * dist,
+                    radius: spreadRadiusShort * (0.4 + Math.random() * 0.4), // Raggio più piccolo
+                    pixels: Math.floor(numPixels * 0.15) // 15% dei pixel totali per ogni isola
+                });
+            }
+        }
+        // -----------------------------------------------------
+
         for (let i = 0; i < numPixels; i++) {
             let attempts = 0;
             let validPosition = false;
             let px = track.x;
             let py = track.y;
 
+            // --- MODIFICA: Selezione Cluster ---
+            let currentCluster = null;
+            if (isHadronic && subClusters.length > 0 && Math.random() < 0.4) {
+                // 40% di probabilità di appartenere a un sub-cluster
+                currentCluster = subClusters[Math.floor(Math.random() * subClusters.length)];
+            }
+            // -----------------------------------
+
             while (!validPosition && attempts < 32) {
-                const t = Math.random() * Math.PI * 2;
-                const radiusFactor = Math.pow(Math.random(), radialExponent);
+                let localX, localY;
 
-                const localX = Math.cos(t) * spreadRadiusLong * radiusFactor;
-                const localY = Math.sin(t) * spreadRadiusShort * radiusFactor;
+                if (currentCluster) {
+                    // Generazione pixel nel sub-cluster (caotico)
+                    const t = Math.random() * Math.PI * 2;
+                    const r = Math.random() * currentCluster.radius;
+                    localX = currentCluster.dx + Math.cos(t) * r;
+                    localY = currentCluster.dy + Math.sin(t) * r;
+                    
+                    // Rotazione base (opzionale per sub-cluster, ma mantiene coerenza)
+                    const rotX = localX * cosAngle - localY * sinAngle;
+                    const rotY = localX * sinAngle + localY * cosAngle;
+                    px = track.x + rotX;
+                    py = track.y + rotY;
 
-                const rotX = localX * cosAngle - localY * sinAngle;
-                const rotY = localX * sinAngle + localY * cosAngle;
+                } else {
+                    // Generazione standard (ellisse principale)
+                    const t = Math.random() * Math.PI * 2;
+                    const radiusFactor = Math.pow(Math.random(), radialExponent);
 
-                px = track.x + rotX;
-                py = track.y + rotY;
+                    const lx = Math.cos(t) * spreadRadiusLong * radiusFactor;
+                    const ly = Math.sin(t) * spreadRadiusShort * radiusFactor;
+
+                    const rotX = lx * cosAngle - ly * sinAngle;
+                    const rotY = lx * sinAngle + ly * cosAngle;
+
+                    px = track.x + rotX;
+                    py = track.y + rotY;
+                }
 
                 if (px < margin || px > canvasW - margin || py < margin || py > canvasH - margin) {
                     attempts++;
