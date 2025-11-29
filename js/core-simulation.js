@@ -625,27 +625,23 @@ class SimulationEngine {
                 if (intensity > 0.8) intensity = 0.8 + (intensity - 0.8) * 0.2;
             }
 
-            // 2. BASSA ENERGIA: Frammentazione
+            // 2. BASSA ENERGIA: Traccia debole ma coerente
             if (energy < 200) {
-                // Drop casuale di fotoni per creare "buchi" e frammentazione
-                // Più bassa è l'energia, più alta la probabilità di drop
-                const dropProb = Math.max(0, 0.4 - (energy / 500));
-                if (Math.random() < dropProb) continue;
-                
-                // Riduci intensità residua
-                intensity *= 0.7;
+                // Invece di cancellare fotoni (che crea buchi e instabilità Hillas),
+                // riduciamo solo l'intensità per renderli spettrali
+                intensity *= 0.6;
             }
 
-            // 3. CRAB / GAMMA STANDARD: Core Compatto
+            // 3. CRAB / GAMMA STANDARD: Core Bilanciato
             if (sourceType === 'crab' || sourceType === 'gamma') {
-                // Enfatizza il core centrale
+                // Enfatizza il core ma MENO aggressivamente per non rompere Hillas
                 const radial = Math.hypot(x - centerX, y - centerY);
                 const coreLimit = Math.min(widthPx, lengthPx * 0.4);
                 if (radial < coreLimit) {
-                    intensity *= 1.8; // Core molto luminoso
+                    intensity *= 1.25; // Era 1.8 - Ridotto per evitare ellissi puntiformi
                 } else {
-                    // Falloff morbido verso l'esterno
-                    intensity *= 0.8;
+                    // Falloff meno severo per mantenere visibile la forma
+                    intensity *= 0.9;  // Era 0.8
                 }
             }
 
