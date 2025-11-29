@@ -2006,20 +2006,20 @@ class CanvasRenderer {
         const cosAngle = Math.cos(trackAngle);
         const sinAngle = Math.sin(trackAngle);
 
-        // --- MODIFICA: Generazione Sub-Clusters per Adroni ---
+        // --- MODIFICA: Generazione Sub-Clusters per Adroni (Effetto "Macchia Sporca") ---
         const subClusters = [];
         if (isHadronic) {
-            // Crea 2-4 "isole" secondarie casuali
-            const numSubClusters = 2 + Math.floor(Math.random() * 3);
+            // Aumenta drasticamente il numero e la dispersione dei frammenti
+            const numSubClusters = 3 + Math.floor(Math.random() * 4); // 3-6 isole
             for (let k = 0; k < numSubClusters; k++) {
-                // Posizione relativa al centro della traccia
-                const dist = spreadRadiusLong * (0.6 + Math.random() * 0.8); // Distanza variabile
+                // Distanza molto maggiore dal centro per separare bene le isole
+                const dist = spreadRadiusLong * (0.8 + Math.random() * 1.2); 
                 const ang = Math.random() * Math.PI * 2;
                 subClusters.push({
                     dx: Math.cos(ang) * dist,
                     dy: Math.sin(ang) * dist,
-                    radius: spreadRadiusShort * (0.4 + Math.random() * 0.4), // Raggio più piccolo
-                    pixels: Math.floor(numPixels * 0.15) // 15% dei pixel totali per ogni isola
+                    radius: spreadRadiusShort * (0.5 + Math.random() * 0.6),
+                    // Non usiamo 'pixels' qui, ma la probabilità nel loop principale
                 });
             }
         }
@@ -2033,8 +2033,8 @@ class CanvasRenderer {
 
             // --- MODIFICA: Selezione Cluster ---
             let currentCluster = null;
-            if (isHadronic && subClusters.length > 0 && Math.random() < 0.4) {
-                // 40% di probabilità di appartenere a un sub-cluster
+            // 65% di probabilità di finire in un frammento esterno (molto frammentato)
+            if (isHadronic && subClusters.length > 0 && Math.random() < 0.65) {
                 currentCluster = subClusters[Math.floor(Math.random() * subClusters.length)];
             }
             // -----------------------------------
@@ -2043,22 +2043,25 @@ class CanvasRenderer {
                 let localX, localY;
 
                 if (currentCluster) {
-                    // Generazione pixel nel sub-cluster (caotico)
+                    // Generazione pixel nel sub-cluster
                     const t = Math.random() * Math.PI * 2;
-                    const r = Math.random() * currentCluster.radius;
+                    // Distribuzione uniforme nel cerchio del cluster (più "piatta", meno nucleo)
+                    const r = Math.sqrt(Math.random()) * currentCluster.radius;
                     localX = currentCluster.dx + Math.cos(t) * r;
                     localY = currentCluster.dy + Math.sin(t) * r;
                     
-                    // Rotazione base (opzionale per sub-cluster, ma mantiene coerenza)
+                    // Rotazione coerente con la traccia (opzionale, ma aiuta il realismo)
                     const rotX = localX * cosAngle - localY * sinAngle;
                     const rotY = localX * sinAngle + localY * cosAngle;
                     px = track.x + rotX;
                     py = track.y + rotY;
 
                 } else {
-                    // Generazione standard (ellisse principale)
+                    // Generazione standard (ellisse principale o residuo centrale)
                     const t = Math.random() * Math.PI * 2;
-                    const radiusFactor = Math.pow(Math.random(), radialExponent);
+                    // Per adroni, anche il centro è meno concentrato (esponente più basso)
+                    const exp = isHadronic ? 1.0 : radialExponent; 
+                    const radiusFactor = Math.pow(Math.random(), exp);
 
                     const lx = Math.cos(t) * spreadRadiusLong * radiusFactor;
                     const ly = Math.sin(t) * spreadRadiusShort * radiusFactor;
@@ -2192,7 +2195,8 @@ class CanvasRenderer {
             return false;
         }
         const tag = (sourceTag || this.sourceType || '').toString().toLowerCase();
-        const hadronicTags = ['pevatron', 'snr', 'hadron', 'hadronic', 'muon', 'galactic-center', 'cosmic-ray'];
+        // Rimosso 'pevatron', 'snr', 'galactic-center' perché nel simulatore osserviamo i GAMMA da queste sorgenti
+        const hadronicTags = ['hadron', 'hadronic', 'proton', 'iron', 'cosmic-ray'];
         return hadronicTags.includes(tag);
     }
 
