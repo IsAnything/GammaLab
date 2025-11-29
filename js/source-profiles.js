@@ -339,15 +339,16 @@ const HADRON_BACKGROUND_PROFILE = {
     asymmetry: { mean: 0.45, std: 0.20 },  // MOLTO asimmetrico
 
     visualSignature: {
-        dispersionScaleX: 0.5,
-        dispersionScaleY: 0.5,
-        hotspotCount: 3,
-        hotspotSpread: 1.0,
-        hotspotFill: 0.7,
-        hotspotBoost: 0.5,
-        intensityVariance: 1.2,
+        dispersionScaleX: 0.6,      // Aumentato dispersione generale
+        dispersionScaleY: 0.6,
+        hotspotCount: 5,            // Più isole (era 3)
+        hotspotSpread: 1.6,         // Isole più lontane (era 1.0)
+        hotspotFill: 0.85,          // Più fotoni nelle isole (era 0.7)
+        hotspotBoost: 0.8,          // Isole più brillanti
+        intensityVariance: 1.5,     // Molto rumore di intensità
         energyInitialBoost: 1.05,
-        energyNoise: 0.3,
+        energyNoise: 0.4,           // Più rumore energetico
+
         offAxisShear: 0.2
     },
     
