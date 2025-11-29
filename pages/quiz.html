@@ -122,27 +122,22 @@
                     Analizza le immagini Cherenkov e i parametri di Hillas per identificare la sorgente.
                 </p>
 
-                <!-- 3 Camere -->
-                <div class="cameras-grid">
-                    <div class="camera-container">
-                        <div class="camera-label">📷 Camera 1</div>
+                <!-- Single Camera + Info Box Layout -->
+                <div class="quiz-layout-container" style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                    <!-- Camera Section -->
+                    <div class="camera-container" style="flex: 1; min-width: 300px; max-width: 600px;">
+                        <div class="camera-label">📷 Camera Telescopio</div>
                         <div class="canvas-wrapper">
                             <canvas id="quizCam1" class="camera-canvas" width="600" height="600"></canvas>
                             <canvas id="quizCam1-overlay" class="overlay-canvas" width="600" height="600"></canvas>
                         </div>
                     </div>
-                    <div class="camera-container">
-                        <div class="camera-label">📷 Camera 2</div>
-                        <div class="canvas-wrapper">
-                            <canvas id="quizCam2" class="camera-canvas" width="600" height="600"></canvas>
-                            <canvas id="quizCam2-overlay" class="overlay-canvas" width="600" height="600"></canvas>
-                        </div>
-                    </div>
-                    <div class="camera-container">
-                        <div class="camera-label">📷 Camera 3</div>
-                        <div class="canvas-wrapper">
-                            <canvas id="quizCam3" class="camera-canvas" width="600" height="600"></canvas>
-                            <canvas id="quizCam3-overlay" class="overlay-canvas" width="600" height="600"></canvas>
+
+                    <!-- Info Box Section -->
+                    <div class="quiz-info-box" style="flex: 1; min-width: 250px; background: var(--bg-elevated); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <h4 style="margin-top: 0; color: var(--accent-cyan);">🔍 Analisi Traccia</h4>
+                        <div id="quizInfoContent" style="font-size: 1.1em; line-height: 1.6;">
+                            <p style="color: var(--text-secondary);">Passa il mouse sulla traccia per vedere i dettagli...</p>
                         </div>
                     </div>
                 </div>

@@ -289,9 +289,7 @@ class QuizEngine {
         
         // Inizializza renderers
         this.renderers = [
-            new CanvasRenderer('quizCam1', 'quizCam1-overlay'),
-            new CanvasRenderer('quizCam2', 'quizCam2-overlay'),
-            new CanvasRenderer('quizCam3', 'quizCam3-overlay')
+            new CanvasRenderer('quizCam1', 'quizCam1-overlay')
         ];
         
         // Abilita rendering stile chiaro e source-specific per quiz
@@ -782,55 +780,53 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
-        const hillasMap = {};
         
-        for (let i = 0; i < 3; i++) {
-            let event = null;
-            let hillas = null;
-            const maxAttempts = 8;
-            let attempt = 0;
+        // Use only 1 camera (index 0)
+        let event = null;
+        let hillas = null;
+        const maxAttempts = 8;
+        let attempt = 0;
 
-            // If caller requested forceCenter, try resampling events until CoG is near camera center
-            // BUT do not force centering for hadronic or muonic events (their CoG can legitimately be far)
-            const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
-            const acceptRadiusPx = 12; // Accept if CoG within 12 px of center
+        // If caller requested forceCenter, try resampling events until CoG is near camera center
+        // BUT do not force centering for hadronic or muonic events (their CoG can legitimately be far)
+        const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
+        const acceptRadiusPx = 12; // Accept if CoG within 12 px of center
 
-            do {
-                event = this.engine.generateEvent(profile, i + 1, canvasSize, customParams);
-                hillas = this.hillasAnalyzer.analyze(event);
-                attempt++;
+        do {
+            event = this.engine.generateEvent(profile, 1, canvasSize, customParams);
+            hillas = this.hillasAnalyzer.analyze(event);
+            attempt++;
 
-                if (!wantCentered) break; // no need to resample
-
-                if (hillas && hillas.valid) {
-                    const cx = hillas.cogX;
-                    const cy = hillas.cogY;
-                    const centerX = (canvasSize && canvasSize.width) ? canvasSize.width / 2 : 300;
-                    const centerY = (canvasSize && canvasSize.height) ? canvasSize.height / 2 : 300;
-                    const dx = cx - centerX;
-                    const dy = cy - centerY;
-                    const r = Math.sqrt(dx * dx + dy * dy);
-                    if (r <= acceptRadiusPx) break; // acceptable
-                    console.log(`🔁 Resampling event for camera ${i+1} (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
-                }
-
-            } while (attempt < maxAttempts);
-
-            events.push(event);
+            if (!wantCentered) break; // no need to resample
 
             if (hillas && hillas.valid) {
-                this.currentHillasParams.push(hillas);
-                hillasMap[`cam${i+1}`] = hillas;
+                const cx = hillas.cogX;
+                const cy = hillas.cogY;
+                const centerX = (canvasSize && canvasSize.width) ? canvasSize.width / 2 : 300;
+                const centerY = (canvasSize && canvasSize.height) ? canvasSize.height / 2 : 300;
+                const dx = cx - centerX;
+                const dy = cy - centerY;
+                const r = Math.sqrt(dx * dx + dy * dy);
+                if (r <= acceptRadiusPx) break; // acceptable
+                console.log(`🔁 Resampling event for camera 1 (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
             }
 
-            this.renderers[i].renderEvent(event, i === 0);
+        } while (attempt < maxAttempts);
 
-            if (hillas && hillas.valid) {
-                this.renderers[i].renderHillasOverlay(hillas);
-            }
+        events.push(event);
+
+        if (hillas && hillas.valid) {
+            this.currentHillasParams.push(hillas);
+        }
+
+        this.renderers[0].renderEvent(event, true);
+
+        if (hillas && hillas.valid) {
+            this.renderers[0].renderHillasOverlay(hillas);
         }
         
         this.currentEvent = events;
+        this._updateInfoBox(hillas, 'gamma', event);
     }
     
     /**
@@ -845,26 +841,24 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
-        const hillasMap = {};
         
-        for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateHadronicEvent(i + 1, canvasSize, customParams);
-            events.push(event);
-            
-            const hillas = this.hillasAnalyzer.analyze(event);
-            if (hillas && hillas.valid) {
-                this.currentHillasParams.push(hillas);
-                hillasMap[`cam${i+1}`] = hillas;
-            }
-            
-            this.renderers[i].renderEvent(event, i === 0);
-            
-            if (hillas && hillas.valid) {
-                this.renderers[i].renderHillasOverlay(hillas);
-            }
+        // Single camera
+        const event = this.engine.generateHadronicEvent(1, canvasSize, customParams);
+        events.push(event);
+        
+        const hillas = this.hillasAnalyzer.analyze(event);
+        if (hillas && hillas.valid) {
+            this.currentHillasParams.push(hillas);
+        }
+        
+        this.renderers[0].renderEvent(event, true);
+        
+        if (hillas && hillas.valid) {
+            this.renderers[0].renderHillasOverlay(hillas);
         }
         
         this.currentEvent = events;
+        this._updateInfoBox(hillas, 'hadron', event);
     }
     
     /**
@@ -879,28 +873,87 @@ class QuizEngine {
         
         const events = [];
         this.currentHillasParams = [];
-        const hillasMap = {};
         
-        for (let i = 0; i < 3; i++) {
-            const event = this.engine.generateMuonEvent(i + 1, canvasSize, customParams);
-            events.push(event);
-            
-            const hillas = this.hillasAnalyzer.analyze(event);
-            if (hillas && hillas.valid) {
-                this.currentHillasParams.push(hillas);
-                hillasMap[`cam${i+1}`] = hillas;
-            }
-            
-            this.renderers[i].renderEvent(event, i === 0);
-            
-            if (hillas && hillas.valid) {
-                this.renderers[i].renderHillasOverlay(hillas);
-            }
+        // Single camera
+        const event = this.engine.generateMuonEvent(1, canvasSize, customParams);
+        events.push(event);
+        
+        const hillas = this.hillasAnalyzer.analyze(event);
+        if (hillas && hillas.valid) {
+            this.currentHillasParams.push(hillas);
+        }
+        
+        this.renderers[0].renderEvent(event, true);
+        
+        if (hillas && hillas.valid) {
+            this.renderers[0].renderHillasOverlay(hillas);
         }
         
         this.currentEvent = events;
+        this._updateInfoBox(hillas, 'muon', event);
     }
     
+    /**
+     * Aggiorna il box informativo con le caratteristiche salienti
+     */
+    _updateInfoBox(hillas, type, event) {
+        const infoBox = document.getElementById('quizInfoContent');
+        if (!infoBox) return;
+
+        let html = '';
+        
+        // Header generico
+        html += `<h5 style="margin-bottom: 10px; color: var(--text-secondary);">Dati Osservati:</h5>`;
+
+        if (type === 'muon') {
+            html += `
+                <ul style="padding-left: 20px;">
+                    <li><strong>Forma:</strong> Anello / Arco circolare</li>
+                    <li><strong>Distribuzione:</strong> Uniforme lungo l'arco</li>
+                    <li><strong>Pixel:</strong> Pochi pixel sparsi esterni</li>
+                </ul>
+                <p style="font-size: 0.9em; margin-top: 10px; color: var(--text-secondary);"><em>Nota: Geometria circolare caratteristica.</em></p>
+            `;
+        } else if (type === 'hadron') {
+            html += `
+                <ul style="padding-left: 20px;">
+                    <li><strong>Forma:</strong> Irregolare / Frammentata</li>
+                    <li><strong>Width:</strong> Elevata (diffusa)</li>
+                    <li><strong>Struttura:</strong> Possibili sottostrutture multiple</li>
+                </ul>
+                <p style="font-size: 0.9em; margin-top: 10px; color: var(--text-secondary);"><em>Nota: Sciame "disordinato" e largo.</em></p>
+            `;
+        } else {
+            // Gamma
+            if (hillas && hillas.valid) {
+                const length = hillas.lengthPx.toFixed(1);
+                const width = hillas.widthPx.toFixed(1);
+                const size = Math.round(hillas.size);
+                const alpha = hillas.alpha ? hillas.alpha.toFixed(1) + '°' : 'N/A';
+                
+                html += `
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 4px;">📏 <strong>Length:</strong> <span style="color: var(--accent-cyan)">${length} px</span></li>
+                        <li style="margin-bottom: 4px;">↔️ <strong>Width:</strong> <span style="color: var(--accent-cyan)">${width} px</span></li>
+                        <li style="margin-bottom: 4px;">💡 <strong>Size:</strong> <span style="color: var(--energy-high)">${size} p.e.</span></li>
+                        <li style="margin-bottom: 4px;">ang <strong>Alpha:</strong> <span style="color: var(--accent-purple)">${alpha}</span></li>
+                    </ul>
+                    <hr style="border-color: var(--border-color); margin: 10px 0;">
+                    <p><strong>Morfologia:</strong></p>
+                    <ul style="padding-left: 20px; font-size: 0.95em;">
+                        <li>Forma ellittica definita</li>
+                        <li>${width < 10 ? 'Molto compatta (stretta)' : 'Estesa lateralmente'}</li>
+                        <li>${hillas.alpha < 15 ? 'Punta verso il centro' : 'Non punta al centro'}</li>
+                    </ul>
+                `;
+            } else {
+                html += `<p><em>Segnale troppo debole per parametrizzazione Hillas.</em></p>`;
+            }
+        }
+
+        infoBox.innerHTML = html;
+    }
+
     /**
      * Imposta opzioni di risposta dinamicamente
      */
