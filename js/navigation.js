@@ -329,7 +329,6 @@ window.configureRendererHoverEllipses = function(renderers) {
     function generateEvent() {
         console.log(`🔬 Generazione evento ${sourceType}...`);
 
-        const profile = getSourceProfile(sourceType);
         const events = [];
         const hillasParams = [];
         const hillasMap = {};
@@ -389,6 +388,8 @@ window.configureRendererHoverEllipses = function(renderers) {
                 }
             } else {
                 // Per eventi gamma normali
+                const profile = getSourceProfile(sourceType);
+                
                 // Genera evento base con parametri fissi (senza varianza inter-camera)
                 const baseParams = engine._sampleFromProfile(profile);
                 baseParams.sourceType = profile.type;
@@ -465,6 +466,8 @@ window.configureRendererHoverEllipses = function(renderers) {
             }
         } else {
             // MODALITÀ ORIGINALE: eventi indipendenti per camera
+            const profile = getSourceProfile(sourceType);
+            
             // Genera per 3 camere
             for (let i = 0; i < 3; i++) {
                 const cameraId = i + 1;
