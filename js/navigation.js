@@ -434,7 +434,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                     };
                     
                     events.push(event);
-                    
+                
                     // Analisi Hillas per questa camera
                     const canvas = document.getElementById(`cam${cameraId}`);
                     const hillas = hillasAnalyzer.analyze(event);
