@@ -263,6 +263,9 @@ window.configureRendererHoverEllipses = function(renderers) {
      * @param {Object} options - Opzioni aggiuntive
      */
     function setupSourceSimulator(sourceType, options = {}) {
+        // Salva sourceType in una variabile locale accessibile a generateEvent
+        const currentSourceType = sourceType;
+        
         const {
             generateBtnId = 'generateBtn',
             clearBtnId = 'clearBtn',
@@ -327,7 +330,9 @@ window.configureRendererHoverEllipses = function(renderers) {
      * Genera evento per la sorgente
      */
     function generateEvent() {
-        console.log(`🔬 Generazione evento ${sourceType}...`);
+        // Usa la variabile locale catturata dalla closure
+        const activeSourceType = currentSourceType;
+        console.log(`🔬 Generazione evento ${activeSourceType}...`);
 
         const events = [];
         const hillasParams = [];
@@ -346,7 +351,7 @@ window.configureRendererHoverEllipses = function(renderers) {
             console.log('📷 Modalità stereoscopica: evento coerente su 3 camere');
             
             // Per eventi adronici, genera usando generateHadronicEvent
-            if (sourceType === 'hadron') {
+            if (activeSourceType === 'hadron') {
                 // Genera evento adronico base con energia fissa
                 const energy = engine._randomInRange(100, 10000); // GeV
                 
@@ -388,7 +393,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                 }
             } else {
                 // Per eventi gamma normali
-                const profile = getSourceProfile(sourceType);
+                const profile = getSourceProfile(activeSourceType);
                 
                 // Genera evento base con parametri fissi (senza varianza inter-camera)
                 const baseParams = engine._sampleFromProfile(profile);
@@ -418,7 +423,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                     cameraParams.alpha += (Math.random() - 0.5) * 5; // ±2.5° variazione
                     
                     // Genera tracce con parametri leggermente variati
-                    const tracks = engine._generateTracks(cameraParams, energy, canvasSize.width, canvasSize.height, { sourceType });
+                    const tracks = engine._generateTracks(cameraParams, energy, canvasSize.width, canvasSize.height, { sourceType: activeSourceType });
                     
                     const event = {
                         sourceType: profile.type,
@@ -466,7 +471,7 @@ window.configureRendererHoverEllipses = function(renderers) {
             }
         } else {
             // MODALITÀ ORIGINALE: eventi indipendenti per camera
-            const profile = getSourceProfile(sourceType);
+            const profile = getSourceProfile(activeSourceType);
             
             // Genera per 3 camere
             for (let i = 0; i < 3; i++) {
@@ -537,7 +542,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                 console.log('🔺 Rendering ricostruzione stereoscopica');
                 
                 // Configura opzioni in base al tipo di sorgente
-                const isHadron = (sourceType === 'hadron');
+                const isHadron = (activeSourceType === 'hadron');
                 
                 renderStereoReconstruction(stereoCanvas, hillasMap, {
                     showGeometry: !isHadron,           // Nascondi linee convergenti per adroni
