@@ -346,78 +346,122 @@ window.configureRendererHoverEllipses = function(renderers) {
             // MODALITÀ STEREOSCOPICA: genera un singolo evento coerente visto da 3 camere
             console.log('📷 Modalità stereoscopica: evento coerente su 3 camere');
             
-            // Genera evento base con parametri fissi (senza varianza inter-camera)
-            const baseParams = engine._sampleFromProfile(profile);
-            baseParams.sourceType = profile.type;
-            
-            // Energia fissa per coerenza
-            const energy = engine._sampleEnergy(profile.energyRange);
-            
-            // Angolo zenitale fisso
-            const zenithAngle = engine._randomInRange(0, 30);
-            if (zenithAngle > 0) {
-                engine._applyZenithEffects(baseParams, zenithAngle, energy);
-            }
-            
-            // Genera per 3 camere con variazioni minime per simulare visione da posizioni diverse
-            for (let i = 0; i < 3; i++) {
-                const cameraId = i + 1;
-                const camKey = `cam${cameraId}`;
+            // Per eventi adronici, genera usando generateHadronicEvent
+            if (sourceType === 'hadron') {
+                // Genera evento adronico base con energia fissa
+                const energy = engine._randomInRange(100, 10000); // GeV
                 
-                // Parametri leggermente variati per simulare visione da angolazioni diverse
-                const cameraParams = { ...baseParams };
-                
-                // Variazione minima posizione (±5% per simulare parallasse)
-                const parallaxVariation = 0.05;
-                cameraParams.length *= (1 + (Math.random() - 0.5) * parallaxVariation);
-                cameraParams.width *= (1 + (Math.random() - 0.5) * parallaxVariation);
-                cameraParams.alpha += (Math.random() - 0.5) * 5; // ±2.5° variazione
-                
-                // Genera tracce con parametri leggermente variati
-                const tracks = engine._generateTracks(cameraParams, energy, canvasSize.width, canvasSize.height, { sourceType });
-                
-                const event = {
-                    sourceType: profile.type,
-                    cameraId: cameraId,
-                    energy: energy,
-                    zenithAngle: zenithAngle,
-                    params: cameraParams,
-                    tracks: tracks,
-                    canvasWidth: canvasSize.width,
-                    canvasHeight: canvasSize.height,
-                    timestamp: Date.now(),
-                    signatureHint: cameraParams.signatureHint || ''
-                };
-                
-                events.push(event);
-                
-                // Analisi Hillas per questa camera
-                const canvas = document.getElementById(`cam${cameraId}`);
-                const hillas = hillasAnalyzer.analyze(event);
-                if (hillas && hillas.valid) {
-                    renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
-                    hillasParams.push(hillas);
-                    hillasMap[camKey] = hillas;
+                for (let i = 0; i < 3; i++) {
+                    const cameraId = i + 1;
+                    const camKey = `cam${cameraId}`;
                     
-                    renderers[i].fillEllipseBackground(hillas, event.tracks);
-                }
-                
-                // Rendering
-                if (canvas && renderers[i]) {
-                    // Aggiungi classe flash per animazione
-                    canvas.classList.add('flash');
-                    setTimeout(() => canvas.classList.remove('flash'), 400);
+                    // Genera evento adronico per questa camera
+                    const event = engine.generateHadronicEvent(cameraId, canvasSize, { energy });
+                    events.push(event);
                     
-                    renderers[i].renderEvent(event, i === 0 && showLegend);
-                    console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+                    // Analisi Hillas per questa camera
+                    const canvas = document.getElementById(`cam${cameraId}`);
+                    const hillas = hillasAnalyzer.analyze(event);
+                    if (hillas && hillas.valid) {
+                        renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
+                        hillasParams.push(hillas);
+                        hillasMap[camKey] = hillas;
+                        
+                        renderers[i].fillEllipseBackground(hillas, event.tracks);
+                    }
+                    
+                    // Rendering
+                    if (canvas && renderers[i]) {
+                        // Aggiungi classe flash per animazione
+                        canvas.classList.add('flash');
+                        setTimeout(() => canvas.classList.remove('flash'), 400);
+                        
+                        renderers[i].renderEvent(event, i === 0 && showLegend);
+                        console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+                    }
+                    
+                    // Overlay Hillas
+                    if (hillas && hillas.valid) {
+                        renderers[i].renderHillasOverlay(hillas);
+                    }
+                    
+                    console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
+                }
+            } else {
+                // Per eventi gamma normali
+                // Genera evento base con parametri fissi (senza varianza inter-camera)
+                const baseParams = engine._sampleFromProfile(profile);
+                baseParams.sourceType = profile.type;
+                
+                // Energia fissa per coerenza
+                const energy = engine._sampleEnergy(profile.energyRange);
+                
+                // Angolo zenitale fisso
+                const zenithAngle = engine._randomInRange(0, 30);
+                if (zenithAngle > 0) {
+                    engine._applyZenithEffects(baseParams, zenithAngle, energy);
                 }
                 
-                // Overlay Hillas
-                if (hillas && hillas.valid) {
-                    renderers[i].renderHillasOverlay(hillas);
+                // Genera per 3 camere con variazioni minime per simulare visione da posizioni diverse
+                for (let i = 0; i < 3; i++) {
+                    const cameraId = i + 1;
+                    const camKey = `cam${cameraId}`;
+                    
+                    // Parametri leggermente variati per simulare visione da angolazioni diverse
+                    const cameraParams = { ...baseParams };
+                    
+                    // Variazione minima posizione (±5% per simulare parallasse)
+                    const parallaxVariation = 0.05;
+                    cameraParams.length *= (1 + (Math.random() - 0.5) * parallaxVariation);
+                    cameraParams.width *= (1 + (Math.random() - 0.5) * parallaxVariation);
+                    cameraParams.alpha += (Math.random() - 0.5) * 5; // ±2.5° variazione
+                    
+                    // Genera tracce con parametri leggermente variati
+                    const tracks = engine._generateTracks(cameraParams, energy, canvasSize.width, canvasSize.height, { sourceType });
+                    
+                    const event = {
+                        sourceType: profile.type,
+                        cameraId: cameraId,
+                        energy: energy,
+                        zenithAngle: zenithAngle,
+                        params: cameraParams,
+                        tracks: tracks,
+                        canvasWidth: canvasSize.width,
+                        canvasHeight: canvasSize.height,
+                        timestamp: Date.now(),
+                        signatureHint: cameraParams.signatureHint || ''
+                    };
+                    
+                    events.push(event);
+                    
+                    // Analisi Hillas per questa camera
+                    const canvas = document.getElementById(`cam${cameraId}`);
+                    const hillas = hillasAnalyzer.analyze(event);
+                    if (hillas && hillas.valid) {
+                        renderers[i].adjustHillasToContainTracks(hillas, event.tracks);
+                        hillasParams.push(hillas);
+                        hillasMap[camKey] = hillas;
+                        
+                        renderers[i].fillEllipseBackground(hillas, event.tracks);
+                    }
+                    
+                    // Rendering
+                    if (canvas && renderers[i]) {
+                        // Aggiungi classe flash per animazione
+                        canvas.classList.add('flash');
+                        setTimeout(() => canvas.classList.remove('flash'), 400);
+                        
+                        renderers[i].renderEvent(event, i === 0 && showLegend);
+                        console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
+                    }
+                    
+                    // Overlay Hillas
+                    if (hillas && hillas.valid) {
+                        renderers[i].renderHillasOverlay(hillas);
+                    }
+                    
+                    console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
                 }
-                
-                console.log(`  Camera ${cameraId}: ${event.tracks.length} fotoni, E=${(event.energy/1000).toFixed(1)} TeV`);
             }
         } else {
             // MODALITÀ ORIGINALE: eventi indipendenti per camera
