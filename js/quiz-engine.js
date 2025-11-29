@@ -513,7 +513,13 @@ class QuizEngine {
         // Reset visibility (show simulator elements by default)
         if (simulatorSection) {
             simulatorSection.classList.remove('hidden');
-            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = '');
+            // Mostra il container del layout quiz (camera + info box)
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+            
+            // Nascondi vecchi elementi se presenti
+            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = 'none');
+
             const instructionEl = document.getElementById('quizInstruction');
             if (instructionEl) {
                 instructionEl.style.display = '';
@@ -561,7 +567,6 @@ class QuizEngine {
     _generateTheoreticalQuestion() {
         // Nascondi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
-        if (simulatorSection) simulatorSection.classList.add('hidden');
         
         // Seleziona domanda in base all'indice corrente (0-4)
         // Mappatura basata su QUESTION_DISTRIBUTION
@@ -581,18 +586,13 @@ class QuizEngine {
         
         // Update UI
         const instructionEl = document.getElementById('quizInstruction');
-        // Poiché abbiamo nascosto il simulatore che conteneva l'istruzione, 
-        // dobbiamo assicurarci che l'istruzione sia visibile altrove o spostarla.
-        // Ma aspetta, quizInstruction è DENTRO simulator-section nel HTML originale?
-        // Controlliamo l'HTML.
-        // Sì: <div class="card simulator-section"> ... <p id="quizInstruction"> ... </div>
         
-        // Se nascondo simulator-section, nascondo anche la domanda!
-        // Soluzione: Non nascondere simulator-section, ma nascondere il contenuto interno tranne l'istruzione.
         if (simulatorSection) {
             simulatorSection.classList.remove('hidden');
-            // Nascondi canvas e hillas panel
-            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = 'none');
+            // Nascondi il layout del quiz (camera + info box) per domande teoriche
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'none';
+            
             // Mostra istruzione
             instructionEl.style.display = 'block';
         }
@@ -620,7 +620,9 @@ class QuizEngine {
         // Ripristina visibilità elementi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
-            simulatorSection.querySelectorAll('.cameras-grid, .stereo-container, .hillas-panel').forEach(el => el.style.display = '');
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+            
             document.getElementById('quizInstruction').style.textAlign = '';
             document.getElementById('quizInstruction').style.padding = '';
             document.getElementById('quizInstruction').style.color = '';
@@ -1636,7 +1638,7 @@ class QuizEngine {
         document.getElementById('finalScore').textContent = this.score;
         
         // Performance rating
-        const rating = this.getPerformanceRating(this.score);
+        const rating = this.getPerformanceRating(this.score, this.answerHistory);
         document.getElementById('performanceRating').innerHTML = `
             <h3 style="color: ${rating.color}; margin-bottom: 8px;">${rating.emoji} ${rating.title}</h3>
             <p style="font-size: 14px;">${rating.message}</p>
@@ -1656,43 +1658,56 @@ class QuizEngine {
     /**
      * Get performance rating
      */
-    getPerformanceRating(score) {
-        if (score >= 900) {
-            return {
-                emoji: '🏆',
-                title: 'Eccellente!',
-                color: '#ffd700',
-                message: 'Sei un esperto di astronomia gamma! Conosci perfettamente le firme di ogni sorgente.'
-            };
-        } else if (score >= 700) {
-            return {
-                emoji: '🌟',
-                title: 'Ottimo!',
-                color: '#00ff88',
-                message: 'Ottima performance! Hai una solida comprensione dei parametri Hillas.'
-            };
-        } else if (score >= 500) {
-            return {
-                emoji: '👍',
-                title: 'Buono',
-                color: '#4488ff',
-                message: 'Buon lavoro! Con un po\' più di pratica diventerai un esperto.'
-            };
-        } else if (score >= 300) {
-            return {
-                emoji: '📚',
-                title: 'Sufficiente',
-                color: '#ffaa00',
-                message: 'Hai capito le basi, ma c\'è ancora da imparare. Riprova!'
-            };
+    getPerformanceRating(score, history) {
+        // Analisi dettagliata
+        const theoryQuestions = history.filter(h => h.questionType === QUESTION_TYPES.THEORETICAL);
+        const practiceQuestions = history.filter(h => h.questionType !== QUESTION_TYPES.THEORETICAL);
+        const sourceQuestions = history.filter(h => h.questionType === QUESTION_TYPES.SOURCE_IDENTIFICATION);
+        
+        const theoryCorrect = theoryQuestions.filter(h => h.correct).length;
+        const practiceCorrect = practiceQuestions.filter(h => h.correct).length;
+        const sourceCorrect = sourceQuestions.filter(h => h.correct).length;
+        
+        const theoryAcc = theoryQuestions.length ? (theoryCorrect / theoryQuestions.length) : 0;
+        const practiceAcc = practiceQuestions.length ? (practiceCorrect / practiceQuestions.length) : 0;
+        const sourceAcc = sourceQuestions.length ? (sourceCorrect / sourceQuestions.length) : 0;
+
+        let baseRating = {};
+        
+        // Soglie aggiornate per 15 domande (Max ~1500+)
+        if (score >= 1250) {
+            baseRating = { emoji: '🏆', title: 'Eccellente!', color: '#ffd700', message: 'Punteggio stellare!' };
+        } else if (score >= 950) {
+            baseRating = { emoji: '🌟', title: 'Ottimo!', color: '#00ff88', message: 'Ottima performance!' };
+        } else if (score >= 650) {
+            baseRating = { emoji: '👍', title: 'Buono', color: '#4488ff', message: 'Buon lavoro!' };
+        } else if (score >= 350) {
+            baseRating = { emoji: '📚', title: 'Sufficiente', color: '#ffaa00', message: 'Hai le basi.' };
         } else {
-            return {
-                emoji: '💪',
-                title: 'Riprova!',
-                color: '#ff4444',
-                message: 'Non scoraggiarti! Studia le pagine delle sorgenti e riprova il quiz.'
-            };
+            baseRating = { emoji: '💪', title: 'Riprova!', color: '#ff4444', message: 'Non mollare.' };
         }
+
+        // Feedback specifico
+        let feedback = baseRating.message;
+        
+        if (score < 1250) { // Se non è perfetto, diamo consigli
+            if (sourceAcc < 0.4 && theoryAcc > 0.6) {
+                feedback = "Hai ottime conoscenze teoriche, ma devi esercitarti di più nel riconoscimento visivo delle sorgenti (Crab, Blazar, ecc.).";
+            } else if (practiceAcc > 0.7 && theoryAcc < 0.5) {
+                feedback = "Hai un ottimo occhio per le tracce e l'analisi Hillas, ma dovresti ripassare un po' di teoria di base.";
+            } else if (sourceAcc < 0.5) {
+                feedback = "Sembra che tu abbia difficoltà a distinguere le diverse sorgenti. Consulta la tabella comparativa prima di riprovare.";
+            } else if (theoryAcc < 0.5) {
+                feedback = "La pratica va bene, ma non trascurare i concetti teorici fondamentali.";
+            } else {
+                feedback += " Continua a esercitarti per migliorare la tua precisione.";
+            }
+        } else {
+            feedback = "Sei un vero esperto di astronomia gamma! Conosci perfettamente sia la teoria che le firme delle sorgenti.";
+        }
+
+        baseRating.message = feedback;
+        return baseRating;
     }
 
     /**
