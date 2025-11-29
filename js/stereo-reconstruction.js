@@ -213,6 +213,42 @@ function renderStereoReconstruction(canvas, hillasMap, options = {}) {
         ctx.restore();
     }
 
+    // === SHOWER AXES (LINES OF SIGHT) ===
+    if (opts.showShowerAxes) {
+        ctx.save();
+        
+        // Extend lines to canvas boundaries
+        const diag = Math.sqrt(canvas.width*canvas.width + canvas.height*canvas.height);
+
+        for (const it of rec.items) {
+            const cx = it.xc * scale + offsetX;
+            const cy = it.yc * scale + offsetY;
+            const angle = it.angle || 0;
+
+            // Color matching the camera
+            const camColors = {
+                cam1: 'rgba(255,100,100,0.5)',
+                cam2: 'rgba(100,255,120,0.5)',
+                cam3: 'rgba(100,160,255,0.5)'
+            };
+            ctx.strokeStyle = camColors[it.cam] || 'rgba(200,200,200,0.5)';
+            
+            if (opts.isHadron) {
+                ctx.setLineDash([6, 4]); // Dashed for hadrons
+                ctx.lineWidth = 1.5;
+            } else {
+                ctx.setLineDash([]);
+                ctx.lineWidth = 1;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(cx - Math.cos(angle) * diag, cy - Math.sin(angle) * diag);
+            ctx.lineTo(cx + Math.cos(angle) * diag, cy + Math.sin(angle) * diag);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
     // === INDIVIDUAL CAMERA PROJECTIONS ===
     const camColors = {
         cam1: { fill: 'rgba(255,100,100,0.25)', stroke: 'rgba(255,100,100,0.85)', label: 'rgba(255,120,120,1.0)' },

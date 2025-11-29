@@ -490,6 +490,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                     showArrows: !isHadron,             // Nascondi frecce di contributo per adroni
                     showArrivalDirection: !isHadron,   // Nascondi "Direzione arrivo gamma" per adroni
                     showReconstruction: !isHadron,     // Nascondi ellisse ricostruita per adroni
+                    showShowerAxes: isHadron,          // MOSTRA assi degli sciami per adroni (per vedere che non convergono)
                     isHadron: isHadron                 // Flag per eventuali stili specifici
                 });
             } else if (stereoCanvas) {
