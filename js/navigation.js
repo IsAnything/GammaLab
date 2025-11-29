@@ -480,11 +480,17 @@ window.configureRendererHoverEllipses = function(renderers) {
             
             if (stereoCanvas && typeof renderStereoReconstruction === 'function') {
                 console.log('🔺 Rendering ricostruzione stereoscopica');
+                
+                // Configura opzioni in base al tipo di sorgente
+                const isHadron = (sourceType === 'hadron');
+                
                 renderStereoReconstruction(stereoCanvas, hillasMap, {
-                    showGeometry: true,
+                    showGeometry: !isHadron,           // Nascondi linee convergenti per adroni
                     showCameraPositions: true,
-                    showArrows: true,
-                    showArrivalDirection: true
+                    showArrows: !isHadron,             // Nascondi frecce di contributo per adroni
+                    showArrivalDirection: !isHadron,   // Nascondi "Direzione arrivo gamma" per adroni
+                    showReconstruction: !isHadron,     // Nascondi ellisse ricostruita per adroni
+                    isHadron: isHadron                 // Flag per eventuali stili specifici
                 });
             } else if (stereoCanvas) {
                 // Fallback a vecchia stereo

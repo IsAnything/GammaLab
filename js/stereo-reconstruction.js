@@ -94,6 +94,7 @@ function renderStereoReconstruction(canvas, hillasMap, options = {}) {
         showCameraPositions: true,
         showArrows: true,
         showArrivalDirection: true,
+        showReconstruction: true, // Default: mostra ellisse ricostruita
         ...options
     };
 
@@ -285,35 +286,37 @@ function renderStereoReconstruction(canvas, hillasMap, options = {}) {
     const a_px = Math.max(4, (rec.length * 0.5) * scale);
     const b_px = Math.max(3, (rec.width * 0.5) * scale);
 
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(rec.angle || 0);
+    if (opts.showReconstruction) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(rec.angle || 0);
 
-    // Radial fill
-    const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(a_px, b_px));
-    rg.addColorStop(0, 'rgba(255,250,180,0.35)');
-    rg.addColorStop(0.6, 'rgba(140,220,120,0.10)');
-    rg.addColorStop(1, 'rgba(0,0,0,0.0)');
-    ctx.fillStyle = rg;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, a_px, b_px, 0, 0, Math.PI * 2);
-    ctx.fill();
+        // Radial fill
+        const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(a_px, b_px));
+        rg.addColorStop(0, 'rgba(255,250,180,0.35)');
+        rg.addColorStop(0.6, 'rgba(140,220,120,0.10)');
+        rg.addColorStop(1, 'rgba(0,0,0,0.0)');
+        ctx.fillStyle = rg;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, a_px, b_px, 0, 0, Math.PI * 2);
+        ctx.fill();
 
-    // Gradient stroke
-    const grad = ctx.createLinearGradient(-a_px, 0, a_px, 0);
-    grad.addColorStop(0, '#7fe67f');
-    grad.addColorStop(0.6, '#e6f36b');
-    grad.addColorStop(1, '#ffd54f');
-    ctx.lineWidth = Math.max(2, 3);
-    ctx.strokeStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, a_px, b_px, 0, 0, Math.PI * 2);
-    ctx.stroke();
+        // Gradient stroke
+        const grad = ctx.createLinearGradient(-a_px, 0, a_px, 0);
+        grad.addColorStop(0, '#7fe67f');
+        grad.addColorStop(0.6, '#e6f36b');
+        grad.addColorStop(1, '#ffd54f');
+        ctx.lineWidth = Math.max(2, 3);
+        ctx.strokeStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, a_px, b_px, 0, 0, Math.PI * 2);
+        ctx.stroke();
 
-    // Center marker
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(-2.2, -2.2, 4.4, 4.4);
-    ctx.restore();
+        // Center marker
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(-2.2, -2.2, 4.4, 4.4);
+        ctx.restore();
+    }
 
     if (opts.showArrivalDirection) {
         const dirLength = Math.max(80, a_px * 1.6);
