@@ -2010,16 +2010,16 @@ class CanvasRenderer {
         const subClusters = [];
         if (isHadronic) {
             // Aumenta drasticamente il numero e la dispersione dei frammenti
-            const numSubClusters = 3 + Math.floor(Math.random() * 4); // 3-6 isole
+            const numSubClusters = 4 + Math.floor(Math.random() * 5); // 4-8 isole
             for (let k = 0; k < numSubClusters; k++) {
                 // Distanza molto maggiore dal centro per separare bene le isole
-                const dist = spreadRadiusLong * (0.8 + Math.random() * 1.2); 
+                // Usiamo un fattore molto più alto per sparpagliare i pezzi
+                const dist = spreadRadiusLong * (1.5 + Math.random() * 2.0); 
                 const ang = Math.random() * Math.PI * 2;
                 subClusters.push({
                     dx: Math.cos(ang) * dist,
                     dy: Math.sin(ang) * dist,
-                    radius: spreadRadiusShort * (0.5 + Math.random() * 0.6),
-                    // Non usiamo 'pixels' qui, ma la probabilità nel loop principale
+                    radius: spreadRadiusShort * (0.8 + Math.random() * 0.8), // Raggio più grande per ogni macchia
                 });
             }
         }
@@ -2033,8 +2033,8 @@ class CanvasRenderer {
 
             // --- MODIFICA: Selezione Cluster ---
             let currentCluster = null;
-            // 65% di probabilità di finire in un frammento esterno (molto frammentato)
-            if (isHadronic && subClusters.length > 0 && Math.random() < 0.65) {
+            // 90% di probabilità di finire in un frammento esterno per adroni (quasi nessun nucleo centrale)
+            if (isHadronic && subClusters.length > 0 && Math.random() < 0.90) {
                 currentCluster = subClusters[Math.floor(Math.random() * subClusters.length)];
             }
             // -----------------------------------
@@ -2059,12 +2059,14 @@ class CanvasRenderer {
                 } else {
                     // Generazione standard (ellisse principale o residuo centrale)
                     const t = Math.random() * Math.PI * 2;
-                    // Per adroni, anche il centro è meno concentrato (esponente più basso)
-                    const exp = isHadronic ? 1.0 : radialExponent; 
+                    // Per adroni, distribuzione totalmente piatta (esponente 0.5 o 1) per evitare picchi centrali
+                    const exp = isHadronic ? 0.8 : radialExponent; 
                     const radiusFactor = Math.pow(Math.random(), exp);
 
-                    const lx = Math.cos(t) * spreadRadiusLong * radiusFactor;
-                    const ly = Math.sin(t) * spreadRadiusShort * radiusFactor;
+                    // Se è adrone, allarghiamo ulteriormente anche il residuo centrale
+                    const spreadFactor = isHadronic ? 2.0 : 1.0;
+                    const lx = Math.cos(t) * spreadRadiusLong * radiusFactor * spreadFactor;
+                    const ly = Math.sin(t) * spreadRadiusShort * radiusFactor * spreadFactor;
 
                     const rotX = lx * cosAngle - ly * sinAngle;
                     const rotY = lx * sinAngle + ly * cosAngle;
