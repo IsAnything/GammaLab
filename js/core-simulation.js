@@ -616,6 +616,39 @@ class SimulationEngine {
 
             let intensity = this._energyToIntensity(photonEnergy);
 
+            // === MODIFICHE SPECIFICHE PER TIPO SORGENTE ===
+            
+            // 1. PEVATRON: Saturazione e Brillantezza Estrema
+            if (sourceType === 'pevatron') {
+                intensity *= 2.0; // Boost generale
+                // Simulazione saturazione: se intensità è alta, la appiattiamo verso l'alto
+                if (intensity > 0.8) intensity = 0.8 + (intensity - 0.8) * 0.2;
+            }
+
+            // 2. BASSA ENERGIA: Frammentazione
+            if (energy < 200) {
+                // Drop casuale di fotoni per creare "buchi" e frammentazione
+                // Più bassa è l'energia, più alta la probabilità di drop
+                const dropProb = Math.max(0, 0.4 - (energy / 500));
+                if (Math.random() < dropProb) continue;
+                
+                // Riduci intensità residua
+                intensity *= 0.7;
+            }
+
+            // 3. CRAB / GAMMA STANDARD: Core Compatto
+            if (sourceType === 'crab' || sourceType === 'gamma') {
+                // Enfatizza il core centrale
+                const radial = Math.hypot(x - centerX, y - centerY);
+                const coreLimit = Math.min(widthPx, lengthPx * 0.4);
+                if (radial < coreLimit) {
+                    intensity *= 1.8; // Core molto luminoso
+                } else {
+                    // Falloff morbido verso l'esterno
+                    intensity *= 0.8;
+                }
+            }
+
             if (profileConfig.intensityVariance) {
                 const variance = 1 + (Math.random() - 0.5) * profileConfig.intensityVariance;
                 intensity *= Math.max(0.2, variance);
@@ -782,81 +815,61 @@ class SimulationEngine {
     }
 
     /**
-     * Genera tracce muoniche (lineari, sottili, attraversano la camera)
+     * Genera tracce muoniche (Anello Perfetto)
+     * Genera un arco o anello con distribuzione uniforme e bordi netti
      */
     _generateMuonTracks(params, energy, canvasWidth = CANVAS_WIDTH, canvasHeight = CANVAS_HEIGHT, options = {}) {
         const tracks = [];
         
-        const numPhotons = Math.min(Math.floor(params.size), 800);
+        // Parametri Anello Muonico
+        // Raggio tipico: 1.0 - 1.3 gradi
+        const degreeToPixel = canvasWidth / FOV_WIDTH; // ~100 px/deg
+        const radius = this._randomInRange(0.9, 1.3) * degreeToPixel;
         
-        // Punto di ingresso del muone (bordo della camera)
-        const side = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
-        let startX, startY, endX, endY;
-        
-        switch(side) {
-            case 0: // Top
-                startX = Math.random() * canvasWidth;
-                startY = 0;
-                endX = Math.random() * canvasWidth;
-                endY = canvasHeight;
-                break;
-            case 1: // Right
-                startX = canvasWidth;
-                startY = Math.random() * canvasHeight;
-                endX = 0;
-                endY = Math.random() * canvasHeight;
-                break;
-            case 2: // Bottom
-                startX = Math.random() * canvasWidth;
-                startY = canvasHeight;
-                endX = Math.random() * canvasWidth;
-                endY = 0;
-                break;
-            case 3: // Left
-                startX = 0;
-                startY = Math.random() * canvasHeight;
-                endX = canvasWidth;
-                endY = Math.random() * canvasHeight;
-                break;
-        }
-        
-        const degreeToPixel = canvasWidth / FOV_WIDTH;
-        const widthPx = params.width * degreeToPixel;
-
-        // If forceCenter is set, create a muon that crosses near the camera center
+        // Centro dell'anello
+        // Se forceCenter è true, centra l'anello (raro per muoni reali, ma utile per demo)
+        let centerX, centerY;
         if (options && options.forceCenter) {
-            // Create a near-central straight muon passing through center
-            startX = canvasWidth * 0.1;
-            startY = canvasHeight / 2 + (Math.random() - 0.5) * canvasHeight * 0.05;
-            endX = canvasWidth * 0.9;
-            endY = canvasHeight / 2 + (Math.random() - 0.5) * canvasHeight * 0.05;
+            centerX = canvasWidth / 2;
+            centerY = canvasHeight / 2;
+        } else {
+            // Centro casuale, ma preferibilmente entro il FOV o appena fuori
+            centerX = this._randomInRange(-canvasWidth * 0.2, canvasWidth * 1.2);
+            centerY = this._randomInRange(-canvasHeight * 0.2, canvasHeight * 1.2);
         }
-
-        // Genera fotoni lungo la linea
+        
+        // Spessore anello (molto sottile per bordi netti)
+        const ringWidth = this._randomInRange(0.04, 0.08) * degreeToPixel;
+        
+        // Numero fotoni
+        const numPhotons = Math.min(Math.floor(params.size), 2000);
+        
         for (let i = 0; i < numPhotons; i++) {
-            // Posizione lungo la linea (parametro t da 0 a 1)
-            const t = Math.random();
-            const lineX = startX + t * (endX - startX);
-            const lineY = startY + t * (endY - startY);
+            // Distribuzione angolare uniforme (0 - 2PI)
+            const angle = Math.random() * 2 * Math.PI;
             
-            // Piccola dispersione perpendicolare alla linea
-            const perpAngle = Math.atan2(endY - startY, endX - startX) + Math.PI / 2;
-            const perpDist = (Math.random() - 0.5) * widthPx * 2;
+            // Profilo Radiale: Uniforme (Top-hat) per bordi netti
+            // Invece di gaussiana, usiamo distribuzione uniforme nello spessore
+            const r = radius + (Math.random() - 0.5) * ringWidth;
             
-            const x = lineX + Math.cos(perpAngle) * perpDist;
-            const y = lineY + Math.sin(perpAngle) * perpDist;
+            const x = centerX + r * Math.cos(angle);
+            const y = centerY + r * Math.sin(angle);
             
-            if (!isFinite(x) || !isFinite(y)) continue;
+            // Scarta fotoni troppo lontani (ottimizzazione)
+            if (x < -50 || x > canvasWidth + 50 || y < -50 || y > canvasHeight + 50) continue;
             
             const photonEnergy = this._samplePhotonEnergy(energy);
-            const intensity = this._energyToIntensity(photonEnergy);
+            
+            // Intensità uniforme lungo l'arco (nessun gradiente centrale)
+            // Simuliamo la luce Cherenkov uniforme del cono muonico
+            let intensity = this._energyToIntensity(photonEnergy) * 1.2;
             
             tracks.push({
                 x: x,
                 y: y,
                 energy: photonEnergy,
                 intensity: intensity,
-                sourceType: params.sourceType || 'muon'
+                sourceType: 'muon'
             });
         }
         
