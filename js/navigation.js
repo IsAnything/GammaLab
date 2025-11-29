@@ -404,6 +404,10 @@ window.configureRendererHoverEllipses = function(renderers) {
                 
                 // Rendering
                 if (canvas && renderers[i]) {
+                    // Aggiungi classe flash per animazione
+                    canvas.classList.add('flash');
+                    setTimeout(() => canvas.classList.remove('flash'), 400);
+                    
                     renderers[i].renderEvent(event, i === 0 && showLegend);
                     console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
                 }
@@ -451,6 +455,10 @@ window.configureRendererHoverEllipses = function(renderers) {
 
                 // Rendering con palette già configurata (fotoni sopra il riempimento)
                 if (canvas && renderers[i]) {
+                    // Aggiungi classe flash per animazione
+                    canvas.classList.add('flash');
+                    setTimeout(() => canvas.classList.remove('flash'), 400);
+                    
                     renderers[i].renderEvent(event, i === 0 && showLegend);
                     console.log(`🎨 Camera ${cameraId}: ${event.tracks.length} fotoni renderizzati`);
                 }

@@ -821,6 +821,13 @@ class QuizEngine {
             this.currentHillasParams.push(hillas);
         }
 
+        // Aggiungi animazione flash
+        const canvas = document.getElementById('cam1');
+        if (canvas) {
+            canvas.classList.add('flash');
+            setTimeout(() => canvas.classList.remove('flash'), 400);
+        }
+
         this.renderers[0].renderEvent(event, true);
 
         if (hillas && hillas.valid) {
@@ -851,6 +858,13 @@ class QuizEngine {
         const hillas = this.hillasAnalyzer.analyze(event);
         if (hillas && hillas.valid) {
             this.currentHillasParams.push(hillas);
+        }
+        
+        // Aggiungi animazione flash
+        const canvas = document.getElementById('cam1');
+        if (canvas) {
+            canvas.classList.add('flash');
+            setTimeout(() => canvas.classList.remove('flash'), 400);
         }
         
         this.renderers[0].renderEvent(event, true);

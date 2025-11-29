@@ -43,6 +43,35 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  position: relative;
+}
+
+/* Animazione stelle di sfondo */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(2px 2px at 90% 60%, white, transparent),
+    radial-gradient(1px 1px at 33% 80%, white, transparent),
+    radial-gradient(1px 1px at 15% 90%, white, transparent);
+  background-size: 200% 200%;
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+  animation: twinkle 8s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
 }
 
 /* Container principale */
@@ -50,18 +79,20 @@ body {
   width: 100%;
   max-width: var(--ultra-wide);
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 15px;
+    padding: 16px;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 10px;
+    padding: 8px;
   }
 }
 
@@ -109,8 +140,26 @@ img {
   align-items: start;
 }
 
+/* Variante con immagine più larga */
+.content-with-image--wide {
+  grid-template-columns: 1fr 1.5fr;
+}
+
+/* Variante con immagine più stretta */
+.content-with-image--narrow {
+  grid-template-columns: 1.5fr 1fr;
+}
+
 .content-with-image.reverse {
   grid-template-columns: 1fr 1fr;
+}
+
+.content-with-image--wide.reverse {
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.content-with-image--narrow.reverse {
+  grid-template-columns: 1fr 1.5fr;
 }
 
 .content-with-image.reverse .text-content {
@@ -146,9 +195,13 @@ img {
 /* ==================== HEADER E NAVIGAZIONE ==================== */
 
 header {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  padding: 12px 0;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 16px 0;
   box-shadow: 0 4px 20px var(--shadow);
+  position: relative;
+  z-index: 10;
 }
 
 .header-content {
@@ -170,12 +223,12 @@ header {
 .site-subtitle {
   color: var(--text-secondary);
   font-size: 1em;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 /* Menu navigazione */
 nav {
-  margin-top: 12px;
+  margin-top: 16px;
   position: relative; /* Necessario per il menu a tendina mobile */
 }
 
@@ -231,10 +284,16 @@ nav {
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 2px solid var(--accent-blue);
-  padding: 48px !important;
+  padding: 48px;
   margin-bottom: 32px;
+}
+
+.container .hero-section {
+  padding: 48px;
 }
 
 .hero-title {
@@ -255,12 +314,16 @@ nav {
 }
 
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 12px var(--shadow);
+  position: relative;
+  z-index: 1;
 }
 
 .card h2 {
@@ -325,6 +388,26 @@ nav {
   border-radius: 8px;
   cursor: crosshair;
   display: block;
+  transition: box-shadow 0.3s ease;
+}
+
+.camera-canvas.flash {
+  animation: flash 0.4s ease-out;
+}
+
+@keyframes flash {
+  0% { 
+    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+    border-color: var(--border-color);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.9), inset 0 0 20px rgba(59, 130, 246, 0.3);
+    border-color: var(--accent-cyan);
+  }
+  100% { 
+    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+    border-color: var(--border-color);
+  }
 }
 
 .viewer-canvas {
@@ -366,10 +449,12 @@ nav {
 /* ==================== PANNELLO PARAMETRI HILLAS ==================== */
 
 .hillas-panel {
-  background: var(--bg-elevated);
-  border: 2px solid var(--accent-blue);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(59, 130, 246, 0.4);
   border-radius: 8px;
-  padding: 20px;
+  padding: 24px;
   margin-top: 24px;
 }
 
@@ -488,6 +573,32 @@ nav {
 .btn-danger {
   background: #ef4444;
   color: white;
+}
+
+/* Focus states accessibili */
+.btn:focus,
+.btn:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+.nav-menu li a:focus,
+.nav-menu li a:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+.camera-canvas:focus,
+.camera-canvas:focus-visible {
+  outline: 3px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
 }
 
 /* ==================== TABELLE ==================== */
@@ -1694,6 +1805,7 @@ table tr:hover {
 /* Micro-interazioni per i controlli del simulatore */
 input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   cursor: pointer;
 }
