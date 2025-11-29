@@ -610,6 +610,11 @@ Note tecniche:
 - Il comportamento mantiene realismo per le domande che richiedono hadron/muon: in quei casi non viene forzato il centramento.
 - Il resampling evita di alterare la fisica degli eventi adronici/muonici; rigenerazione è limitata per evitare blocchi.
 
+### Aggiornamento Visuale Adroni (29 Novembre 2025)
+- **Unificazione Logica**: Il Quiz ora utilizza lo stesso profilo `HADRON_BACKGROUND_PROFILE` del simulatore dedicato.
+- **Effetti Visivi**: Abilitati sub-clusters ("isole"), bordi irregolari e disattivata la soppressione del rumore (`suppressNoise = false`) per gli eventi adronici nel quiz.
+- **Obiettivo**: Rendere gli eventi di background visivamente distinti (più "sporchi" e caotici) rispetto ai segnali gamma puliti.
+
 Stato: Implementato e committato nel codice. Resto disponibile per aggiungere un toggle UI nel pannello quiz se desideri un controllo in tempo reale.
 
 ## 🔗 Dipendenze
