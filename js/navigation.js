@@ -592,6 +592,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                             <td style="padding: 4px 8px;"><strong>Alpha:</strong></td>
                             <td>${hillas.alpha.toFixed(1)}°</td>
                         </tr>
+                        <!-- Parametri avanzati nascosti per semplificazione didattica
                         <tr>
                             <td style="padding: 4px 8px;"><strong>L/W Ratio:</strong></td>
                             <td>${hillas.elongation.toFixed(2)}</td>
@@ -604,9 +605,11 @@ window.configureRendererHoverEllipses = function(renderers) {
                             <td style="padding: 4px 8px;"><strong>Fotoni:</strong></td>
                             <td>${hillas.numPhotons}</td>
                         </tr>
+                        -->
                     </table>
                 </div>
             `;
+        });
         });
 
         container.innerHTML = html;
@@ -631,6 +634,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                       comparison.coherence > 80 ? '⚠️ Buona - Probabile evento gamma' :
                       '❌ Bassa - Possibile contaminazione adronica'}
                 </p>
+                <!-- Tabella statistica nascosta per semplificazione didattica
                 <table style="width: 100%; margin-top: 12px; font-family: 'Courier New', monospace; font-size: 13px;">
                     <tr style="background: rgba(255,255,255,0.05);">
                         <th style="padding: 6px; text-align: left;">Parametro</th>
@@ -658,6 +662,7 @@ window.configureRendererHoverEllipses = function(renderers) {
                         <td style="padding: 6px; text-align: center;">±${comparison.variance.alpha.toFixed(1)}°</td>
                     </tr>
                 </table>
+                -->
             </div>
         `;
     }
