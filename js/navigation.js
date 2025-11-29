@@ -353,7 +353,8 @@ window.configureRendererHoverEllipses = function(renderers) {
             // Per eventi adronici, genera usando generateHadronicEvent
             if (activeSourceType === 'hadron') {
                 // Genera evento adronico base con energia fissa
-                const energy = engine._randomInRange(100, 10000); // GeV
+                // Energia ridotta (max 6 TeV) per evitare colori troppo gialli (resta su verde/teal)
+                const energy = engine._randomInRange(100, 6000); 
                 
                 for (let i = 0; i < 3; i++) {
                     const cameraId = i + 1;
