@@ -670,7 +670,6 @@ window.configureRendererHoverEllipses = function(renderers) {
                 </div>
             `;
         });
-        });
 
         container.innerHTML = html;
     }
