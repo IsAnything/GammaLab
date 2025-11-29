@@ -829,9 +829,12 @@ class SimulationEngine {
             centerX = canvasWidth / 2;
             centerY = canvasHeight / 2;
         } else {
-            // Centro casuale, ma preferibilmente entro il FOV o appena fuori
-            centerX = this._randomInRange(-canvasWidth * 0.2, canvasWidth * 1.2);
-            centerY = this._randomInRange(-canvasHeight * 0.2, canvasHeight * 1.2);
+            // Centro casuale: deve essere tale che almeno una parte dell'anello sia visibile
+            // Il raggio è 'radius'. Se il centro è a distanza > radius dal bordo, non si vede nulla.
+            // Usiamo un margine di sicurezza per garantire che almeno un arco significativo sia nel FOV.
+            const margin = radius * 0.8; // Il centro può essere fuori, ma non troppo
+            centerX = this._randomInRange(-margin, canvasWidth + margin);
+            centerY = this._randomInRange(-margin, canvasHeight + margin);
         }
         
         // Spessore anello (molto sottile per bordi netti)
