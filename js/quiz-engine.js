@@ -1659,7 +1659,10 @@ class QuizEngine {
      * Get performance rating
      */
     getPerformanceRating(score, history) {
-        // Analisi dettagliata
+        // Analisi dettagliata basata sulle risposte corrette
+        const totalQuestions = history.length;
+        const totalCorrect = history.filter(h => h.correct).length;
+        
         const theoryQuestions = history.filter(h => h.questionType === QUESTION_TYPES.THEORETICAL);
         const practiceQuestions = history.filter(h => h.questionType !== QUESTION_TYPES.THEORETICAL);
         const sourceQuestions = history.filter(h => h.questionType === QUESTION_TYPES.SOURCE_IDENTIFICATION);
@@ -1674,33 +1677,40 @@ class QuizEngine {
 
         let baseRating = {};
         
-        // Soglie aggiornate per 15 domande (Max ~1500+)
-        if (score >= 1250) {
-            baseRating = { emoji: '🏆', title: 'Eccellente!', color: '#ffd700', message: 'Punteggio stellare!' };
-        } else if (score >= 950) {
+        // Soglie basate sul numero di risposte corrette (su 15 domande totali)
+        // Eccellente: 14-15 (>= 93%)
+        // Ottimo: 12-13 (>= 80%)
+        // Buono: 9-11 (>= 60%)
+        // Sufficiente: 6-8 (>= 40%)
+        // Riprova: < 6
+        
+        if (totalCorrect >= 14) {
+            baseRating = { emoji: '🏆', title: 'Eccellente!', color: '#ffd700', message: 'Prestazione quasi perfetta!' };
+        } else if (totalCorrect >= 12) {
             baseRating = { emoji: '🌟', title: 'Ottimo!', color: '#00ff88', message: 'Ottima performance!' };
-        } else if (score >= 650) {
+        } else if (totalCorrect >= 9) {
             baseRating = { emoji: '👍', title: 'Buono', color: '#4488ff', message: 'Buon lavoro!' };
-        } else if (score >= 350) {
-            baseRating = { emoji: '📚', title: 'Sufficiente', color: '#ffaa00', message: 'Hai le basi.' };
+        } else if (totalCorrect >= 6) {
+            baseRating = { emoji: '📚', title: 'Sufficiente', color: '#ffaa00', message: 'Hai le basi, ma serve pratica.' };
         } else {
             baseRating = { emoji: '💪', title: 'Riprova!', color: '#ff4444', message: 'Non mollare.' };
         }
 
-        // Feedback specifico
-        let feedback = baseRating.message;
+        // Feedback specifico qualitativo
+        let feedback = "";
         
-        if (score < 1250) { // Se non è perfetto, diamo consigli
-            if (sourceAcc < 0.4 && theoryAcc > 0.6) {
+        if (totalCorrect < 14) { // Se non è perfetto, diamo consigli specifici
+            if (sourceAcc < 0.5 && theoryAcc > 0.7) {
                 feedback = "Hai ottime conoscenze teoriche, ma devi esercitarti di più nel riconoscimento visivo delle sorgenti (Crab, Blazar, ecc.).";
             } else if (practiceAcc > 0.7 && theoryAcc < 0.5) {
-                feedback = "Hai un ottimo occhio per le tracce e l'analisi Hillas, ma dovresti ripassare un po' di teoria di base.";
+                feedback = "Hai un ottimo occhio per le tracce e l'analisi Hillas, ma dovresti ripassare i concetti teorici di base.";
             } else if (sourceAcc < 0.5) {
                 feedback = "Sembra che tu abbia difficoltà a distinguere le diverse sorgenti. Consulta la tabella comparativa prima di riprovare.";
             } else if (theoryAcc < 0.5) {
                 feedback = "La pratica va bene, ma non trascurare i concetti teorici fondamentali.";
             } else {
-                feedback += " Continua a esercitarti per migliorare la tua precisione.";
+                // Feedback generico basato sul livello
+                feedback = baseRating.message + " Continua a esercitarti per migliorare la tua precisione.";
             }
         } else {
             feedback = "Sei un vero esperto di astronomia gamma! Conosci perfettamente sia la teoria che le firme delle sorgenti.";
