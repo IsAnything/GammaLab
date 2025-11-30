@@ -78,10 +78,10 @@ const PEVATRON_PROFILE = {
     type: 'pevatron',
     name: 'PeVatron SNR',
     displayName: 'Resto di Supernova (PeVatron)',
-    signatureHint: 'Sciame enorme con filamenti multipli e hot-spot tra i gusci.',
+    signatureHint: 'Sciame enorme, molto allungato e luminoso, con nucleo definito.',
     
     length: { min: 0.30, max: 0.50 },  // 30-50 pixel - ESTESO
-    width: { min: 0.08, max: 0.15 },   // 8-15 pixel - Più stretto di un adrone
+    width: { min: 0.06, max: 0.12 },   // 6-12 pixel - Nettamente più stretto di un adrone
     size: { min: 2000, max: 5000 },    // ESTREMO - spesso saturazione
     alpha: { 
         type: 'gaussian',
@@ -89,28 +89,28 @@ const PEVATRON_PROFILE = {
         std: 8  // Distribuito, sorgente estesa
     },
     
-    elongation: 0.30, // Più allungato
+    elongation: 0.25, // Più allungato (L/W più alto)
     asymmetry: { mean: 0.15, std: 0.08 },
 
     visualSignature: {
-        dispersionScaleX: 0.25,
-        dispersionScaleY: 0.25,
+        dispersionScaleX: 0.15,
+        dispersionScaleY: 0.15,
         centerBiasX: 0.12,
-        lengthScale: 1.20,
-        widthScale: 0.60, // Ridotto per evitare confusione con adroni
+        lengthScale: 1.15,
+        widthScale: 0.50, // Molto ridotto per pulizia
         alphaNoiseScale: 0.8,
-        spineTightening: 0.50, // Core più definito
+        spineTightening: 0.40, // Core molto definito
         ringProbability: 0.38,
         ringThickness: 0.55,
-        hotspotCount: 3,
-        hotspotSpread: 0.40,
+        hotspotCount: 1, // Ridotto a 1 per evitare "grumi" adronici
+        hotspotSpread: 0.20,
         hotspotFill: 0.55,
         hotspotBoost: 1.35,
-        intensityVariance: 0.5,
-        offAxisShear: 0.15,
+        intensityVariance: 0.3, // Meno rumore
+        offAxisShear: 0.10,
         energyInitialBoost: 1.4,
-        energyCoreBoost: 0.6,
-        energyNoise: 0.15
+        energyCoreBoost: 0.8, // Core più luminoso
+        energyNoise: 0.10
     },
     
     energyRange: {
@@ -119,7 +119,7 @@ const PEVATRON_PROFILE = {
         spectralIndex: 2.2  // Spettro più duro
     },
     
-    interCameraVariance: 0.12,  // 12% - estensione causa varianza
+    interCameraVariance: 0.10,  // Ridotto per evitare outlier adronici
     
     description: 'Acceleratore ultra-relativista, può raggiungere PeV',
     observables: {
