@@ -81,7 +81,7 @@ const PEVATRON_PROFILE = {
     signatureHint: 'Sciame enorme con filamenti multipli e hot-spot tra i gusci.',
     
     length: { min: 0.30, max: 0.50 },  // 30-50 pixel - ESTESO
-    width: { min: 0.10, max: 0.20 },   // 10-20 pixel
+    width: { min: 0.08, max: 0.15 },   // 8-15 pixel - Più stretto di un adrone
     size: { min: 2000, max: 5000 },    // ESTREMO - spesso saturazione
     alpha: { 
         type: 'gaussian',
@@ -89,28 +89,28 @@ const PEVATRON_PROFILE = {
         std: 8  // Distribuito, sorgente estesa
     },
     
-    elongation: 0.35,
-    asymmetry: { mean: 0.15, std: 0.08 },  // Più irregolare
+    elongation: 0.30, // Più allungato
+    asymmetry: { mean: 0.15, std: 0.08 },
 
     visualSignature: {
-        dispersionScaleX: 0.48,
-        dispersionScaleY: 0.48,
+        dispersionScaleX: 0.25,
+        dispersionScaleY: 0.25,
         centerBiasX: 0.12,
-        lengthScale: 1.28,
-        widthScale: 0.96,
-        alphaNoiseScale: 1.35,
-        spineTightening: 0.78,
+        lengthScale: 1.20,
+        widthScale: 0.60, // Ridotto per evitare confusione con adroni
+        alphaNoiseScale: 0.8,
+        spineTightening: 0.50, // Core più definito
         ringProbability: 0.38,
         ringThickness: 0.55,
-        hotspotCount: 4,
-        hotspotSpread: 0.82,
+        hotspotCount: 3,
+        hotspotSpread: 0.40,
         hotspotFill: 0.55,
         hotspotBoost: 1.35,
-        intensityVariance: 0.9,
-        offAxisShear: 0.25,
+        intensityVariance: 0.5,
+        offAxisShear: 0.15,
         energyInitialBoost: 1.4,
-        energyCoreBoost: 0.4,
-        energyNoise: 0.2
+        energyCoreBoost: 0.6,
+        energyNoise: 0.15
     },
     
     energyRange: {
