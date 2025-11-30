@@ -81,15 +81,15 @@ const PEVATRON_PROFILE = {
     signatureHint: 'Sciame enorme, molto allungato e luminoso, con nucleo definito.',
     
     length: { min: 0.30, max: 0.50 },  // 30-50 pixel - ESTESO
-    width: { min: 0.06, max: 0.12 },   // 6-12 pixel - Nettamente più stretto di un adrone
-    size: { min: 2000, max: 5000 },    // ESTREMO - spesso saturazione
+    width: { min: 0.08, max: 0.14 },   // Leggermente aumentato per match visivo
+    size: { min: 1500, max: 3500 },    // Ridotto max per pulizia code
     alpha: { 
         type: 'gaussian',
         mean: 10,
-        std: 8  // Distribuito, sorgente estesa
+        std: 8
     },
     
-    elongation: 0.25, // Più allungato (L/W più alto)
+    elongation: 0.28,
     asymmetry: { mean: 0.15, std: 0.08 },
 
     visualSignature: {
@@ -97,19 +97,19 @@ const PEVATRON_PROFILE = {
         dispersionScaleY: 0.15,
         centerBiasX: 0.12,
         lengthScale: 1.15,
-        widthScale: 0.50, // Molto ridotto per pulizia
+        widthScale: 0.85, // Aumentato per riempire l'ellisse
         alphaNoiseScale: 0.8,
-        spineTightening: 0.40, // Core molto definito
-        ringProbability: 0.38,
+        spineTightening: 0.60,
+        ringProbability: 0.05, // QUASI RIMOSSO (era 0.38) - Elimina l'alone largo
         ringThickness: 0.55,
-        hotspotCount: 1, // Ridotto a 1 per evitare "grumi" adronici
+        hotspotCount: 1,
         hotspotSpread: 0.20,
         hotspotFill: 0.55,
         hotspotBoost: 1.35,
-        intensityVariance: 0.3, // Meno rumore
+        intensityVariance: 0.3,
         offAxisShear: 0.10,
         energyInitialBoost: 1.4,
-        energyCoreBoost: 0.8, // Core più luminoso
+        energyCoreBoost: 0.8,
         energyNoise: 0.10
     },
     
