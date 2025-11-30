@@ -6,7 +6,7 @@
 
 // === CONFIGURAZIONE QUIZ ===
 const QUIZ_CONFIG = {
-    totalQuestions: 15,
+    totalQuestions: 10,      // Ridotto a 10 domande per sessione
     timeLimit: 60,           // secondi per domanda
     basePoints: 100,         // punti base per risposta corretta
     hintPenalties: [30, 30, 20], // penalità per hint 1, 2, 3
@@ -205,6 +205,223 @@ const THEORETICAL_QUESTIONS = [
         ],
         correctAnswer: 'processing',
         explanation: "È l'intervallo di tempo subito dopo un trigger durante il quale l'elettronica sta elaborando i dati e il telescopio è 'cieco' a nuovi eventi."
+    },
+    // === NUOVE DOMANDE SORGENTI ===
+    {
+        id: 'crab_nature',
+        question: "Che tipo di oggetto celeste alimenta la Crab Nebula?",
+        options: [
+            { value: 'blackhole', label: "Un buco nero" },
+            { value: 'pulsar', label: "Una pulsar (stella di neutroni in rotazione)" },
+            { value: 'star', label: "Una stella gigante rossa" },
+            { value: 'planet', label: "Un pianeta gassoso" }
+        ],
+        correctAnswer: 'pulsar',
+        explanation: "La Crab Nebula è alimentata dal vento di una pulsar centrale, residuo dell'esplosione di supernova del 1054 d.C."
+    },
+    {
+        id: 'crab_constellation',
+        question: "In quale costellazione si trova la Crab Nebula?",
+        options: [
+            { value: 'orion', label: "Orione" },
+            { value: 'taurus', label: "Toro" },
+            { value: 'ursa', label: "Orsa Maggiore" },
+            { value: 'cassiopeia', label: "Cassiopea" }
+        ],
+        correctAnswer: 'taurus',
+        explanation: "La Crab Nebula si trova nella costellazione del Toro, vicino alla stella Zeta Tauri."
+    },
+    {
+        id: 'crab_candle',
+        question: "Perché la Crab Nebula è importante per l'astronomia gamma?",
+        options: [
+            { value: 'variable', label: "Perché cambia luminosità ogni giorno" },
+            { value: 'standard', label: "È la 'candela standard' stabile per calibrare i telescopi" },
+            { value: 'closest', label: "È la sorgente più vicina alla Terra" },
+            { value: 'dark', label: "È l'unica sorgente oscura" }
+        ],
+        correctAnswer: 'standard',
+        explanation: "Essendo molto luminosa e stabile nel tempo, viene usata come unità di misura (1 Crab) per il flusso di altre sorgenti."
+    },
+    {
+        id: 'snr_acceleration',
+        question: "Qual è il meccanismo principale di accelerazione nei resti di supernova (SNR)?",
+        options: [
+            { value: 'gravity', label: "Collasso gravitazionale" },
+            { value: 'shock', label: "Accelerazione di Fermi nelle onde d'urto" },
+            { value: 'thermal', label: "Emissione termica" },
+            { value: 'chemical', label: "Reazioni chimiche" }
+        ],
+        correctAnswer: 'shock',
+        explanation: "Le particelle vengono accelerate rimbalzando avanti e indietro attraverso il fronte dell'onda d'urto dell'esplosione (meccanismo di Fermi)."
+    },
+    {
+        id: 'snr_energy',
+        question: "Fino a quali energie si pensa possano accelerare i protoni nei SNR?",
+        options: [
+            { value: 'kev', label: "Pochi keV" },
+            { value: 'gev', label: "Alcuni GeV" },
+            { value: 'pev', label: "Fino ai PeV (10^15 eV)" },
+            { value: 'tev', label: "Massimo 1 TeV" }
+        ],
+        correctAnswer: 'pev',
+        explanation: "Si ritiene che i SNR siano i 'Pevatrons' galattici, capaci di accelerare i raggi cosmici fino al PeV (energia del ginocchio)."
+    },
+    {
+        id: 'snr_remnant',
+        question: "Cosa rimane tipicamente al centro di un resto di supernova?",
+        options: [
+            { value: 'nothing', label: "Nulla, tutto viene distrutto" },
+            { value: 'compact', label: "Spesso una stella di neutroni o un buco nero" },
+            { value: 'planet', label: "Un nuovo sistema planetario" },
+            { value: 'dwarf', label: "Una nana bianca" }
+        ],
+        correctAnswer: 'compact',
+        explanation: "Il nucleo della stella massiccia collassa formando un oggetto compatto (stella di neutroni o buco nero), mentre gli strati esterni vengono espulsi."
+    },
+    {
+        id: 'blazar_jet',
+        question: "Cosa distingue un Blazar da un normale nucleo galattico attivo (AGN)?",
+        options: [
+            { value: 'size', label: "È più piccolo" },
+            { value: 'orientation', label: "Il suo getto relativistico punta verso la Terra" },
+            { value: 'color', label: "È più rosso" },
+            { value: 'silent', label: "Non emette onde radio" }
+        ],
+        correctAnswer: 'orientation',
+        explanation: "Nei Blazar, il getto di plasma relativistico è allineato quasi perfettamente con la nostra linea di vista, amplificandone la luminosità."
+    },
+    {
+        id: 'blazar_variability',
+        question: "Qual è una caratteristica tipica dell'emissione dei Blazar?",
+        options: [
+            { value: 'constant', label: "Luminosità costante per secoli" },
+            { value: 'periodic', label: "Pulsazioni regolari come un orologio" },
+            { value: 'variable', label: "Variabilità rapida e imprevedibile (flare)" },
+            { value: 'thermal', label: "Solo emissione termica" }
+        ],
+        correctAnswer: 'variable',
+        explanation: "I Blazar mostrano una variabilità estrema su tempi scala che vanno da minuti a anni, spesso con improvvisi 'flare' di luminosità."
+    },
+    {
+        id: 'blazar_host',
+        question: "Che tipo di galassia ospita solitamente un Blazar?",
+        options: [
+            { value: 'spiral', label: "Una galassia a spirale come la Via Lattea" },
+            { value: 'elliptical', label: "Una galassia ellittica gigante" },
+            { value: 'dwarf', label: "Una galassia nana irregolare" },
+            { value: 'cluster', label: "Un ammasso globulare" }
+        ],
+        correctAnswer: 'elliptical',
+        explanation: "I Blazar sono tipicamente associati a buchi neri supermassicci al centro di grandi galassie ellittiche."
+    },
+    {
+        id: 'grb_types',
+        question: "Qual è la differenza principale tra GRB lunghi e corti?",
+        options: [
+            { value: 'color', label: "Il colore della luce" },
+            { value: 'duration', label: "La durata (maggiore o minore di 2 secondi)" },
+            { value: 'distance', label: "La distanza dalla Terra" },
+            { value: 'time', label: "L'ora del giorno in cui avvengono" }
+        ],
+        correctAnswer: 'duration',
+        explanation: "I GRB vengono classificati in 'Short' (< 2s) e 'Long' (> 2s), indicando probabilmente due diversi meccanismi di origine."
+    },
+    {
+        id: 'grb_short_origin',
+        question: "Cosa si pensa generi i GRB corti (Short GRB)?",
+        options: [
+            { value: 'collapse', label: "Collasso di una stella massiccia" },
+            { value: 'merger', label: "Fusione (merger) di due stelle di neutroni" },
+            { value: 'explosion', label: "Esplosione di un pianeta" },
+            { value: 'comet', label: "Impatto di una cometa" }
+        ],
+        correctAnswer: 'merger',
+        explanation: "I GRB corti sono associati alla fusione di sistemi binari compatti (stelle di neutroni), eventi che producono anche onde gravitazionali."
+    },
+    {
+        id: 'grb_energy',
+        question: "Perché i GRB sono considerati gli eventi più violenti dell'universo?",
+        options: [
+            { value: 'loud', label: "Fanno molto rumore" },
+            { value: 'energy', label: "Emettono in pochi secondi l'energia che il Sole produce in una vita intera" },
+            { value: 'hot', label: "Sono più caldi del Big Bang" },
+            { value: 'large', label: "Sono più grandi di una galassia" }
+        ],
+        correctAnswer: 'energy',
+        explanation: "L'energia isotropa equivalente rilasciata in un GRB può raggiungere 10^54 erg, rendendoli le esplosioni più luminose dopo il Big Bang."
+    },
+    {
+        id: 'gc_object',
+        question: "Cosa si trova al centro esatto della nostra Galassia (Sgr A*)?",
+        options: [
+            { value: 'star', label: "Una stella molto luminosa" },
+            { value: 'void', label: "Un vuoto assoluto" },
+            { value: 'blackhole', label: "Un buco nero supermassiccio" },
+            { value: 'nebula', label: "Una nebulosa planetaria" }
+        ],
+        correctAnswer: 'blackhole',
+        explanation: "Al centro della Via Lattea risiede Sagittarius A*, un buco nero supermassiccio di circa 4 milioni di masse solari."
+    },
+    {
+        id: 'gc_pevatron',
+        question: "Cosa indica la presenza di un 'Pevatron' al Centro Galattico?",
+        options: [
+            { value: 'robot', label: "Una macchina aliena" },
+            { value: 'accelerator', label: "Un acceleratore naturale capace di raggiungere energie del PeV" },
+            { value: 'star', label: "Una stella di tipo P" },
+            { value: 'gas', label: "Una nube di gas freddo" }
+        ],
+        correctAnswer: 'accelerator',
+        explanation: "Le osservazioni indicano che il Centro Galattico agisce come un acceleratore di particelle cosmiche fino a energie di peta-elettronvolt (PeV)."
+    },
+    {
+        id: 'gc_visibility',
+        question: "Perché è difficile osservare il Centro Galattico in luce visibile?",
+        options: [
+            { value: 'far', label: "È troppo lontano" },
+            { value: 'dust', label: "C'è troppa polvere interstellare che assorbe la luce" },
+            { value: 'dark', label: "È sempre buio lì" },
+            { value: 'bright', label: "È troppo luminoso e acceca i telescopi" }
+        ],
+        correctAnswer: 'dust',
+        explanation: "Le nubi di polvere sul piano galattico assorbono la luce visibile, rendendo necessarie osservazioni in infrarosso, radio o raggi gamma."
+    },
+    {
+        id: 'hadron_noise',
+        question: "Qual è la principale fonte di 'rumore' di fondo per i telescopi Cherenkov?",
+        options: [
+            { value: 'moon', label: "La luce della Luna" },
+            { value: 'cr', label: "I raggi cosmici adronici (protoni, nuclei)" },
+            { value: 'cities', label: "Le luci delle città" },
+            { value: 'satellites', label: "I satelliti artificiali" }
+        ],
+        correctAnswer: 'cr',
+        explanation: "I raggi cosmici carichi bombardano continuamente l'atmosfera, producendo sciami che simulano quelli gamma ma sono molto più frequenti."
+    },
+    {
+        id: 'hadron_shape',
+        question: "Come appare tipicamente un evento adronico rispetto a un gamma?",
+        options: [
+            { value: 'identical', label: "Identico, impossibile distinguerli" },
+            { value: 'irregular', label: "Più largo, irregolare e frammentato" },
+            { value: 'smaller', label: "Molto più piccolo e puntiforme" },
+            { value: 'blue', label: "Sempre di colore blu" }
+        ],
+        correctAnswer: 'irregular',
+        explanation: "A causa delle interazioni nucleari e del momento trasverso, gli sciami adronici sono più sparpagliati e irregolari di quelli elettromagnetici."
+    },
+    {
+        id: 'hadron_ratio',
+        question: "Qual è il rapporto tipico tra eventi di fondo adronico e veri eventi gamma?",
+        options: [
+            { value: 'equal', label: "1 a 1" },
+            { value: 'gamma_more', label: "Ci sono più gamma che adroni" },
+            { value: 'hadron_more', label: "Gli adroni sono 1000 volte più frequenti dei gamma" },
+            { value: 'none', label: "Non ci sono adroni di notte" }
+        ],
+        correctAnswer: 'hadron_more',
+        explanation: "Il flusso di raggi cosmici è enormemente superiore a quello gamma (rapporto ~1000:1), rendendo la reiezione del fondo cruciale."
     }
 ];
 
@@ -446,13 +663,43 @@ class QuizEngine {
             this.sourceStats[key] = { attempts: 0, correct: 0 };
         });
         
-        // Seleziona 5 domande teoriche casuali per questa sessione
+        // Reset indice domande teoriche
+        this.theoreticalQuestionIndex = 0;
+        
+        // Genera piano domande casuale (10 domande)
+        this.sessionPlan = this._generateSessionPlan(QUIZ_CONFIG.totalQuestions);
+        
+        // Seleziona domande teoriche necessarie per questa sessione
+        const theoreticalCount = this.sessionPlan.filter(t => t === QUESTION_TYPES.THEORETICAL).length;
         this.selectedTheoreticalQuestions = [...THEORETICAL_QUESTIONS]
             .sort(() => 0.5 - Math.random())
-            .slice(0, 5);
+            .slice(0, theoreticalCount);
         
         // Genera prima domanda
         this.generateQuestion();
+    }
+
+    /**
+     * Genera un piano di domande casuale per la sessione
+     */
+    _generateSessionPlan(count) {
+        const plan = [];
+        const types = Object.values(QUESTION_TYPES);
+        
+        // Assicura varietà: ~40% teoriche, ~60% pratiche
+        for (let i = 0; i < count; i++) {
+            if (Math.random() < 0.4) {
+                plan.push(QUESTION_TYPES.THEORETICAL);
+            } else {
+                // Scegli un tipo pratico a caso (escludendo THEORETICAL)
+                const practicalTypes = types.filter(t => t !== QUESTION_TYPES.THEORETICAL);
+                const randomType = practicalTypes[Math.floor(Math.random() * practicalTypes.length)];
+                plan.push(randomType);
+            }
+        }
+        
+        // Mischia il piano
+        return plan.sort(() => 0.5 - Math.random());
     }
 
     /**
@@ -497,10 +744,16 @@ class QuizEngine {
      */
     _selectQuestionType() {
         const questionIndex = this.currentQuestion - 1;
-        const types = QUESTION_DISTRIBUTION.flat();
-        const selectedType = types[questionIndex] || QUESTION_TYPES.SOURCE_IDENTIFICATION;
-        console.log(`🎲 Domanda ${this.currentQuestion}: tipo = ${selectedType} (index: ${questionIndex}, totale tipi: ${types.length})`);
-        return selectedType;
+        
+        // Usa il piano generato per questa sessione
+        if (this.sessionPlan && this.sessionPlan[questionIndex]) {
+            const selectedType = this.sessionPlan[questionIndex];
+            console.log(`🎲 Domanda ${this.currentQuestion}: tipo = ${selectedType} (da piano sessione)`);
+            return selectedType;
+        }
+        
+        // Fallback (non dovrebbe accadere)
+        return QUESTION_TYPES.SOURCE_IDENTIFICATION;
     }
     
     /**
@@ -568,19 +821,20 @@ class QuizEngine {
         // Nascondi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         
-        // Seleziona domanda in base all'indice corrente (0-4)
-        // Mappatura basata su QUESTION_DISTRIBUTION
-        let qIndex = 0;
-        if (this.currentQuestion === 1) qIndex = 0;
-        else if (this.currentQuestion === 4) qIndex = 1;
-        else if (this.currentQuestion === 7) qIndex = 2;
-        else if (this.currentQuestion === 10) qIndex = 3;
-        else if (this.currentQuestion === 13) qIndex = 4;
+        // Prendi la prossima domanda teorica disponibile dalla lista mescolata
+        // Usiamo un indice che incrementa ogni volta che usiamo una domanda teorica
+        if (typeof this.theoreticalQuestionIndex === 'undefined') {
+            this.theoreticalQuestionIndex = 0;
+        }
         
-        // Fallback se l'indice sfora
-        if (qIndex >= this.selectedTheoreticalQuestions.length) qIndex = 0;
+        // Se abbiamo esaurito le domande teoriche selezionate, ricominciamo (non dovrebbe succedere con la logica attuale)
+        if (this.theoreticalQuestionIndex >= this.selectedTheoreticalQuestions.length) {
+            this.theoreticalQuestionIndex = 0;
+        }
         
-        const questionData = this.selectedTheoreticalQuestions[qIndex];
+        const questionData = this.selectedTheoreticalQuestions[this.theoreticalQuestionIndex];
+        this.theoreticalQuestionIndex++; // Incrementa per la prossima volta
+        
         this.currentTheoreticalQuestion = questionData;
         this.currentCorrectAnswer = questionData.correctAnswer;
         
