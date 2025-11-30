@@ -1930,6 +1930,7 @@ class QuizEngine {
         // Analisi dettagliata basata sulle risposte corrette
         const totalQuestions = history.length;
         const totalCorrect = history.filter(h => h.correct).length;
+        const percentage = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
         
         const theoryQuestions = history.filter(h => h.questionType === QUESTION_TYPES.THEORETICAL);
         const practiceQuestions = history.filter(h => h.questionType !== QUESTION_TYPES.THEORETICAL);
@@ -1941,24 +1942,25 @@ class QuizEngine {
         
         const theoryAcc = theoryQuestions.length ? (theoryCorrect / theoryQuestions.length) : 0;
         const practiceAcc = practiceQuestions.length ? (practiceCorrect / practiceQuestions.length) : 0;
-        const sourceAcc = sourceQuestions.length ? (sourceCorrect / sourceQuestions.length) : 0;
+        // Usa practiceAcc come fallback se non ci sono domande specifiche sulle sorgenti
+        const sourceAcc = sourceQuestions.length ? (sourceCorrect / sourceQuestions.length) : (practiceQuestions.length ? practiceAcc : 0);
 
         let baseRating = {};
         
-        // Soglie basate sul numero di risposte corrette (su 15 domande totali)
-        // Eccellente: 14-15 (>= 93%)
-        // Ottimo: 12-13 (>= 80%)
-        // Buono: 9-11 (>= 60%)
-        // Sufficiente: 6-8 (>= 40%)
-        // Riprova: < 6
+        // Soglie basate su percentuale
+        // Eccellente: >= 90% (9-10 su 10)
+        // Ottimo: >= 80% (8 su 10)
+        // Buono: >= 60% (6-7 su 10)
+        // Sufficiente: >= 40% (4-5 su 10)
+        // Riprova: < 40%
         
-        if (totalCorrect >= 14) {
+        if (percentage >= 90) {
             baseRating = { emoji: '🏆', title: 'Eccellente!', color: '#ffd700', message: 'Prestazione quasi perfetta!' };
-        } else if (totalCorrect >= 12) {
+        } else if (percentage >= 80) {
             baseRating = { emoji: '🌟', title: 'Ottimo!', color: '#00ff88', message: 'Ottima performance!' };
-        } else if (totalCorrect >= 9) {
+        } else if (percentage >= 60) {
             baseRating = { emoji: '👍', title: 'Buono', color: '#4488ff', message: 'Buon lavoro!' };
-        } else if (totalCorrect >= 6) {
+        } else if (percentage >= 40) {
             baseRating = { emoji: '📚', title: 'Sufficiente', color: '#ffaa00', message: 'Hai le basi, ma serve pratica.' };
         } else {
             baseRating = { emoji: '💪', title: 'Riprova!', color: '#ff4444', message: 'Non mollare.' };
@@ -1967,12 +1969,12 @@ class QuizEngine {
         // Feedback specifico qualitativo
         let feedback = "";
         
-        if (totalCorrect < 14) { // Se non è perfetto, diamo consigli specifici
-            if (sourceAcc < 0.5 && theoryAcc > 0.7) {
-                feedback = "Hai ottime conoscenze teoriche, ma devi esercitarti di più nel riconoscimento visivo delle sorgenti (Crab, Blazar, ecc.).";
+        if (percentage < 90) { // Se non è perfetto (o quasi), diamo consigli specifici
+            if (practiceAcc < 0.5 && theoryAcc > 0.7) {
+                feedback = "Hai ottime conoscenze teoriche, ma devi esercitarti di più nel riconoscimento visivo delle sorgenti.";
             } else if (practiceAcc > 0.7 && theoryAcc < 0.5) {
                 feedback = "Hai un ottimo occhio per le tracce e l'analisi Hillas, ma dovresti ripassare i concetti teorici di base.";
-            } else if (sourceAcc < 0.5) {
+            } else if (sourceQuestions.length > 0 && sourceAcc < 0.5) {
                 feedback = "Sembra che tu abbia difficoltà a distinguere le diverse sorgenti. Consulta la tabella comparativa prima di riprovare.";
             } else if (theoryAcc < 0.5) {
                 feedback = "La pratica va bene, ma non trascurare i concetti teorici fondamentali.";
