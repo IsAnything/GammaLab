@@ -326,30 +326,30 @@ const HADRON_BACKGROUND_PROFILE = {
     name: 'Hadronic Background',
     displayName: 'Fondo Adronico (CR)',
     
-    length: { min: 0.15, max: 0.30 },  // 15-30 pixel - RIDOTTO (più piccole)
-    width: { min: 0.10, max: 0.18 },   // 10-18 pixel - RIDOTTO (più piccole)
-    size: { min: 500, max: 3000 },     // Molto variabile
+    length: { min: 0.20, max: 0.35 },  // 20-35 pixel - Leggermente più lunghe
+    width: { min: 0.15, max: 0.25 },   // 15-25 pixel - Più larghe (più "grasse")
+    size: { min: 600, max: 3500 },     // Size leggermente aumentata per visibilità
     alpha: { 
         type: 'uniform',
         min: 0,
         max: 90  // UNIFORME - nessun picco!
     },
     
-    elongation: 0.55,  // L/W ~ 1.6 - PIÙ BASSO
-    asymmetry: { mean: 0.45, std: 0.20 },  // MOLTO asimmetrico
+    elongation: 0.65,  // L/W ~ 1.5 - Molto meno allungate dei gamma
+    asymmetry: { mean: 0.55, std: 0.25 },  // MOLTO asimmetrico
 
     visualSignature: {
-        dispersionScaleX: 0.6,      // Aumentato dispersione generale
-        dispersionScaleY: 0.6,
-        hotspotCount: 5,            // Più isole (era 3)
-        hotspotSpread: 1.6,         // Isole più lontane (era 1.0)
-        hotspotFill: 0.85,          // Più fotoni nelle isole (era 0.7)
-        hotspotBoost: 0.8,          // Isole più brillanti
-        intensityVariance: 1.5,     // Molto rumore di intensità
-        energyInitialBoost: 1.05,
-        energyNoise: 0.4,           // Più rumore energetico
+        dispersionScaleX: 0.9,      // Molto disperso (bordi frastagliati)
+        dispersionScaleY: 0.9,
+        hotspotCount: 6,            // Più frammenti
+        hotspotSpread: 2.2,         // Frammenti molto separati
+        hotspotFill: 0.7,           // Meno densità nei frammenti
+        hotspotBoost: 0.9,          // Frammenti brillanti
+        intensityVariance: 1.8,     // Altissimo rumore
+        energyInitialBoost: 1.0,
+        energyNoise: 0.5,           // Rumore energetico massimo
 
-        offAxisShear: 0.2
+        offAxisShear: 0.4           // Distorsione laterale
     },
     
     energyRange: {

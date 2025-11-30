@@ -732,9 +732,9 @@ class SimulationEngine {
             if (!isFinite(gx) || !isFinite(gy)) continue;
             
             // DIFFERENZA CHIAVE: rapporto length/width molto più basso (shower più rotondo)
-            // RIDOTTO ma bilanciato per visibilità
-            let dx = gx * lengthPx * 0.4;  // Da 0.3 a 0.4
-            let dy = gy * widthPx * 0.2;   // Da 0.15 a 0.2
+            // AUMENTATO per visibilità e distinzione da gamma
+            let dx = gx * lengthPx * 1.0;  // Da 0.4 a 1.0 (simile a gamma)
+            let dy = gy * widthPx * 0.8;   // Da 0.2 a 0.8 (molto più largo)
             
             if (!isFinite(dx) || !isFinite(dy)) continue;
             
@@ -746,7 +746,7 @@ class SimulationEngine {
             }
             
             // Aggiungi rumore per irregolarità
-            const noiseFactor = 1 + (Math.random() - 0.5) * 0.4;
+            const noiseFactor = 1 + (Math.random() - 0.5) * 0.8; // Rumore aumentato
             dx *= noiseFactor;
             dy *= noiseFactor;
             
@@ -764,10 +764,10 @@ class SimulationEngine {
             x = clamped.x;
             y = clamped.y;
             
-            // 20% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
-            if (Math.random() < 0.2) {
+            // 35% dei fotoni vanno in sub-shower secondari (caratteristica adronica)
+            if (Math.random() < 0.35) {
                 const subAngle = Math.random() * 2 * Math.PI;
-                const subDist = Math.random() * lengthPx * 0.2;
+                const subDist = Math.random() * lengthPx * 0.8; // Distanza aumentata per separazione
                 const newX = x + Math.cos(subAngle) * subDist;
                 const newY = y + Math.sin(subAngle) * subDist;
                 
