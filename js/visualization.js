@@ -2333,8 +2333,13 @@ class CanvasRenderer {
         const lengthScale = this.respectExactHillas ? 1.0 : 1.02;
         const widthScale = this.respectExactHillas ? 1.0 : 1.02;
         const ellipseBoost = this.lightStyle ? 1.28 : 1.24;
-        const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale * ellipseBoost, 8);
-        const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale * ellipseBoost, 5);
+        
+        // Aggiungiamo un padding fisso per compensare la dimensione visiva dei fotoni (glow)
+        // Questo evita che per tracce molto sottili (SNR) l'ellisse sembri troppo stretta rispetto all'immagine
+        const photonVisualPadding = 3.5; 
+        
+        const lengthPx = Math.max((hillasParams.lengthPx || 0) * lengthScale * ellipseBoost + photonVisualPadding, 8);
+        const widthPx = Math.max((hillasParams.widthPx || 0) * widthScale * ellipseBoost + photonVisualPadding, 5);
 
         ctx.save();
         ctx.translate(centerX, centerY);
