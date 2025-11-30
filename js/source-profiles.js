@@ -138,7 +138,7 @@ const BLAZAR_PROFILE = {
     type: 'blazar',
     name: 'Blazar/AGN',
     displayName: 'Blazar (AGN)',
-    signatureHint: 'Getto stretto ad asse brillante; oltre 10 TeV vira al verde.',
+    signatureHint: 'Nucleo estremamente compatto e brillante, quasi puntiforme.',
     
     length: { min: 0.10, max: 0.20 },  // 10-20 pixel - COMPATTO
     width: { min: 0.04, max: 0.07 },   // 4-7 pixel - MOLTO stretto
@@ -153,25 +153,25 @@ const BLAZAR_PROFILE = {
     asymmetry: { mean: 0.08, std: 0.05 },
 
     visualSignature: {
-        dispersionScaleX: 0.08,
-        dispersionScaleY: 0.08,
-        lengthScale: 0.92,
-        widthScale: 0.48,
-        alphaNoiseScale: 0.18,
-        spineTightening: 0.38,
-        tailStrength: 0.18,
-        tailDecay: 0.65,
+        dispersionScaleX: 0.04,
+        dispersionScaleY: 0.04,
+        lengthScale: 0.85,
+        widthScale: 0.35,
+        alphaNoiseScale: 0.10,
+        spineTightening: 0.25,
+        tailStrength: 0.10,
+        tailDecay: 0.80,
         centralCoreBoost: true,
-        hotspotCount: 3,
-        hotspotSpread: 0.2,
-        hotspotFill: 0.38,
-        hotspotBoost: 1.35,
-        intensityVariance: 0.16,
-        energyInitialBoost: 1.4,
-        energyCoreBoost: 0.75,
-        energySpineBoost: 1.25,
-        energyRadialFalloff: 1.15,
-        energyNoise: 0.08
+        hotspotCount: 1,
+        hotspotSpread: 0.1,
+        hotspotFill: 0.60,
+        hotspotBoost: 1.80,
+        intensityVariance: 0.10,
+        energyInitialBoost: 1.6,
+        energyCoreBoost: 1.20,
+        energySpineBoost: 1.50,
+        energyRadialFalloff: 0.8,
+        energyNoise: 0.05
     },
     
     energyRange: {
@@ -200,7 +200,7 @@ const GRB_PROFILE = {
     type: 'grb',
     name: 'Gamma-Ray Burst',
     displayName: 'Lampo Gamma (GRB)',
-    signatureHint: 'Coda ampia che si raffredda: sfumatura verso il verde lungo la scia.',
+    signatureHint: 'Struttura irregolare ed esplosiva con coda frammentata.',
     
     length: { min: 0.10, max: 0.20 },  // 10-20 pixel
     width: { min: 0.05, max: 0.10 },   // 5-10 pixel
@@ -215,23 +215,25 @@ const GRB_PROFILE = {
     asymmetry: { mean: 0.12, std: 0.06 },
 
     visualSignature: {
-        dispersionScaleX: 0.32,
-        dispersionScaleY: 0.26,
-        lengthScale: 1.35,
-        widthScale: 0.78,
-        alphaNoiseScale: 0.7,
-        tailStrength: 1.25,
-        tailDecay: 0.55,
-        hotspotCount: 2,
-        hotspotSpread: 0.52,
-        hotspotFill: 0.34,
-        hotspotBoost: 0.95,
-        intensityVariance: 0.55,
-        energyInitialBoost: 1.5,
-        energyTailDrop: 1.05,
-        energyCoreBoost: 0.28,
-        energyRadialFalloff: 2.9,
-        energyNoise: 0.16
+        dispersionScaleX: 0.45,
+        dispersionScaleY: 0.35,
+        lengthScale: 1.50,
+        widthScale: 0.90,
+        alphaNoiseScale: 0.9,
+        spineTightening: 0.9,
+        tailStrength: 1.80,
+        tailDecay: 0.40,
+        centralCoreBoost: false,
+        hotspotCount: 4,
+        hotspotSpread: 0.70,
+        hotspotFill: 0.25,
+        hotspotBoost: 1.10,
+        intensityVariance: 0.75,
+        energyInitialBoost: 1.4,
+        energyTailDrop: 0.80,
+        energyCoreBoost: 0.20,
+        energyRadialFalloff: 3.5,
+        energyNoise: 0.25
     },
     
     energyRange: {
