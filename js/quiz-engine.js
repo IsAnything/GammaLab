@@ -1028,6 +1028,7 @@ class QuizEngine {
         const sourceType = profile.type;
         this.renderers.forEach(renderer => {
             renderer.sourceType = sourceType;
+            renderer.lightStyle = true; // Assicura stile chiaro per il quiz
             // Restore noise suppression for gamma events if quizGammaOnly is true
             if (this.quizGammaOnly) {
                 renderer.suppressNoise = true;
@@ -1098,6 +1099,7 @@ class QuizEngine {
     _generateAndRenderHadronicEvents(canvasSize, customParams = null) {
         this.renderers.forEach(renderer => {
             renderer.sourceType = 'hadron';
+            renderer.lightStyle = true; // Assicura stile chiaro per il quiz
             // Enable noise for hadronic events to make them look messy and distinguishable
             renderer.suppressNoise = false;
         });
@@ -1144,6 +1146,7 @@ class QuizEngine {
     _generateAndRenderMuonEvents(canvasSize, customParams = null) {
         this.renderers.forEach(renderer => {
             renderer.sourceType = 'muon';
+            renderer.lightStyle = true; // Assicura stile chiaro per il quiz
             // Enable noise for muon events too
             renderer.suppressNoise = false;
         });
