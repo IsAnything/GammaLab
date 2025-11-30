@@ -354,7 +354,7 @@ const HADRON_BACKGROUND_PROFILE = {
     
     energyRange: {
         min: 50,
-        max: 100000,    // Tutto lo spettro
+        max: 8000,      // RIDOTTO da 100000 a 8000 per evitare "palle di fuoco" gialle
         spectralIndex: 2.7
     },
     

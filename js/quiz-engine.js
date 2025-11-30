@@ -1105,8 +1105,15 @@ class QuizEngine {
         const events = [];
         this.currentHillasParams = [];
         
+        // Usa parametri custom o default con energia limitata per coerenza con simulatore background
+        const params = customParams || {};
+        if (!params.energy) {
+            // Energia limitata a 6 TeV per evitare che sembrino gamma ad alta energia
+            params.energy = this.engine._randomInRange(100, 6000);
+        }
+
         // Single camera
-        const event = this.engine.generateHadronicEvent(1, canvasSize, customParams);
+        const event = this.engine.generateHadronicEvent(1, canvasSize, params);
         events.push(event);
         
         const hillas = this.hillasAnalyzer.analyze(event);
