@@ -1096,6 +1096,30 @@ table tr:hover {
   transform: translateY(-50%) scale(1.1);
 }
 
+/* ==================== VIDEO CONTAINER ==================== */
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  background: #000;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 1px solid var(--border-color);
+}
+
+.video-container iframe,
+.video-container object,
+.video-container embed,
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 1024px) {
