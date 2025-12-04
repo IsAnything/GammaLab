@@ -1392,6 +1392,12 @@ class CanvasRenderer {
     renderEvent(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
+
+        // Force light style for quiz cameras to prevent black screen issues
+        if (this.canvas && this.canvas.id && this.canvas.id.startsWith('quiz')) {
+            this.lightStyle = true;
+        }
+
         this._lastShowLegend = showLegend;
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;
         this.signatureHint = (event && (event.signatureHint || (event.params && event.params.signatureHint))) || '';
