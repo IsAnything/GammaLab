@@ -6,8 +6,8 @@
 
 // === COSTANTI ===
 // PIXEL_TO_DEGREE definito in core-simulation.js (0.01)
-const MIN_PHOTONS = 50; // Minimo fotoni per analisi valida
-const CLEANING_THRESHOLD = 0.3; // Soglia intensità per cleaning
+const MIN_PHOTONS = 30; // Minimo fotoni per analisi valida (ridotto per Blazar)
+const CLEANING_THRESHOLD = 0.2; // Soglia intensità per cleaning (ridotta per non tagliare code)
 
 // === CLASSE HILLAS ANALYZER ===
 class HillasAnalyzer {
