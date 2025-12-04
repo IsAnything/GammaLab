@@ -5,6 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Sorgenti Gamma - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        /* Compact Quiz Layout */
+        body {
+            overflow-y: auto; /* Allow scroll if needed but try to fit */
+        }
+
+        /* Layout principale del quiz: Header in alto, contenuto sotto */
+        #quizScreen {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px); /* Altezza viewport meno header/footer stimati */
+            min-height: 600px;
+        }
+
+        .quiz-header {
+            flex: 0 0 auto; /* Altezza fissa */
+            margin-bottom: 10px;
+        }
+
+        /* Wrapper per mettere simulatore e controlli affiancati */
+        .quiz-main-layout {
+            display: flex;
+            flex: 1;
+            gap: 16px;
+            overflow: hidden; /* Contiene lo scroll interno */
+            align-items: stretch;
+        }
+
+        /* Sezione Simulatore (Sinistra) */
+        .simulator-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0 !important;
+            overflow-y: auto;
+            min-width: 0; /* Fix flexbox overflow */
+        }
+
+        .quiz-layout-container {
+            flex: 1;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .camera-container {
+            flex: 0 1 auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 100%;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Limite massimo larghezza */
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+        }
+
+        /* Importante: forza il canvas a stare nel contenitore e non eccedere l'altezza disponibile */
+        .camera-canvas, .overlay-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        /* Sezione Controlli/Risposte (Destra) */
+        .quiz-controls-card {
+            flex: 0 0 350px; /* Larghezza fissa per i controlli */
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            margin-bottom: 0 !important;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr; /* Una colonna per risparmiare spazio orizzontale nella colonna destra */
+            gap: 8px;
+        }
+
+        .quiz-option {
+            padding: 10px;
+            font-size: 0.95em;
+        }
+
+        /* Info box dentro il simulatore */
+        .quiz-info-box {
+            font-size: 0.9em;
+            padding: 12px !important;
+        }
+
+        /* Adattamento per schermi piccoli */
+        @media (max-width: 1000px) {
+            #quizScreen {
+                height: auto;
+                display: block;
+            }
+            
+            .quiz-main-layout {
+                flex-direction: column;
+                overflow: visible;
+            }
+
+            .quiz-controls-card {
+                flex: 1;
+                width: 100%;
+            }
+
+            .quiz-options {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .canvas-wrapper {
+                max-height: 40vh;
+            }
+        }
+        
+        /* Nascondi header/footer standard quando in modalità quiz attivo per guadagnare spazio? 
+           No, manteniamo la navigazione ma riduciamo i margini */
+        .quiz-container {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            max-width: 100% !important; /* Usa tutta la larghezza */
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    </style>
 </head>
 <body>
     <header>
