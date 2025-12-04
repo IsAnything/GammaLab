@@ -694,19 +694,23 @@ class QuizEngine {
         const plan = [];
         const types = Object.values(QUESTION_TYPES);
         
-        // Assicura varietà: ~40% teoriche, ~60% pratiche
-        for (let i = 0; i < count; i++) {
-            if (Math.random() < 0.4) {
-                plan.push(QUESTION_TYPES.THEORETICAL);
-            } else {
-                // Scegli un tipo pratico a caso (escludendo THEORETICAL)
-                const practicalTypes = types.filter(t => t !== QUESTION_TYPES.THEORETICAL);
-                const randomType = practicalTypes[Math.floor(Math.random() * practicalTypes.length)];
-                plan.push(randomType);
-            }
+        // Force at least 4 theoretical questions
+        const theoreticalCount = 4;
+        const practicalCount = count - theoreticalCount;
+
+        for (let i = 0; i < theoreticalCount; i++) {
+            plan.push(QUESTION_TYPES.THEORETICAL);
+        }
+
+        // Fill the rest with practical questions
+        const practicalTypes = types.filter(t => t !== QUESTION_TYPES.THEORETICAL);
+        
+        for (let i = 0; i < practicalCount; i++) {
+            const randomType = practicalTypes[Math.floor(Math.random() * practicalTypes.length)];
+            plan.push(randomType);
         }
         
-        // Mischia il piano
+        // Shuffle the plan
         return plan.sort(() => 0.5 - Math.random());
     }
 
@@ -843,6 +847,10 @@ class QuizEngine {
         // Nascondi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         
+        // Update section title
+        const sectionTitle = simulatorSection.querySelector('h3');
+        if (sectionTitle) sectionTitle.textContent = '🧠 Domanda Teorica';
+
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
         // Usiamo un indice che incrementa ogni volta che usiamo una domanda teorica
         if (typeof this.theoreticalQuestionIndex === 'undefined') {
@@ -870,11 +878,15 @@ class QuizEngine {
             if (layoutContainer) layoutContainer.style.display = 'none';
             
             // Mostra istruzione
-            instructionEl.style.display = 'block';
+            instructionEl.style.display = 'flex';
+            instructionEl.style.flexDirection = 'column';
+            instructionEl.style.justifyContent = 'center';
+            instructionEl.style.minHeight = '300px'; // Match camera height to prevent layout shift
         }
         
         instructionEl.textContent = questionData.question;
-        instructionEl.style.fontSize = '1.4em';
+        instructionEl.style.fontSize = '1.5em';
+        instructionEl.style.lineHeight = '1.4';
         instructionEl.style.fontWeight = 'bold';
         instructionEl.style.color = 'var(--accent-cyan)';
         instructionEl.style.textAlign = 'center';
@@ -899,6 +911,10 @@ class QuizEngine {
             const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
             if (layoutContainer) layoutContainer.style.display = 'flex';
             
+            // Restore title
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+
             document.getElementById('quizInstruction').style.textAlign = '';
             document.getElementById('quizInstruction').style.padding = '';
             document.getElementById('quizInstruction').style.color = '';
@@ -940,6 +956,17 @@ class QuizEngine {
      * Domanda: È un gamma o un adrone?
      */
     _generateParticleTypeQuestion(canvasSize) {
+        // Restore title
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+            
+            // Ensure layout container is visible
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+        }
+
         // 50% gamma, 50% hadron
         const isGamma = Math.random() < 0.5;
         
@@ -975,6 +1002,17 @@ class QuizEngine {
      * Domanda: Energia alta o bassa?
      */
     _generateEnergyLevelQuestion(canvasSize) {
+        // Restore title
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+            
+            // Ensure layout container is visible
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+        }
+
         // 50% bassa energia (100-500 GeV), 50% alta energia (2-5 TeV)
         const isHighEnergy = Math.random() < 0.5;
         const energy = isHighEnergy ? 
@@ -1000,6 +1038,17 @@ class QuizEngine {
      * Domanda: È un muone?
      */
     _generateMuonDetectionQuestion(canvasSize) {
+        // Restore title
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+            
+            // Ensure layout container is visible
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+        }
+
         const isMuon = Math.random() < 0.5;
         
             if (isMuon) {
@@ -1031,6 +1080,17 @@ class QuizEngine {
      * Domanda: Ellisse stretta o larga?
      */
     _generateShowerShapeQuestion(canvasSize) {
+        // Restore title
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+            
+            // Ensure layout container is visible
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+        }
+
         const isNarrow = Math.random() < 0.5;
         
         if (isNarrow) {
