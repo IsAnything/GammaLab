@@ -67,10 +67,8 @@
             overflow: visible; /* Assicura che il contenuto sia visibile */
         }
 
-        .camera-canvas, .overlay-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .camera-canvas {
+            display: block;
             width: 100% !important;
             height: 100% !important;
             /* Background grigio chiaro per modalità quiz (lightStyle) */
@@ -78,8 +76,14 @@
         }
         
         .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
             background: transparent !important;
             pointer-events: none;
+            z-index: 10;
         }
 
         /* Sezione Controlli/Risposte (Destra) */
@@ -218,8 +222,8 @@
         }
         
         .canvas-wrapper {
-            background: #1a1a1a; /* Visible background if canvas fails */
-            border-radius: 50%; /* Circular hint */
+            background: #e0e0e0; /* Visible background if canvas fails */
+            border-radius: 8px; /* Angoli arrotondati, NON circolare */
         }
 
         /* Ensure sticky controls don't get covered */
@@ -489,11 +493,11 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="../js/core-simulation.js?v=30"></script>
-    <script src="../js/source-profiles.js?v=30"></script>
-    <script src="../js/hillas-analysis.js?v=30"></script>
-    <script src="../js/visualization-core.js?v=30"></script>
-    <script src="../js/quiz-engine-core.js?v=30"></script>
+    <script src="../js/core-simulation.js?v=31"></script>
+    <script src="../js/source-profiles.js?v=31"></script>
+    <script src="../js/hillas-analysis.js?v=31"></script>
+    <script src="../js/visualization-core.js?v=31"></script>
+    <script src="../js/quiz-engine-core.js?v=31"></script>
     <script src="../js/lightbox.js"></script>
     <!-- Quiz Engine si inizializza automaticamente -->
 </body>
