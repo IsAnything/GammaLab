@@ -945,6 +945,9 @@ class QuizEngine {
      * Domanda classica: identifica la sorgente
      */
     _generateSourceIdentificationQuestion(canvasSize) {
+        console.log('🎯 _generateSourceIdentificationQuestion CALLED');
+        console.log('   canvasSize:', canvasSize);
+        
         // Ripristina visibilità elementi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
@@ -966,17 +969,27 @@ class QuizEngine {
         let attempts = 0;
         const maxAttempts = 10;
         
+        console.log('🔄 Selecting random profile...');
         do {
             profile = this.quizGammaOnly ? getRandomSourceProfile(false) : getRandomSourceProfile(true);
+            console.log('   Attempt', attempts + 1, '- profile:', profile?.type);
             attempts++;
         } while (this.usedSourceTypes.has(profile.type) && attempts < maxAttempts);
+        
+        if (!profile) {
+            console.error('❌ PROFILE IS NULL after selection!');
+            return;
+        }
+        console.log('✅ Profile selected:', profile.type, profile.name);
         
         this.usedSourceTypes.add(profile.type);
         this.currentProfile = profile;
         this.currentCorrectAnswer = this.currentProfile.type;
         
         // Genera eventi per 3 camere (forza eventi centrati per didattica)
+        console.log('🎨 Calling _generateAndRenderEvents...');
         this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
+        console.log('✅ _generateAndRenderEvents completed');
         
         // Imposta opzioni risposta (tutte le sorgenti)
         this._setAnswerOptions([
