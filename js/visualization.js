@@ -1775,27 +1775,28 @@ class CanvasRenderer {
      * Renderizza singolo fotone
      */
     renderPhoton(track) {
-        // Validazione input
-        if (!track || typeof track.x !== 'number' || typeof track.y !== 'number' || 
-            !isFinite(track.x) || !isFinite(track.y) || 
-            !track.intensity || !isFinite(track.intensity) ||
-            !track.energy || !isFinite(track.energy)) {
-            console.warn(`⚠️ Track non valido: x=${track?.x}, y=${track?.y}, energy=${track?.energy}, intensity=${track?.intensity}`);
-            return;
-        }
+        try {
+            // Validazione input
+            if (!track || typeof track.x !== 'number' || typeof track.y !== 'number' || 
+                !isFinite(track.x) || !isFinite(track.y) || 
+                !track.intensity || !isFinite(track.intensity) ||
+                !track.energy || !isFinite(track.energy)) {
+                // console.warn(`⚠️ Track non valido: x=${track?.x}, y=${track?.y}, energy=${track?.energy}, intensity=${track?.intensity}`);
+                return;
+            }
 
-        const trackSourceTag = track.sourceType || this.sourceType;
-        const isHadronic = this._isHadronicSource(trackSourceTag);
-        const isGammaLike = !isHadronic;
+            const trackSourceTag = track.sourceType || this.sourceType;
+            const isHadronic = this._isHadronicSource(trackSourceTag);
+            const isGammaLike = !isHadronic;
 
-        // Light style: rendering con pixel esagonali
-        if (this.lightStyle) {
-            this.renderPhotonHexagonal(track);
-            return;
-        }
+            // Light style: rendering con pixel esagonali
+            if (this.lightStyle) {
+                this.renderPhotonHexagonal(track);
+                return;
+            }
 
-        // Dark style: rendering tradizionale con glow
-        let intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+            // Dark style: rendering tradizionale con glow
+            let intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
 
         // Color mapping: combine energy and intensity, then tone-map for photographic dynamic range
         let baseRGB = this.colorPalette.getColorRGB(track.energy || this.colorPalette.minEnergy);
@@ -1891,6 +1892,9 @@ class CanvasRenderer {
         this.ctx.arc(drawX, drawY, radius * 0.5, 0, 2 * Math.PI);
         this.ctx.fill();
 
+        } catch (e) {
+            console.error("Error rendering photon:", e);
+        }
     }
 
     renderEnergyHistogram(event) {
@@ -2193,24 +2197,27 @@ class CanvasRenderer {
             const exposureK = (typeof this.exposureK === 'number') ? this.exposureK : 4.0;
             const exposureBoost = 1 + (Math.max(0, exposureK - 4.0)) * 0.28;
 
-            const energyMin = this.colorPalette?.minEnergy || 1;
-            const energyMax = this.colorPalette?.maxEnergy || (energyMin * 10);
-            let energyNorm = 0.5;
-            try {
-                const clampedEnergy = Math.min(energyMax, Math.max(energyMin, track.energy || energyMin));
-                const logSpan = Math.log10(energyMax / energyMin) || 1;
-                const baseNorm = Math.log10(clampedEnergy / energyMin) / logSpan;
-                const energyVariation = (Math.random() - 0.5) * 0.3;
-                energyNorm = Math.min(1, Math.max(0, baseNorm + energyVariation));
-            } catch (_) {
-                energyNorm = 0.5;
+            let colorRGB = [100, 200, 255]; // Default fallback color
+            if (this.colorPalette && typeof this.colorPalette.mapNormalized === 'function') {
+                const energyMin = this.colorPalette.minEnergy || 1;
+                const energyMax = this.colorPalette.maxEnergy || (energyMin * 10);
+                let energyNorm = 0.5;
+                try {
+                    const clampedEnergy = Math.min(energyMax, Math.max(energyMin, track.energy || energyMin));
+                    const logSpan = Math.log10(energyMax / energyMin) || 1;
+                    const baseNorm = Math.log10(clampedEnergy / energyMin) / logSpan;
+                    const energyVariation = (Math.random() - 0.5) * 0.3;
+                    energyNorm = Math.min(1, Math.max(0, baseNorm + energyVariation));
+                } catch (_) {
+                    energyNorm = 0.5;
+                }
+
+                const tone = this.colorPalette.toneMap(energyNorm, exposureK);
+                colorRGB = this.colorPalette.mapNormalized(energyNorm);
+                
+                const brightness = Math.max(0.15, tone * exposureBoost * (0.8 + 0.4 * intensityFactor) * (0.6 + 0.4 * distanceFactor));
+                colorRGB = this.colorPalette.applyBrightnessToRGB(colorRGB, brightness);
             }
-
-            const tone = this.colorPalette.toneMap(energyNorm, exposureK);
-            let colorRGB = this.colorPalette.mapNormalized(energyNorm);
-
-            const brightness = Math.max(0.15, tone * exposureBoost * (0.8 + 0.4 * intensityFactor) * (0.6 + 0.4 * distanceFactor));
-            colorRGB = this.colorPalette.applyBrightnessToRGB(colorRGB, brightness);
 
             const pixelAlpha = Math.min(0.95, (0.55 + 0.45 * intensityFactor) * Math.pow(Math.max(0, distanceFactor), 0.4));
 

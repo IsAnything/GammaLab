@@ -149,9 +149,31 @@
         .feedback-panel {
             margin-top: 20px;
             padding: 15px;
-            background: rgba(20, 30, 50, 0.8);
+            background: rgba(20, 30, 50, 0.95);
             border-radius: 8px;
-            border: 1px solid var(--accent-cyan);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
+        }
+        
+        /* Make next button very prominent */
+        #nextQuestionBtn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2em;
+            margin-top: 10px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        #nextQuestionBtn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -404,7 +426,7 @@
     <script src="../js/core-simulation.js?v=12"></script>
     <script src="../js/source-profiles.js?v=8"></script>
     <script src="../js/hillas-analysis.js?v=15"></script>
-    <script src="../js/visualization.js?v=20"></script>
+    <script src="../js/visualization.js?v=21"></script>
     <script src="../js/quiz-engine.js?v=12"></script>
     <script src="../js/lightbox.js"></script>
     <!-- Quiz Engine si inizializza automaticamente -->

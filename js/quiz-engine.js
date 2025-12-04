@@ -1476,6 +1476,14 @@ class QuizEngine {
         
         // Show feedback
         this.showFeedback(correct);
+        
+        // Scroll to feedback panel to ensure button is visible
+        setTimeout(() => {
+            const feedbackPanel = document.getElementById('feedbackPanel');
+            if (feedbackPanel) {
+                feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     }
 
     /**
