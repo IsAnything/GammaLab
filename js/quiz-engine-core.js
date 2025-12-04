@@ -649,11 +649,24 @@ class QuizEngine {
      * Inizia il quiz
      */
     startQuiz() {
-        console.log('🚀 Start quiz! (v2.2)');
+        console.log('🚀 Start quiz! (v2.3 DEBUG)');
         
         // Nascondi start screen, mostra quiz screen
         document.getElementById('startScreen').classList.add('hidden');
         document.getElementById('quizScreen').classList.remove('hidden');
+        
+        // DEBUG: Disegna rettangolo verde di test sul canvas ORA che è visibile
+        const testCanvas = document.getElementById('quizCam1');
+        if (testCanvas) {
+            const testCtx = testCanvas.getContext('2d');
+            testCtx.fillStyle = 'lime';
+            testCtx.fillRect(0, 0, testCanvas.width, testCanvas.height);
+            testCtx.fillStyle = 'black';
+            testCtx.font = '24px Arial';
+            testCtx.textAlign = 'center';
+            testCtx.fillText('QUIZ STARTED - TEST OK', testCanvas.width/2, testCanvas.height/2);
+            console.log('🟢 Test post-start: rettangolo verde disegnato');
+        }
         
         // IMPORTANTE: Forza render iniziale del canvas per assicurarsi che sia visibile
         // Questo risolve il problema del canvas vuoto all'avvio
