@@ -729,6 +729,10 @@ class QuizEngine {
         document.getElementById('hintPanel').classList.add('hidden');
         document.getElementById('feedbackPanel').classList.add('hidden');
         
+        // Show options again
+        const optionsPanel = document.getElementById('answerOptions');
+        if (optionsPanel) optionsPanel.style.display = 'grid';
+
         // Abilita bottoni risposta
         document.querySelectorAll('.quiz-option').forEach(btn => {
             btn.disabled = false;
@@ -1639,6 +1643,15 @@ class QuizEngine {
         }
         
         feedbackPanel.classList.remove('hidden');
+        
+        // Hide options to save space and focus on feedback
+        const optionsPanel = document.getElementById('answerOptions');
+        if (optionsPanel) optionsPanel.style.display = 'none';
+        
+        // Hide hints buttons
+        document.getElementById('hint1Btn').style.display = 'none';
+        document.getElementById('hint2Btn').style.display = 'none';
+        document.getElementById('hint3Btn').style.display = 'none';
     }
 
     /**
