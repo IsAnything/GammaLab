@@ -797,9 +797,25 @@ class QuizEngine {
             this.startTimer();
         } catch (error) {
             console.error('❌ Errore in generateQuestion:', error);
-            // Prova a recuperare mostrando i risultati
-            alert('Si è verificato un errore. Il quiz verrà terminato.');
-            this.showResults();
+            console.error('   Stack:', error.stack);
+            
+            // Mostra errore dettagliato nella console ma prova a continuare
+            alert(`Errore: ${error.message}\n\nControlla la console (F12) per dettagli.\n\nProvo a passare alla prossima domanda...`);
+            
+            // Prova a recuperare saltando alla prossima domanda
+            if (this.currentQuestion < QUIZ_CONFIG.totalQuestions) {
+                // Forza tipo domanda semplice
+                this.currentQuestionType = QUESTION_TYPES.SOURCE_IDENTIFICATION;
+                try {
+                    this._generateSourceIdentificationQuestion({ width: 600, height: 600 });
+                    this.startTimer();
+                } catch (e2) {
+                    console.error('❌ Anche il fallback ha fallito:', e2);
+                    this.showResults();
+                }
+            } else {
+                this.showResults();
+            }
         }
     }
     
@@ -1312,10 +1328,10 @@ class QuizEngine {
                     const dy = cy - centerY;
                     const r = Math.sqrt(dx * dx + dy * dy);
                     if (r <= acceptRadiusPx) break;
-                console.log(`🔁 Resampling event for camera 1 (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
-            }
+                    console.log(`🔁 Resampling event for camera 1 (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
+                }
 
-        } while (attempt < maxAttempts);
+            } while (attempt < maxAttempts);
 
         if (event) {
             events.push(event);
