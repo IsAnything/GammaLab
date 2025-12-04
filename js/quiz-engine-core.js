@@ -841,22 +841,28 @@ class QuizEngine {
 
         switch(this.currentQuestionType) {
             case QUESTION_TYPES.THEORETICAL:
+                console.log('📚 Generating THEORETICAL question');
                 this._generateTheoreticalQuestion();
                 break;
             case QUESTION_TYPES.PARTICLE_TYPE:
+                console.log('⚛️ Generating PARTICLE_TYPE question');
                 this._generateParticleTypeQuestion(quizCanvasSize);
                 break;
             case QUESTION_TYPES.ENERGY_LEVEL:
+                console.log('⚡ Generating ENERGY_LEVEL question');
                 this._generateEnergyLevelQuestion(quizCanvasSize);
                 break;
             case QUESTION_TYPES.MUON_DETECTION:
+                console.log('🔵 Generating MUON_DETECTION question');
                 this._generateMuonDetectionQuestion(quizCanvasSize);
                 break;
             case QUESTION_TYPES.SHOWER_SHAPE:
+                console.log('🔷 Generating SHOWER_SHAPE question');
                 this._generateShowerShapeQuestion(quizCanvasSize);
                 break;
             case QUESTION_TYPES.SOURCE_IDENTIFICATION:
             default:
+                console.log('🎯 Generating SOURCE_IDENTIFICATION question');
                 this._generateSourceIdentificationQuestion(quizCanvasSize);
                 break;
         }
@@ -907,13 +913,20 @@ class QuizEngine {
         this.currentTheoreticalQuestion = questionData;
         this.currentCorrectAnswer = questionData.correctAnswer;
         
+        console.log('🧠 Theoretical Question:', questionData.question);
+        console.log('🧠 Options:', questionData.options);
+        
         // MOSTRA il container per domande teoriche
         if (theoreticalContainer) {
             theoreticalContainer.style.display = 'block';
             const questionTextEl = document.getElementById('theoreticalQuestionText');
+            console.log('🧠 questionTextEl found:', !!questionTextEl);
             if (questionTextEl) {
                 questionTextEl.textContent = questionData.question;
+                console.log('🧠 Set question text to:', questionData.question);
             }
+        } else {
+            console.error('❌ theoreticalContainer NOT FOUND!');
         }
         
         // Cambia il titolo delle opzioni
@@ -1021,19 +1034,41 @@ class QuizEngine {
     }
     
     /**
+     * Helper: Reset UI per domande pratiche (mostra simulatore, nascondi box teorico)
+     */
+    _resetUIForPracticalQuestion() {
+        // Nascondi container domande teoriche
+        const theoreticalContainer = document.getElementById('theoreticalQuestionContainer');
+        if (theoreticalContainer) {
+            theoreticalContainer.style.display = 'none';
+        }
+        
+        // Mostra simulatore
+        const simulatorSection = document.querySelector('.simulator-section');
+        if (simulatorSection) {
+            simulatorSection.style.display = '';
+            
+            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
+            if (layoutContainer) layoutContainer.style.display = 'flex';
+            
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
+        }
+        
+        // Mostra hints
+        document.getElementById('hint1Btn').style.display = 'inline-block';
+        document.getElementById('hint2Btn').style.display = 'inline-block';
+        document.getElementById('hint3Btn').style.display = 'inline-block';
+    }
+    
+    /**
      * Domanda: È un gamma o un adrone?
      */
     _generateParticleTypeQuestion(canvasSize) {
-        // Restore title
+        // Reset UI per domanda pratica
+        this._resetUIForPracticalQuestion();
+        
         const simulatorSection = document.querySelector('.simulator-section');
-        if (simulatorSection) {
-            const sectionTitle = simulatorSection.querySelector('h3');
-            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
-            
-            // Ensure layout container is visible
-            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
-            if (layoutContainer) layoutContainer.style.display = 'flex';
-        }
 
         // 50% gamma, 50% hadron
         const isGamma = Math.random() < 0.5;
@@ -1070,16 +1105,8 @@ class QuizEngine {
      * Domanda: Energia alta o bassa?
      */
     _generateEnergyLevelQuestion(canvasSize) {
-        // Restore title
-        const simulatorSection = document.querySelector('.simulator-section');
-        if (simulatorSection) {
-            const sectionTitle = simulatorSection.querySelector('h3');
-            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
-            
-            // Ensure layout container is visible
-            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
-            if (layoutContainer) layoutContainer.style.display = 'flex';
-        }
+        // Reset UI per domanda pratica
+        this._resetUIForPracticalQuestion();
 
         // 50% bassa energia (100-500 GeV), 50% alta energia (2-5 TeV)
         const isHighEnergy = Math.random() < 0.5;
@@ -1106,20 +1133,12 @@ class QuizEngine {
      * Domanda: È un muone?
      */
     _generateMuonDetectionQuestion(canvasSize) {
-        // Restore title
-        const simulatorSection = document.querySelector('.simulator-section');
-        if (simulatorSection) {
-            const sectionTitle = simulatorSection.querySelector('h3');
-            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
-            
-            // Ensure layout container is visible
-            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
-            if (layoutContainer) layoutContainer.style.display = 'flex';
-        }
+        // Reset UI per domanda pratica
+        this._resetUIForPracticalQuestion();
 
         const isMuon = Math.random() < 0.5;
         
-            if (isMuon) {
+        if (isMuon) {
             this._generateAndRenderMuonEvents(canvasSize);
             this.currentCorrectAnswer = 'yes';
         } else {
@@ -1148,16 +1167,8 @@ class QuizEngine {
      * Domanda: Ellisse stretta o larga?
      */
     _generateShowerShapeQuestion(canvasSize) {
-        // Restore title
-        const simulatorSection = document.querySelector('.simulator-section');
-        if (simulatorSection) {
-            const sectionTitle = simulatorSection.querySelector('h3');
-            if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
-            
-            // Ensure layout container is visible
-            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
-            if (layoutContainer) layoutContainer.style.display = 'flex';
-        }
+        // Reset UI per domanda pratica
+        this._resetUIForPracticalQuestion();
 
         const isNarrow = Math.random() < 0.5;
         
