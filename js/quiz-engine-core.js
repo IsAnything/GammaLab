@@ -1088,17 +1088,27 @@ class QuizEngine {
         }
         container.innerHTML = '';
         
+        // Salva riferimento a this per l'event handler
+        const self = this;
+        
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-option';
             btn.setAttribute('data-answer', opt.value);
             btn.textContent = opt.label;
-            btn.addEventListener('click', (e) => {
-                const answer = e.target.dataset.answer;
-                this.submitAnswer(answer);
+            btn.addEventListener('click', function(e) {
+                try {
+                    const answer = this.dataset.answer;
+                    console.log('🖱️ Theoretical answer clicked:', answer);
+                    self.submitAnswer(answer);
+                } catch (err) {
+                    console.error('❌ Error in theoretical click handler:', err);
+                }
             });
             container.appendChild(btn);
         });
+        
+        console.log('✅ Theoretical options set:', options.length, 'options');
     }
     
     /**
@@ -1510,19 +1520,33 @@ class QuizEngine {
      */
     _setAnswerOptions(options) {
         const container = document.getElementById('answerOptions');
+        if (!container) {
+            console.error('❌ answerOptions container not found!');
+            return;
+        }
         container.innerHTML = '';
+        
+        // Salva riferimento a this per l'event handler
+        const self = this;
         
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-option';
             btn.setAttribute('data-answer', opt.value);
             btn.textContent = opt.label;
-            btn.addEventListener('click', (e) => {
-                const answer = e.target.dataset.answer;
-                this.submitAnswer(answer);
+            btn.addEventListener('click', function(e) {
+                try {
+                    const answer = this.dataset.answer;
+                    console.log('🖱️ Practical answer clicked:', answer);
+                    self.submitAnswer(answer);
+                } catch (err) {
+                    console.error('❌ Error in practical click handler:', err);
+                }
             });
             container.appendChild(btn);
         });
+        
+        console.log('✅ Practical options set:', options.length, 'options');
     }
 
     /**
@@ -1628,23 +1652,29 @@ class QuizEngine {
      */
     submitAnswer(answer) {
         console.log(`📤 Risposta: ${answer}`);
+        console.log(`   currentCorrectAnswer: ${this.currentCorrectAnswer}`);
+        console.log(`   currentQuestionType: ${this.currentQuestionType}`);
         
         // Stop timer
         this.stopTimer();
         const timeSpent = QUIZ_CONFIG.timeLimit - this.timeRemaining;
         
-        // Disabilita bottoni risposta
+        // Disabilita bottoni risposta (entrambi i container)
         document.querySelectorAll('.quiz-option').forEach(btn => {
             btn.disabled = true;
         });
         
         // Nascondi bottoni hint (non servono più dopo aver risposto)
-        document.getElementById('hint1Btn').style.display = 'none';
-        document.getElementById('hint2Btn').style.display = 'none';
-        document.getElementById('hint3Btn').style.display = 'none';
+        const hint1 = document.getElementById('hint1Btn');
+        const hint2 = document.getElementById('hint2Btn');
+        const hint3 = document.getElementById('hint3Btn');
+        if (hint1) hint1.style.display = 'none';
+        if (hint2) hint2.style.display = 'none';
+        if (hint3) hint3.style.display = 'none';
         
-        // Check correct (usa currentCorrectAnswer invece di currentProfile.type)
+        // Check correct (usa currentCorrectAnswer)
         const correct = (answer === this.currentCorrectAnswer);
+        console.log(`   Confronto: "${answer}" === "${this.currentCorrectAnswer}" => ${correct}`);
         
         // Calculate points
         let points = 0;
