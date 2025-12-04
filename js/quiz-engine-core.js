@@ -875,12 +875,14 @@ class QuizEngine {
     _generateTheoreticalQuestion() {
         // Nascondi completamente la sezione simulatore per domande teoriche
         const simulatorSection = document.querySelector('.simulator-section');
+        const quizMainLayout = document.querySelector('.quiz-main-layout');
+        const theoreticalContainer = document.getElementById('theoreticalQuestionContainer');
         
-        if (simulatorSection) {
-            // NASCONDI COMPLETAMENTE il simulatore (canvas, info box, tutto)
-            simulatorSection.style.display = 'none';
+        if (quizMainLayout) {
+            // NASCONDI COMPLETAMENTE il layout con simulatore
+            quizMainLayout.style.display = 'none';
         }
-
+        
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
         if (typeof this.theoreticalQuestionIndex === 'undefined') {
             this.theoreticalQuestionIndex = 0;
@@ -906,18 +908,13 @@ class QuizEngine {
         this.currentTheoreticalQuestion = questionData;
         this.currentCorrectAnswer = questionData.correctAnswer;
         
-        // Update UI - Mostra la domanda in modo prominente
-        const instructionEl = document.getElementById('quizInstruction');
-        
-        if (instructionEl) {
-            instructionEl.innerHTML = `<div class="theoretical-question">
-                <span class="theory-icon">🧠</span>
-                <span class="theory-label">Domanda Teorica</span>
-                <p class="theory-text">${questionData.question}</p>
-            </div>`;
-            instructionEl.style.display = 'block';
-            instructionEl.style.textAlign = 'center';
-            instructionEl.style.padding = '20px';
+        // MOSTRA il container per domande teoriche
+        if (theoreticalContainer) {
+            theoreticalContainer.style.display = 'block';
+            const questionTextEl = document.getElementById('theoreticalQuestionText');
+            if (questionTextEl) {
+                questionTextEl.textContent = questionData.question;
+            }
         }
         
         // Set options
@@ -936,10 +933,21 @@ class QuizEngine {
         console.log('🎯 _generateSourceIdentificationQuestion CALLED');
         console.log('   canvasSize:', canvasSize);
         
-        // Ripristina visibilità elementi simulatore (nascosti in domande teoriche)
+        // NASCONDI il container per domande teoriche
+        const theoreticalContainer = document.getElementById('theoreticalQuestionContainer');
+        if (theoreticalContainer) {
+            theoreticalContainer.style.display = 'none';
+        }
+        
+        // MOSTRA il layout con simulatore
+        const quizMainLayout = document.querySelector('.quiz-main-layout');
+        if (quizMainLayout) {
+            quizMainLayout.style.display = 'flex';
+        }
+        
+        // Ripristina visibilità elementi simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
-            // MOSTRA il simulatore
             simulatorSection.style.display = '';
             
             const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
@@ -953,6 +961,7 @@ class QuizEngine {
         // Reset instruction element
         const instructionEl = document.getElementById('quizInstruction');
         if (instructionEl) {
+            instructionEl.textContent = 'Analizza le immagini Cherenkov e i parametri di Hillas per identificare la sorgente.';
             instructionEl.style.textAlign = '';
             instructionEl.style.padding = '';
             instructionEl.style.color = '';
