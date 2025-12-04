@@ -870,8 +870,8 @@ class CanvasRenderer {
         }
 
         let sumW = 0;
-        let sumX = 0;
-        let sumY = 0;
+        let sumXX = 0;
+        let sumYY = 0;
         let sumXY = 0;
 
         tracks.forEach(track => {
