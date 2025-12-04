@@ -2235,18 +2235,31 @@ class QuizEngine {
 let quizEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Caricamento Quiz Engine... v2.6 (FIX VISUAL)');
+    console.log('🎮 Caricamento Quiz Engine... v2.7 (DEBUG CANVAS)');
+    
+    // TEST IMMEDIATO: Disegna qualcosa sul canvas per verificare che funzioni
+    const testCanvas = document.getElementById('quizCam1');
+    if (testCanvas) {
+        console.log('✅ Canvas trovato:', testCanvas.width, 'x', testCanvas.height);
+        const testCtx = testCanvas.getContext('2d');
+        if (testCtx) {
+            // Disegna un rettangolo rosso di test
+            testCtx.fillStyle = 'red';
+            testCtx.fillRect(0, 0, testCanvas.width, testCanvas.height);
+            testCtx.fillStyle = 'white';
+            testCtx.font = '30px Arial';
+            testCtx.textAlign = 'center';
+            testCtx.fillText('CANVAS TEST OK', testCanvas.width/2, testCanvas.height/2);
+            console.log('🔴 Test canvas: rettangolo rosso disegnato');
+        } else {
+            console.error('❌ Impossibile ottenere context 2D!');
+        }
+    } else {
+        console.error('❌ Canvas quizCam1 non trovato!');
+    }
     
     if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
         console.error('❌ THEORETICAL_QUESTIONS not loaded or empty!');
-    }
-
-    // Verifica che i canvas esistano
-    const quizCanvas = document.getElementById('quizCam1');
-    if (!quizCanvas) {
-        console.error('❌ Canvas quizCam1 non trovato!');
-    } else {
-        console.log('✅ Canvas trovato:', quizCanvas.width, 'x', quizCanvas.height);
     }
 
     quizEngine = new QuizEngine();
