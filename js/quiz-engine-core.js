@@ -649,32 +649,20 @@ class QuizEngine {
      * Inizia il quiz
      */
     startQuiz() {
-        console.log('🚀 Start quiz! (v2.3 DEBUG)');
+        console.log('🚀 Start quiz! (v2.4)');
         
         // Nascondi start screen, mostra quiz screen
         document.getElementById('startScreen').classList.add('hidden');
         document.getElementById('quizScreen').classList.remove('hidden');
-        
-        // DEBUG: Disegna rettangolo verde di test sul canvas ORA che è visibile
-        const testCanvas = document.getElementById('quizCam1');
-        if (testCanvas) {
-            const testCtx = testCanvas.getContext('2d');
-            testCtx.fillStyle = 'lime';
-            testCtx.fillRect(0, 0, testCanvas.width, testCanvas.height);
-            testCtx.fillStyle = 'black';
-            testCtx.font = '24px Arial';
-            testCtx.textAlign = 'center';
-            testCtx.fillText('QUIZ STARTED - TEST OK', testCanvas.width/2, testCanvas.height/2);
-            console.log('🟢 Test post-start: rettangolo verde disegnato');
-        }
         
         // IMPORTANTE: Forza render iniziale del canvas per assicurarsi che sia visibile
         // Questo risolve il problema del canvas vuoto all'avvio
         this.renderers.forEach(renderer => {
             if (renderer && renderer.clear) {
                 renderer.lightStyle = true;
+                renderer.suppressNoise = false;
                 renderer.clear();
-                console.log('🎨 Canvas inizializzato:', renderer.canvas?.id);
+                console.log('🎨 Canvas inizializzato:', renderer.canvas?.id, 'dimensioni:', renderer.canvas?.width, 'x', renderer.canvas?.height);
             }
         });
         
@@ -700,23 +688,12 @@ class QuizEngine {
         
         // Genera piano domande casuale (10 domande)
         this.sessionPlan = this._generateSessionPlan(QUIZ_CONFIG.totalQuestions);
-        console.log('📋 Piano sessione:', this.sessionPlan);
+        console.log('📋 Piano sessione originale:', this.sessionPlan);
         
-        // FORZA LA PRIMA DOMANDA A ESSERE PRATICA (non teorica)
+        // FORZA LA PRIMA DOMANDA A ESSERE SOURCE_IDENTIFICATION (con tracce visibili)
         // Questo assicura che l'utente veda subito un evento visuale
-        if (this.sessionPlan[0] === QUESTION_TYPES.THEORETICAL) {
-            // Trova la prima domanda pratica e scambiala con la prima
-            const firstPracticalIdx = this.sessionPlan.findIndex(t => t !== QUESTION_TYPES.THEORETICAL);
-            if (firstPracticalIdx > 0) {
-                const temp = this.sessionPlan[0];
-                this.sessionPlan[0] = this.sessionPlan[firstPracticalIdx];
-                this.sessionPlan[firstPracticalIdx] = temp;
-                console.log('📋 Prima domanda scambiata: teorica → pratica');
-            } else {
-                // Se non ci sono domande pratiche, forza SOURCE_IDENTIFICATION
-                this.sessionPlan[0] = QUESTION_TYPES.SOURCE_IDENTIFICATION;
-            }
-        }
+        this.sessionPlan[0] = QUESTION_TYPES.SOURCE_IDENTIFICATION;
+        console.log('📋 Prima domanda FORZATA a SOURCE_IDENTIFICATION');
         console.log('📋 Piano finale:', this.sessionPlan);
         
         // Seleziona domande teoriche necessarie per questa sessione
@@ -795,9 +772,11 @@ class QuizEngine {
         
         // Determina tipo di domanda basato su progressione
         this.currentQuestionType = this._selectQuestionType();
+        console.log('🔍 Tipo domanda selezionato:', this.currentQuestionType);
         
         // Genera evento basato sul tipo di domanda
         this._generateQuestionByType();
+        console.log('✅ Domanda generata, tipo:', this.currentQuestionType);
         
         // Start timer
         this.startTimer();
@@ -808,6 +787,7 @@ class QuizEngine {
      */
     _selectQuestionType() {
         const questionIndex = this.currentQuestion - 1;
+        console.log('📊 _selectQuestionType: questionIndex =', questionIndex, 'sessionPlan =', this.sessionPlan);
         
         // Usa il piano generato per questa sessione
         if (this.sessionPlan && this.sessionPlan[questionIndex]) {
@@ -817,6 +797,7 @@ class QuizEngine {
         }
         
         // Fallback (non dovrebbe accadere)
+        console.log('⚠️ Fallback a SOURCE_IDENTIFICATION');
         return QUESTION_TYPES.SOURCE_IDENTIFICATION;
     }
     
@@ -2248,27 +2229,14 @@ class QuizEngine {
 let quizEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Caricamento Quiz Engine... v2.7 (DEBUG CANVAS)');
+    console.log('🎮 Caricamento Quiz Engine... v2.8');
     
-    // TEST IMMEDIATO: Disegna qualcosa sul canvas per verificare che funzioni
-    const testCanvas = document.getElementById('quizCam1');
-    if (testCanvas) {
-        console.log('✅ Canvas trovato:', testCanvas.width, 'x', testCanvas.height);
-        const testCtx = testCanvas.getContext('2d');
-        if (testCtx) {
-            // Disegna un rettangolo rosso di test
-            testCtx.fillStyle = 'red';
-            testCtx.fillRect(0, 0, testCanvas.width, testCanvas.height);
-            testCtx.fillStyle = 'white';
-            testCtx.font = '30px Arial';
-            testCtx.textAlign = 'center';
-            testCtx.fillText('CANVAS TEST OK', testCanvas.width/2, testCanvas.height/2);
-            console.log('🔴 Test canvas: rettangolo rosso disegnato');
-        } else {
-            console.error('❌ Impossibile ottenere context 2D!');
-        }
-    } else {
+    // Verifica che i canvas esistano
+    const quizCanvas = document.getElementById('quizCam1');
+    if (!quizCanvas) {
         console.error('❌ Canvas quizCam1 non trovato!');
+    } else {
+        console.log('✅ Canvas trovato:', quizCanvas.width, 'x', quizCanvas.height);
     }
     
     if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
