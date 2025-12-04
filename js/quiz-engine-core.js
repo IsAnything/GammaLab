@@ -743,52 +743,64 @@ class QuizEngine {
      * Genera nuova domanda
      */
     generateQuestion() {
-        this.currentQuestion++;
-        
-        // Update UI
-        document.getElementById('questionNumber').textContent = 
-            `${this.currentQuestion}/${QUIZ_CONFIG.totalQuestions}`;
-        
-        // Reset hint state
-        this.currentHintLevel = 0;
-        document.getElementById('hint1Btn').disabled = false;
-        document.getElementById('hint1Btn').style.display = 'inline-block';
-        document.getElementById('hint2Btn').disabled = true;
-        document.getElementById('hint2Btn').style.display = 'inline-block';
-        document.getElementById('hint3Btn').disabled = true;
-        document.getElementById('hint3Btn').style.display = 'inline-block';
-        document.getElementById('hintPanel').classList.add('hidden');
-        document.getElementById('feedbackPanel').classList.add('hidden');
-        
-        // Reset anche il feedback teorico
-        const theoreticalFeedback = document.getElementById('theoreticalFeedbackPanel');
-        if (theoreticalFeedback) {
-            theoreticalFeedback.classList.add('hidden');
-        }
-        
-        // Show options again (sia pratiche che teoriche)
-        const optionsPanel = document.getElementById('answerOptions');
-        if (optionsPanel) optionsPanel.style.display = 'grid';
-        
-        const theoreticalOptions = document.getElementById('theoreticalAnswerOptions');
-        if (theoreticalOptions) theoreticalOptions.style.display = 'flex';
+        try {
+            this.currentQuestion++;
+            
+            // Update UI
+            const questionNum = document.getElementById('questionNumber');
+            if (questionNum) {
+                questionNum.textContent = `${this.currentQuestion}/${QUIZ_CONFIG.totalQuestions}`;
+            }
+            
+            // Reset hint state
+            this.currentHintLevel = 0;
+            const hint1 = document.getElementById('hint1Btn');
+            const hint2 = document.getElementById('hint2Btn');
+            const hint3 = document.getElementById('hint3Btn');
+            const hintPanel = document.getElementById('hintPanel');
+            const feedbackPanel = document.getElementById('feedbackPanel');
+            
+            if (hint1) { hint1.disabled = false; hint1.style.display = 'inline-block'; }
+            if (hint2) { hint2.disabled = true; hint2.style.display = 'inline-block'; }
+            if (hint3) { hint3.disabled = true; hint3.style.display = 'inline-block'; }
+            if (hintPanel) hintPanel.classList.add('hidden');
+            if (feedbackPanel) feedbackPanel.classList.add('hidden');
+            
+            // Reset anche il feedback teorico
+            const theoreticalFeedback = document.getElementById('theoreticalFeedbackPanel');
+            if (theoreticalFeedback) {
+                theoreticalFeedback.classList.add('hidden');
+            }
+            
+            // Show options again (sia pratiche che teoriche)
+            const optionsPanel = document.getElementById('answerOptions');
+            if (optionsPanel) optionsPanel.style.display = 'grid';
+            
+            const theoreticalOptions = document.getElementById('theoreticalAnswerOptions');
+            if (theoreticalOptions) theoreticalOptions.style.display = 'flex';
 
-        // Abilita bottoni risposta (entrambi i container)
-        document.querySelectorAll('.quiz-option').forEach(btn => {
-            btn.disabled = false;
-            btn.classList.remove('correct', 'incorrect');
-        });
-        
-        // Determina tipo di domanda basato su progressione
-        this.currentQuestionType = this._selectQuestionType();
-        console.log('🔍 Tipo domanda selezionato:', this.currentQuestionType);
-        
-        // Genera evento basato sul tipo di domanda
-        this._generateQuestionByType();
-        console.log('✅ Domanda generata, tipo:', this.currentQuestionType);
-        
-        // Start timer
-        this.startTimer();
+            // Abilita bottoni risposta (entrambi i container)
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect');
+            });
+            
+            // Determina tipo di domanda basato su progressione
+            this.currentQuestionType = this._selectQuestionType();
+            console.log('🔍 Tipo domanda selezionato:', this.currentQuestionType);
+            
+            // Genera evento basato sul tipo di domanda
+            this._generateQuestionByType();
+            console.log('✅ Domanda generata, tipo:', this.currentQuestionType);
+            
+            // Start timer
+            this.startTimer();
+        } catch (error) {
+            console.error('❌ Errore in generateQuestion:', error);
+            // Prova a recuperare mostrando i risultati
+            alert('Si è verificato un errore. Il quiz verrà terminato.');
+            this.showResults();
+        }
     }
     
     /**
@@ -1586,10 +1598,12 @@ class QuizEngine {
      */
     updateTimerDisplay() {
         const timerEl = document.getElementById('timer');
-        timerEl.textContent = this.timeRemaining;
-        
-        if (this.timeRemaining > 10) {
-            timerEl.classList.remove('warning');
+        if (timerEl) {
+            timerEl.textContent = this.timeRemaining;
+            
+            if (this.timeRemaining > 10) {
+                timerEl.classList.remove('warning');
+            }
         }
     }
 
@@ -1615,9 +1629,12 @@ class QuizEngine {
         });
         
         // Nascondi bottoni hint (tempo scaduto)
-        document.getElementById('hint1Btn').style.display = 'none';
-        document.getElementById('hint2Btn').style.display = 'none';
-        document.getElementById('hint3Btn').style.display = 'none';
+        const h1 = document.getElementById('hint1Btn');
+        const h2 = document.getElementById('hint2Btn');
+        const h3 = document.getElementById('hint3Btn');
+        if (h1) h1.style.display = 'none';
+        if (h2) h2.style.display = 'none';
+        if (h3) h3.style.display = 'none';
         
         // Mostra risposta corretta
         const correctBtn = document.querySelector(`.quiz-option[data-answer="${this.currentCorrectAnswer}"]`);
@@ -1945,17 +1962,21 @@ class QuizEngine {
         
         // Hide hints buttons (solo per domande pratiche)
         if (!isTheoretical) {
-            document.getElementById('hint1Btn').style.display = 'none';
-            document.getElementById('hint2Btn').style.display = 'none';
-            document.getElementById('hint3Btn').style.display = 'none';
+            const h1 = document.getElementById('hint1Btn');
+            const h2 = document.getElementById('hint2Btn');
+            const h3 = document.getElementById('hint3Btn');
+            if (h1) h1.style.display = 'none';
+            if (h2) h2.style.display = 'none';
+            if (h3) h3.style.display = 'none';
         }
         
         // Setup next button event listener per il container corretto
         const nextBtn = document.getElementById(nextBtnId);
         if (nextBtn) {
             // Rimuovi listener precedenti e aggiungi nuovo
-            nextBtn.replaceWith(nextBtn.cloneNode(true));
-            document.getElementById(nextBtnId).addEventListener('click', () => {
+            const newBtn = nextBtn.cloneNode(true);
+            nextBtn.replaceWith(newBtn);
+            newBtn.addEventListener('click', () => {
                 this.nextQuestion();
             });
         }
