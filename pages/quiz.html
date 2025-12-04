@@ -8,52 +8,51 @@
     <style>
         /* Compact Quiz Layout */
         body {
-            overflow-y: auto; /* Allow scroll if needed but try to fit */
+            overflow-y: auto;
         }
 
-        /* Layout principale del quiz: Header in alto, contenuto sotto */
+        /* Layout principale del quiz */
         #quizScreen {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 140px); /* Altezza viewport meno header/footer stimati */
+            /* Remove fixed height to avoid clipping and overlap */
             min-height: 600px;
+            padding-bottom: 40px;
         }
 
         .quiz-header {
-            flex: 0 0 auto; /* Altezza fissa */
+            flex: 0 0 auto;
             margin-bottom: 10px;
         }
 
         /* Wrapper per mettere simulatore e controlli affiancati */
         .quiz-main-layout {
             display: flex;
-            flex: 1;
-            gap: 16px;
-            overflow: hidden; /* Contiene lo scroll interno */
-            align-items: stretch;
+            flex-direction: row;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
 
         /* Sezione Simulatore (Sinistra) */
         .simulator-section {
-            flex: 1;
+            flex: 1 1 500px; /* Grow, shrink, basis */
             display: flex;
             flex-direction: column;
             margin-bottom: 0 !important;
-            overflow-y: auto;
-            min-width: 0; /* Fix flexbox overflow */
+            min-width: 300px;
         }
 
         .quiz-layout-container {
-            flex: 1;
             display: flex;
             gap: 16px;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            height: 100%;
+            flex-wrap: wrap;
         }
 
         .camera-container {
-            flex: 0 1 auto !important;
+            flex: 0 0 350px; /* Fixed width for camera container */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -62,79 +61,97 @@
 
         .canvas-wrapper {
             position: relative;
-            width: 100%;
-            max-width: 500px; /* Limite massimo larghezza */
-            aspect-ratio: 1/1;
+            width: 350px; /* Explicit width */
+            height: 350px; /* Explicit height */
             margin: 0 auto;
         }
 
-        /* Importante: forza il canvas a stare nel contenitore e non eccedere l'altezza disponibile */
         .camera-canvas, .overlay-canvas {
             width: 100% !important;
             height: 100% !important;
             object-fit: contain;
+            /* Force a background color in case JS fails to draw immediately */
+            background: #0a0e1a; 
         }
 
         /* Sezione Controlli/Risposte (Destra) */
         .quiz-controls-card {
-            flex: 0 0 350px; /* Larghezza fissa per i controlli */
+            flex: 0 0 350px; /* Fixed width */
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
             margin-bottom: 0 !important;
+            /* Sticky positioning for desktop */
+            position: sticky;
+            top: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .quiz-options {
             display: grid;
-            grid-template-columns: 1fr; /* Una colonna per risparmiare spazio orizzontale nella colonna destra */
+            grid-template-columns: 1fr;
             gap: 8px;
         }
 
         .quiz-option {
-            padding: 10px;
-            font-size: 0.95em;
+            padding: 12px;
+            font-size: 1em;
+            text-align: left;
         }
 
         /* Info box dentro il simulatore */
         .quiz-info-box {
-            font-size: 0.9em;
-            padding: 12px !important;
+            font-size: 0.95em;
+            padding: 16px !important;
+            flex: 1;
+            min-width: 250px;
         }
 
         /* Adattamento per schermi piccoli */
         @media (max-width: 1000px) {
-            #quizScreen {
-                height: auto;
-                display: block;
-            }
-            
             .quiz-main-layout {
                 flex-direction: column;
-                overflow: visible;
             }
 
             .quiz-controls-card {
                 flex: 1;
                 width: 100%;
+                position: static; /* Disable sticky on mobile */
+                max-height: none;
             }
 
             .quiz-options {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .camera-container {
+                flex: 1;
+                width: 100%;
             }
             
             .canvas-wrapper {
-                max-height: 40vh;
+                width: 100%;
+                max-width: 350px;
+                height: auto;
+                aspect-ratio: 1/1;
             }
         }
         
-        /* Nascondi header/footer standard quando in modalità quiz attivo per guadagnare spazio? 
-           No, manteniamo la navigazione ma riduciamo i margini */
         .quiz-container {
             padding-top: 10px;
-            padding-bottom: 10px;
-            max-width: 100% !important; /* Usa tutta la larghezza */
+            padding-bottom: 40px;
+            max-width: 100% !important;
             padding-left: 20px;
             padding-right: 20px;
+        }
+        
+        /* Ensure feedback panel is visible */
+        .feedback-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(20, 30, 50, 0.8);
+            border-radius: 8px;
+            border: 1px solid var(--accent-cyan);
         }
     </style>
 </head>
@@ -387,7 +404,7 @@
     <script src="../js/core-simulation.js?v=12"></script>
     <script src="../js/source-profiles.js?v=8"></script>
     <script src="../js/hillas-analysis.js?v=15"></script>
-    <script src="../js/visualization.js?v=19"></script>
+    <script src="../js/visualization.js?v=20"></script>
     <script src="../js/quiz-engine.js?v=12"></script>
     <script src="../js/lightbox.js"></script>
     <!-- Quiz Engine si inizializza automaticamente -->

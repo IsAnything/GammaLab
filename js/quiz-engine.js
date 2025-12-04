@@ -521,6 +521,8 @@ class QuizEngine {
             }
             renderer.colorPalette = this.colorPalette;
             renderer.lightStyle = true; // Nuovo stile chiaro
+            // Force clear to set background immediately
+            if (renderer.clear) renderer.clear();
             // In quiz vogliamo che le ellissi siano geometricamente aderenti
             renderer.respectExactHillas = true;
             renderer.subpixelEnabled = false;
