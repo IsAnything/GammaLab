@@ -790,6 +790,16 @@ class QuizEngine {
             }
         }
 
+        // Reset question title visibility
+        const questionTitle = document.getElementById('questionTitle');
+        if (questionTitle) {
+            if (this.currentQuestionType === QUESTION_TYPES.SOURCE_IDENTIFICATION) {
+                questionTitle.style.display = 'block';
+            } else {
+                questionTitle.style.display = 'none';
+            }
+        }
+
         switch(this.currentQuestionType) {
             case QUESTION_TYPES.THEORETICAL:
                 this._generateTheoreticalQuestion();
