@@ -141,7 +141,7 @@ const BLAZAR_PROFILE = {
     signatureHint: 'Ago di luce: traccia sottilissima, stabile e con nucleo accecante.',
     
     length: { min: 0.14, max: 0.24 },  // Leggermente più lungo per enfatizzare l'ago
-    width: { min: 0.04, max: 0.07 },   // Aumentato leggermente per stabilità Hillas
+    width: { min: 0.05, max: 0.09 },   // Aumentato per stabilità Hillas
     size: { min: 1000, max: 1800 },    // Luminoso
     alpha: { 
         type: 'peaked',
@@ -156,14 +156,14 @@ const BLAZAR_PROFILE = {
         dispersionScaleX: 0.02, // Quasi nessuna dispersione
         dispersionScaleY: 0.02,
         lengthScale: 0.90,
-        widthScale: 0.30,       // Molto sottile
+        widthScale: 0.60,       // Aumentato da 0.30 per visibilità e stabilità
         alphaNoiseScale: 0.05,
         spineTightening: 0.15,  // Spina dorsale molto definita
         tailStrength: 0.05,
         tailDecay: 0.90,
         centralCoreBoost: true,
         hotspotCount: 1,        // Singolo core
-        hotspotSpread: 0.08,    // Aumentato da 0.05 per evitare cleaning eccessivo
+        hotspotSpread: 0.15,    // Aumentato da 0.08 per evitare cleaning eccessivo
         hotspotFill: 0.70,      // Core denso
         hotspotBoost: 2.00,     // Ridotto da 2.50 per evitare picchi singoli
         intensityVariance: 0.05, // Molto stabile

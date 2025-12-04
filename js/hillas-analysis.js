@@ -6,7 +6,7 @@
 
 // === COSTANTI ===
 // PIXEL_TO_DEGREE definito in core-simulation.js (0.01)
-const MIN_PHOTONS = 30; // Minimo fotoni per analisi valida (ridotto per Blazar)
+const MIN_PHOTONS = 20; // Minimo fotoni per analisi valida (ridotto per Blazar)
 const CLEANING_THRESHOLD = 0.2; // Soglia intensità per cleaning (ridotta per non tagliare code)
 
 // === CLASSE HILLAS ANALYZER ===
@@ -263,7 +263,7 @@ class HillasAnalyzer {
             validated.warnings.push('Length fuori range fisico');
         }
 
-        if (params.width < 0.02 || params.width > 0.5) {
+        if (params.width < 0.01 || params.width > 0.5) { // Ridotto min width a 0.01 per Blazar
             validated.warnings.push('Width fuori range fisico');
         }
 
@@ -271,8 +271,8 @@ class HillasAnalyzer {
             validated.warnings.push('Size fuori range tipico');
         }
 
-        // Elongation aumentata per accettare tracce gamma molto allungate (fino a 50:1)
-        if (params.elongation < 1.0 || params.elongation > 50) {
+        // Elongation aumentata per accettare tracce gamma molto allungate (fino a 100:1)
+        if (params.elongation < 1.0 || params.elongation > 100) {
             validated.warnings.push('Elongation anomala');
             validated.valid = false;
         }
