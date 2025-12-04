@@ -681,6 +681,7 @@ table tr:hover {
   transition: all 0.3s ease;
   text-align: center;
   font-weight: 600;
+  color: var(--text-primary); /* Fix per leggibilità su mobile */
 }
 
 .quiz-option:hover {
