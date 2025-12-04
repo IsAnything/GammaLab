@@ -648,7 +648,7 @@ class QuizEngine {
      * Inizia il quiz
      */
     startQuiz() {
-        console.log('🚀 Start quiz!');
+        console.log('🚀 Start quiz! (v2.1)');
         
         // Nascondi start screen, mostra quiz screen
         document.getElementById('startScreen').classList.add('hidden');
@@ -676,6 +676,7 @@ class QuizEngine {
         
         // Genera piano domande casuale (10 domande)
         this.sessionPlan = this._generateSessionPlan(QUIZ_CONFIG.totalQuestions);
+        console.log('📋 Piano sessione:', this.sessionPlan);
         
         // Seleziona domande teoriche necessarie per questa sessione
         const theoreticalCount = this.sessionPlan.filter(t => t === QUESTION_TYPES.THEORETICAL).length;
