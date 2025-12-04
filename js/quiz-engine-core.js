@@ -1067,13 +1067,11 @@ class QuizEngine {
     _generateParticleTypeQuestion(canvasSize) {
         // Reset UI per domanda pratica
         this._resetUIForPracticalQuestion();
-        
-        const simulatorSection = document.querySelector('.simulator-section');
 
         // 50% gamma, 50% hadron
         const isGamma = Math.random() < 0.5;
         
-            if (isGamma) {
+        if (isGamma) {
             // Usa una sorgente gamma qualsiasi (escludi hadron)
             const gammaProfiles = [
                 SOURCE_PROFILES.crab,
@@ -1081,9 +1079,14 @@ class QuizEngine {
                 SOURCE_PROFILES.blazar,
                 SOURCE_PROFILES.grb,
                 SOURCE_PROFILES['galactic-center']
-            ];
+            ].filter(p => p); // Filtra eventuali undefined
+            
+            if (gammaProfiles.length === 0) {
+                console.error('❌ No gamma profiles available!');
+                return;
+            }
+            
             this.currentProfile = gammaProfiles[Math.floor(Math.random() * gammaProfiles.length)];
-            // If quizGammaOnly is enabled, ask for onlyGamma images (no hadron/muon, no noise)
             this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
             this.currentCorrectAnswer = 'gamma';
         } else {
@@ -1196,45 +1199,53 @@ class QuizEngine {
      * Genera e renderizza eventi per una sorgente
      */
     _generateAndRenderEvents(profile, canvasSize, customParams = null) {
-        const sourceType = profile.type;
-        this.renderers.forEach(renderer => {
-            renderer.sourceType = sourceType;
-            renderer.lightStyle = true; // Assicura stile chiaro per il quiz
-            // NON sopprimere il rumore per garantire che qualcosa sia sempre visibile
-            // Anche se l'evento è debole, il background deve apparire
-            renderer.suppressNoise = false;
-        });
-        
-        const events = [];
-        this.currentHillasParams = [];
-        
-        // Use only 1 camera (index 0)
-        let event = null;
-        let hillas = null;
-        const maxAttempts = 8;
-        let attempt = 0;
+        try {
+            if (!profile) {
+                console.error('❌ _generateAndRenderEvents: profile è null/undefined!');
+                return;
+            }
+            
+            console.log('🎨 _generateAndRenderEvents:', profile.type, 'canvasSize:', canvasSize);
+            
+            const sourceType = profile.type;
+            this.renderers.forEach(renderer => {
+                renderer.sourceType = sourceType;
+                renderer.lightStyle = true;
+                renderer.suppressNoise = false;
+            });
+            
+            const events = [];
+            this.currentHillasParams = [];
+            
+            let event = null;
+            let hillas = null;
+            const maxAttempts = 8;
+            let attempt = 0;
 
-        // If caller requested forceCenter, try resampling events until CoG is near camera center
-        // BUT do not force centering for hadronic or muonic events (their CoG can legitimately be far)
-        const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
-        const acceptRadiusPx = 80; // Accept if CoG within 80 px of center (aumentato da 12)
+            const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
+            const acceptRadiusPx = 80;
 
-        do {
-            event = this.engine.generateEvent(profile, 1, canvasSize, customParams);
-            hillas = this.hillasAnalyzer.analyze(event);
-            attempt++;
+            do {
+                event = this.engine.generateEvent(profile, 1, canvasSize, customParams);
+                if (!event) {
+                    console.error('❌ generateEvent returned null at attempt', attempt + 1);
+                    attempt++;
+                    continue;
+                }
+                hillas = this.hillasAnalyzer.analyze(event);
+                attempt++;
 
-            if (!wantCentered) break; // no need to resample
+                if (!wantCentered) break;
 
-            if (hillas && hillas.valid) {
-                const cx = hillas.cogX;
-                const cy = hillas.cogY;
-                const centerX = (canvasSize && canvasSize.width) ? canvasSize.width / 2 : 300;
-                const centerY = (canvasSize && canvasSize.height) ? canvasSize.height / 2 : 300;
-                const dx = cx - centerX;
-                const dy = cy - centerY;
-                const r = Math.sqrt(dx * dx + dy * dy);
-                if (r <= acceptRadiusPx) break; // acceptable
+                if (hillas && hillas.valid) {
+                    const cx = hillas.cogX;
+                    const cy = hillas.cogY;
+                    const centerX = (canvasSize && canvasSize.width) ? canvasSize.width / 2 : 300;
+                    const centerY = (canvasSize && canvasSize.height) ? canvasSize.height / 2 : 300;
+                    const dx = cx - centerX;
+                    const dy = cy - centerY;
+                    const r = Math.sqrt(dx * dx + dy * dy);
+                    if (r <= acceptRadiusPx) break;
                 console.log(`🔁 Resampling event for camera 1 (attempt ${attempt}) - CoG dist ${r.toFixed(1)} px > ${acceptRadiusPx}px`);
             }
 
@@ -1292,6 +1303,11 @@ class QuizEngine {
         
         this.currentEvent = events;
         this._updateInfoBox(hillas, 'gamma', event);
+        
+        } catch (e) {
+            console.error('❌ Errore in _generateAndRenderEvents:', e.message);
+            console.error('Stack:', e.stack);
+        }
     }
     
     /**
@@ -2268,22 +2284,46 @@ class QuizEngine {
 let quizEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Caricamento Quiz Engine... v2.8');
-    
-    // Verifica che i canvas esistano
-    const quizCanvas = document.getElementById('quizCam1');
-    if (!quizCanvas) {
-        console.error('❌ Canvas quizCam1 non trovato!');
-    } else {
+    try {
+        console.log('🎮 Caricamento Quiz Engine... v2.9');
+        
+        // Verifica dipendenze
+        if (typeof SOURCE_PROFILES === 'undefined') {
+            console.error('❌ SOURCE_PROFILES non definito! Verifica che source-profiles.js sia caricato.');
+            return;
+        }
+        console.log('✅ SOURCE_PROFILES disponibile, keys:', Object.keys(SOURCE_PROFILES));
+        
+        if (typeof SimulationEngine === 'undefined') {
+            console.error('❌ SimulationEngine non definito! Verifica che core-simulation.js sia caricato.');
+            return;
+        }
+        console.log('✅ SimulationEngine disponibile');
+        
+        if (typeof CanvasRenderer === 'undefined') {
+            console.error('❌ CanvasRenderer non definito! Verifica che visualization-core.js sia caricato.');
+            return;
+        }
+        console.log('✅ CanvasRenderer disponibile');
+        
+        // Verifica che i canvas esistano
+        const quizCanvas = document.getElementById('quizCam1');
+        if (!quizCanvas) {
+            console.error('❌ Canvas quizCam1 non trovato!');
+            return;
+        }
         console.log('✅ Canvas trovato:', quizCanvas.width, 'x', quizCanvas.height);
-    }
-    
-    if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
-        console.error('❌ THEORETICAL_QUESTIONS not loaded or empty!');
-    }
+        
+        if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
+            console.error('❌ THEORETICAL_QUESTIONS not loaded or empty!');
+        }
 
-    quizEngine = new QuizEngine();
-    quizEngine.initialize();
-    
-    console.log('✅ Quiz Engine pronto!');
+        quizEngine = new QuizEngine();
+        quizEngine.initialize();
+        
+        console.log('✅ Quiz Engine pronto!');
+    } catch (e) {
+        console.error('❌ Errore inizializzazione Quiz Engine:', e.message);
+        console.error('Stack:', e.stack);
+    }
 });
