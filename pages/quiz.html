@@ -175,6 +175,50 @@
             background: #2563eb;
             transform: translateY(-2px);
         }
+
+        /* === FIXES FOR USER REPORTED ISSUES === */
+        
+        /* 1. Fix "Black Band" covering title */
+        .quiz-container {
+            margin-top: 40px; /* Push content down below header */
+            position: relative;
+            z-index: 5;
+        }
+
+        /* 2. Fix "Hidden Next Button" */
+        .feedback-panel {
+            z-index: 1000; /* Ensure it's on top */
+            position: relative;
+            background: rgba(20, 30, 50, 0.98); /* More opaque */
+        }
+        
+        #nextQuestionBtn {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+            z-index: 1001;
+            position: relative;
+        }
+
+        /* 3. Fix "Black Camera" visibility */
+        .camera-container {
+            background: #000; /* Fallback background */
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            min-height: 350px; /* Ensure height */
+        }
+        
+        .canvas-wrapper {
+            background: #1a1a1a; /* Visible background if canvas fails */
+            border-radius: 50%; /* Circular hint */
+        }
+
+        /* Ensure sticky controls don't get covered */
+        .quiz-controls-card {
+            z-index: 90;
+            background: var(--bg-card);
+        }
     </style>
 </head>
 <body>

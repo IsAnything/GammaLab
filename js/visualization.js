@@ -258,7 +258,8 @@ class CanvasRenderer {
         this._lastShowLegend = true;
         
         // NEW: Light style flag (default: false = dark theme)
-        this.lightStyle = false;
+        // Auto-detect quiz mode to ensure visibility
+        this.lightStyle = (canvasId && canvasId.startsWith('quiz'));
         // When true the renderer will suppress background noise (useful for clean quiz images)
         this.suppressNoise = false;
         // If true, renderer will draw Hillas ellipses using the exact computed semi-axes
@@ -770,8 +771,14 @@ class CanvasRenderer {
 
     _withHexClip(callback, inset = 3) {
         if (!this.ctx || typeof callback !== 'function') return;
+        
+        // Ensure dimensions are valid to prevent black screen
+        if (this.canvas.width === 0) this.canvas.width = 600;
+        if (this.canvas.height === 0) this.canvas.height = 600;
+
         const radius = this._getHexRadius(this.canvas.width, this.canvas.height, inset);
         if (radius <= 0) {
+            // Fallback: run without clip if radius is invalid
             callback();
             return;
         }
@@ -1396,6 +1403,12 @@ class CanvasRenderer {
         // Force light style for quiz cameras to prevent black screen issues
         if (this.canvas && this.canvas.id && this.canvas.id.startsWith('quiz')) {
             this.lightStyle = true;
+        }
+        
+        // Safety check for canvas dimensions
+        if (this.canvas.width === 0 || this.canvas.height === 0) {
+            this.canvas.width = 600;
+            this.canvas.height = 600;
         }
 
         this._lastShowLegend = showLegend;
