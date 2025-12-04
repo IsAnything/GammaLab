@@ -760,11 +760,20 @@ class QuizEngine {
         document.getElementById('hintPanel').classList.add('hidden');
         document.getElementById('feedbackPanel').classList.add('hidden');
         
-        // Show options again
+        // Reset anche il feedback teorico
+        const theoreticalFeedback = document.getElementById('theoreticalFeedbackPanel');
+        if (theoreticalFeedback) {
+            theoreticalFeedback.classList.add('hidden');
+        }
+        
+        // Show options again (sia pratiche che teoriche)
         const optionsPanel = document.getElementById('answerOptions');
         if (optionsPanel) optionsPanel.style.display = 'grid';
+        
+        const theoreticalOptions = document.getElementById('theoreticalAnswerOptions');
+        if (theoreticalOptions) theoreticalOptions.style.display = 'flex';
 
-        // Abilita bottoni risposta
+        // Abilita bottoni risposta (entrambi i container)
         document.querySelectorAll('.quiz-option').forEach(btn => {
             btn.disabled = false;
             btn.classList.remove('correct', 'incorrect');
@@ -879,13 +888,15 @@ class QuizEngine {
      * Genera domanda teorica
      */
     _generateTheoreticalQuestion() {
-        // Nascondi solo la sezione simulatore, NON le opzioni di risposta
+        // Nascondi la sezione simulatore E la sezione controlli (risposte pratiche)
         const simulatorSection = document.querySelector('.simulator-section');
+        const controlsSection = document.querySelector('.quiz-controls-card');
         const theoreticalContainer = document.getElementById('theoreticalQuestionContainer');
+        const quizMainLayout = document.querySelector('.quiz-main-layout');
         
-        if (simulatorSection) {
-            // NASCONDI solo il simulatore (non le opzioni)
-            simulatorSection.style.display = 'none';
+        // Nascondi tutto il layout pratico
+        if (quizMainLayout) {
+            quizMainLayout.style.display = 'none';
         }
         
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
@@ -920,28 +931,21 @@ class QuizEngine {
         if (theoreticalContainer) {
             theoreticalContainer.style.display = 'block';
             const questionTextEl = document.getElementById('theoreticalQuestionText');
-            console.log('🧠 questionTextEl found:', !!questionTextEl);
             if (questionTextEl) {
                 questionTextEl.textContent = questionData.question;
-                console.log('🧠 Set question text to:', questionData.question);
+            }
+            
+            // Imposta le opzioni nel container teorico dedicato
+            this._setTheoreticalAnswerOptions(questionData.options);
+            
+            // Reset feedback panel
+            const feedbackPanel = document.getElementById('theoreticalFeedbackPanel');
+            if (feedbackPanel) {
+                feedbackPanel.classList.add('hidden');
             }
         } else {
             console.error('❌ theoreticalContainer NOT FOUND!');
         }
-        
-        // Cambia il titolo delle opzioni
-        const questionTitle = document.getElementById('questionTitle');
-        if (questionTitle) {
-            questionTitle.textContent = '📝 Seleziona la risposta corretta:';
-        }
-        
-        // Set options
-        this._setAnswerOptions(questionData.options);
-        
-        // Nascondi hints per domande teoriche
-        document.getElementById('hint1Btn').style.display = 'none';
-        document.getElementById('hint2Btn').style.display = 'none';
-        document.getElementById('hint3Btn').style.display = 'none';
     }
 
     /**
@@ -1043,6 +1047,12 @@ class QuizEngine {
             theoreticalContainer.style.display = 'none';
         }
         
+        // Mostra il layout principale (simulatore + controlli)
+        const quizMainLayout = document.querySelector('.quiz-main-layout');
+        if (quizMainLayout) {
+            quizMainLayout.style.display = 'flex';
+        }
+        
         // Mostra simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
@@ -1059,6 +1069,36 @@ class QuizEngine {
         document.getElementById('hint1Btn').style.display = 'inline-block';
         document.getElementById('hint2Btn').style.display = 'inline-block';
         document.getElementById('hint3Btn').style.display = 'inline-block';
+        
+        // Reset feedback panel pratico
+        const feedbackPanel = document.getElementById('feedbackPanel');
+        if (feedbackPanel) {
+            feedbackPanel.classList.add('hidden');
+        }
+    }
+    
+    /**
+     * Imposta opzioni di risposta per domande teoriche (container dedicato)
+     */
+    _setTheoreticalAnswerOptions(options) {
+        const container = document.getElementById('theoreticalAnswerOptions');
+        if (!container) {
+            console.error('❌ theoreticalAnswerOptions container not found!');
+            return;
+        }
+        container.innerHTML = '';
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.setAttribute('data-answer', opt.value);
+            btn.textContent = opt.label;
+            btn.addEventListener('click', (e) => {
+                const answer = e.target.dataset.answer;
+                this.submitAnswer(answer);
+            });
+            container.appendChild(btn);
+        });
     }
     
     /**
@@ -1678,7 +1718,9 @@ class QuizEngine {
         
         // Scroll to feedback panel to ensure button is visible
         setTimeout(() => {
-            const feedbackPanel = document.getElementById('feedbackPanel');
+            const isTheoretical = this.currentQuestionType === QUESTION_TYPES.THEORETICAL;
+            const feedbackPanelId = isTheoretical ? 'theoreticalFeedbackPanel' : 'feedbackPanel';
+            const feedbackPanel = document.getElementById(feedbackPanelId);
             if (feedbackPanel) {
                 feedbackPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -1833,9 +1875,23 @@ class QuizEngine {
      * Show feedback after answer
      */
     showFeedback(correct, reason = null) {
-        const feedbackPanel = document.getElementById('feedbackPanel');
-        const feedbackTitle = document.getElementById('feedbackTitle');
-        const feedbackText = document.getElementById('feedbackText');
+        // Determina quale pannello feedback usare
+        const isTheoretical = this.currentQuestionType === QUESTION_TYPES.THEORETICAL;
+        
+        const feedbackPanelId = isTheoretical ? 'theoreticalFeedbackPanel' : 'feedbackPanel';
+        const feedbackTitleId = isTheoretical ? 'theoreticalFeedbackTitle' : 'feedbackTitle';
+        const feedbackTextId = isTheoretical ? 'theoreticalFeedbackText' : 'feedbackText';
+        const nextBtnId = isTheoretical ? 'theoreticalNextBtn' : 'nextQuestionBtn';
+        const answerOptionsId = isTheoretical ? 'theoreticalAnswerOptions' : 'answerOptions';
+        
+        const feedbackPanel = document.getElementById(feedbackPanelId);
+        const feedbackTitle = document.getElementById(feedbackTitleId);
+        const feedbackText = document.getElementById(feedbackTextId);
+        
+        if (!feedbackPanel || !feedbackTitle || !feedbackText) {
+            console.error('❌ Elementi feedback non trovati:', feedbackPanelId);
+            return;
+        }
         
         if (reason === 'timeout') {
             feedbackTitle.textContent = '⏰ Tempo Scaduto!';
@@ -1854,13 +1910,25 @@ class QuizEngine {
         feedbackPanel.classList.remove('hidden');
         
         // Hide options to save space and focus on feedback
-        const optionsPanel = document.getElementById('answerOptions');
+        const optionsPanel = document.getElementById(answerOptionsId);
         if (optionsPanel) optionsPanel.style.display = 'none';
         
-        // Hide hints buttons
-        document.getElementById('hint1Btn').style.display = 'none';
-        document.getElementById('hint2Btn').style.display = 'none';
-        document.getElementById('hint3Btn').style.display = 'none';
+        // Hide hints buttons (solo per domande pratiche)
+        if (!isTheoretical) {
+            document.getElementById('hint1Btn').style.display = 'none';
+            document.getElementById('hint2Btn').style.display = 'none';
+            document.getElementById('hint3Btn').style.display = 'none';
+        }
+        
+        // Setup next button event listener per il container corretto
+        const nextBtn = document.getElementById(nextBtnId);
+        if (nextBtn) {
+            // Rimuovi listener precedenti e aggiungi nuovo
+            nextBtn.replaceWith(nextBtn.cloneNode(true));
+            document.getElementById(nextBtnId).addEventListener('click', () => {
+                this.nextQuestion();
+            });
+        }
     }
 
     /**
