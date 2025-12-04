@@ -6,8 +6,13 @@
     <title>Quiz Sorgenti Gamma - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
     <style>
+        /* ============ CRITICAL FIX - HIDDEN CLASS MUST WORK ============ */
+        .hidden {
+            display: none !important;
+        }
+        
         /* ============ EMERGENCY FIX - FORCE VISIBILITY ============ */
-        #startScreen {
+        #startScreen:not(.hidden) {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
@@ -54,8 +59,8 @@
             overflow-y: auto;
         }
 
-        /* Layout principale del quiz */
-        #quizScreen {
+        /* Layout principale del quiz - SOLO quando NON è hidden */
+        #quizScreen:not(.hidden) {
             display: flex;
             flex-direction: column;
             /* Remove fixed height to avoid clipping and overlap */
