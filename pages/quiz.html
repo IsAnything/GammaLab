@@ -6,6 +6,49 @@
     <title>Quiz Sorgenti Gamma - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
     <style>
+        /* ============ EMERGENCY FIX - FORCE VISIBILITY ============ */
+        #startScreen {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            z-index: 100 !important;
+            background: #111827 !important;
+            color: #e2e8f0 !important;
+            padding: 30px !important;
+            margin: 20px !important;
+            border-radius: 12px !important;
+        }
+        
+        #startScreen * {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        #startScreen h2, #startScreen h3 {
+            color: #06b6d4 !important;
+        }
+        
+        #startScreen p, #startScreen li {
+            color: #e2e8f0 !important;
+        }
+        
+        #startQuizBtn {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: #22c55e !important;
+            color: white !important;
+            padding: 16px 32px !important;
+            font-size: 1.2em !important;
+            border: none !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            z-index: 1000 !important;
+        }
+        
+        /* ============ END EMERGENCY FIX ============ */
+        
         /* Compact Quiz Layout */
         body {
             overflow-y: auto;
@@ -493,11 +536,11 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="../js/core-simulation.js?v=33"></script>
-    <script src="../js/source-profiles.js?v=33"></script>
-    <script src="../js/hillas-analysis.js?v=33"></script>
-    <script src="../js/visualization-core.js?v=33"></script>
-    <script src="../js/quiz-engine-core.js?v=33"></script>
+    <script src="../js/core-simulation.js?v=34"></script>
+    <script src="../js/source-profiles.js?v=34"></script>
+    <script src="../js/hillas-analysis.js?v=34"></script>
+    <script src="../js/visualization-core.js?v=34"></script>
+    <script src="../js/quiz-engine-core.js?v=34"></script>
     <script src="../js/lightbox.js"></script>
     <!-- Quiz Engine si inizializza automaticamente -->
 </body>
