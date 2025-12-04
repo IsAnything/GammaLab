@@ -843,6 +843,13 @@ class QuizEngine {
      */
     _generateQuestionByType() {
         const quizCanvasSize = { width: 600, height: 600 };
+        
+        // FIX: Ensure quizMainLayout is visible by default (it might have been hidden by a theoretical question)
+        const quizMainLayout = document.querySelector('.quiz-main-layout');
+        if (quizMainLayout) {
+            quizMainLayout.style.display = ''; // Reset to default (block)
+        }
+
         const simulatorSection = document.querySelector('.simulator-section');
         
         // Reset visibility (show simulator elements by default)
