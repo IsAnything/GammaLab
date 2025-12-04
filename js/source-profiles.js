@@ -138,40 +138,40 @@ const BLAZAR_PROFILE = {
     type: 'blazar',
     name: 'Blazar/AGN',
     displayName: 'Blazar (AGN)',
-    signatureHint: 'Nucleo estremamente compatto e brillante, quasi puntiforme.',
+    signatureHint: 'Ago di luce: traccia sottilissima, stabile e con nucleo accecante.',
     
-    length: { min: 0.10, max: 0.20 },  // 10-20 pixel - COMPATTO
-    width: { min: 0.04, max: 0.07 },   // 4-7 pixel - MOLTO stretto
-    size: { min: 1000, max: 1500 },
+    length: { min: 0.12, max: 0.22 },  // Leggermente più lungo per enfatizzare l'ago
+    width: { min: 0.03, max: 0.06 },   // 3-6 pixel - ESTREMAMENTE stretto
+    size: { min: 1000, max: 1800 },    // Luminoso
     alpha: { 
         type: 'peaked',
         peak: 0,
-        width: 1.5  // Estremamente concentrato
+        width: 1.0  // Punt puntato
     },
     
-    elongation: 0.20,  // L/W ratio ~ 3-4 (alto)
-    asymmetry: { mean: 0.08, std: 0.05 },
+    elongation: 0.18,  // L/W ratio > 5 (molto alto)
+    asymmetry: { mean: 0.05, std: 0.03 }, // Molto simmetrico
 
     visualSignature: {
-        dispersionScaleX: 0.04,
-        dispersionScaleY: 0.04,
-        lengthScale: 0.85,
-        widthScale: 0.35,
-        alphaNoiseScale: 0.10,
-        spineTightening: 0.25,
-        tailStrength: 0.10,
-        tailDecay: 0.80,
+        dispersionScaleX: 0.02, // Quasi nessuna dispersione
+        dispersionScaleY: 0.02,
+        lengthScale: 0.90,
+        widthScale: 0.30,       // Molto sottile
+        alphaNoiseScale: 0.05,
+        spineTightening: 0.15,  // Spina dorsale molto definita
+        tailStrength: 0.05,
+        tailDecay: 0.90,
         centralCoreBoost: true,
-        hotspotCount: 1,
-        hotspotSpread: 0.1,
-        hotspotFill: 0.60,
-        hotspotBoost: 1.80,
-        intensityVariance: 0.10,
-        energyInitialBoost: 1.6,
-        energyCoreBoost: 1.20,
-        energySpineBoost: 1.50,
-        energyRadialFalloff: 0.8,
-        energyNoise: 0.05
+        hotspotCount: 1,        // Singolo core
+        hotspotSpread: 0.05,    // Molto concentrato
+        hotspotFill: 0.70,      // Core denso
+        hotspotBoost: 2.50,     // ACCECANTE (Beaming)
+        intensityVariance: 0.05, // Molto stabile
+        energyInitialBoost: 1.8,
+        energyCoreBoost: 1.50,
+        energySpineBoost: 1.80,
+        energyRadialFalloff: 0.5, // Cade subito fuori dal core
+        energyNoise: 0.02
     },
     
     energyRange: {
@@ -180,7 +180,7 @@ const BLAZAR_PROFILE = {
         spectralIndex: 2.5
     },
     
-    interCameraVariance: 0.06,  // 6% - sorgente puntiforme
+    interCameraVariance: 0.04,  // 4% - Coerenza assoluta
     
     description: 'Getto relativistico puntato verso di noi, beaming',
     observables: {
@@ -200,40 +200,40 @@ const GRB_PROFILE = {
     type: 'grb',
     name: 'Gamma-Ray Burst',
     displayName: 'Lampo Gamma (GRB)',
-    signatureHint: 'Struttura irregolare ed esplosiva con coda frammentata.',
+    signatureHint: 'Esplosione di luce: traccia satura, "grassa" e caldissima.',
     
-    length: { min: 0.10, max: 0.20 },  // 10-20 pixel
-    width: { min: 0.05, max: 0.10 },   // 5-10 pixel
-    size: { min: 1200, max: 2000 },    // Decade nel tempo
+    length: { min: 0.15, max: 0.25 },
+    width: { min: 0.08, max: 0.14 },   // Più largo (saturazione)
+    size: { min: 2500, max: 5000 },    // ENERGIA ESTREMA (molto luminoso)
     alpha: { 
         type: 'gaussian',
         mean: 0,
-        std: 2.5  // Inizialmente puntiforme
+        std: 2.0
     },
     
-    elongation: 0.45,  // L/W ~ 1.9 - FIRMA CHIAVE (più basso)
-    asymmetry: { mean: 0.12, std: 0.06 },
+    elongation: 0.45,  // L/W ~ 2
+    asymmetry: { mean: 0.10, std: 0.05 },
 
     visualSignature: {
-        dispersionScaleX: 0.45,
-        dispersionScaleY: 0.35,
-        lengthScale: 1.50,
-        widthScale: 0.90,
-        alphaNoiseScale: 0.9,
-        spineTightening: 0.9,
-        tailStrength: 1.80,
-        tailDecay: 0.40,
-        centralCoreBoost: false,
-        hotspotCount: 4,
-        hotspotSpread: 0.70,
-        hotspotFill: 0.25,
-        hotspotBoost: 1.10,
-        intensityVariance: 0.75,
-        energyInitialBoost: 1.4,
-        energyTailDrop: 0.80,
-        energyCoreBoost: 0.20,
-        energyRadialFalloff: 3.5,
-        energyNoise: 0.25
+        dispersionScaleX: 0.25,
+        dispersionScaleY: 0.25,
+        lengthScale: 1.30,
+        widthScale: 1.20,       // "Grasso" visivamente
+        alphaNoiseScale: 0.5,
+        spineTightening: 0.7,
+        tailStrength: 1.20,
+        tailDecay: 0.60,
+        centralCoreBoost: true, // Core presente
+        hotspotCount: 1,        // Unico grande blob
+        hotspotSpread: 0.60,    // Molto largo
+        hotspotFill: 0.90,      // Riempie quasi tutto
+        hotspotBoost: 1.80,     // Molto luminoso ovunque
+        intensityVariance: 0.40,
+        energyInitialBoost: 2.0, // Parte caldissimo
+        energyTailDrop: 0.50,
+        energyCoreBoost: 1.00,
+        energyRadialFalloff: 2.0, // Cade più lentamente
+        energyNoise: 0.15
     },
     
     energyRange: {
