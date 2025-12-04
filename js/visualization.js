@@ -1342,8 +1342,8 @@ class CanvasRenderer {
             indicator.style.left = '-5px';
             indicator.style.width = '30px';
             indicator.style.height = '3px';
-            indicator.style.backgroundColor = '#fff';
-            indicator.style.boxShadow = '0 0 8px #fff, 0 0 15px var(--accent-cyan)';
+            indicator.style.backgroundColor = '#ff0000';
+            indicator.style.boxShadow = '0 0 8px #ff0000, 0 0 15px #ff0000';
             indicator.style.zIndex = '10';
             indicator.style.transition = 'top 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
             indicator.style.borderRadius = '2px';
@@ -1355,7 +1355,7 @@ class CanvasRenderer {
             label.style.position = 'absolute';
             label.style.right = '105%';
             label.style.top = '-8px';
-            label.style.color = '#fff';
+            label.style.color = '#ff0000';
             label.style.fontSize = '11px';
             label.style.fontWeight = 'bold';
             label.style.whiteSpace = 'nowrap';
@@ -1384,12 +1384,9 @@ class CanvasRenderer {
             label.textContent = teV < 1 ? `${teV.toFixed(2)} TeV` : `${teV.toFixed(1)} TeV`;
         }
         
-        // Color based on energy
-        if (this.colorPalette) {
-             const color = this.colorPalette.getColor(energyGeV);
-             indicator.style.backgroundColor = color;
-             indicator.style.boxShadow = `0 0 8px ${color}, 0 0 15px ${color}`;
-        }
+        // Force red color always
+        indicator.style.backgroundColor = '#ff0000';
+        indicator.style.boxShadow = '0 0 8px #ff0000, 0 0 15px #ff0000';
     }
 
     renderEvent(event, showLegend = true) {
