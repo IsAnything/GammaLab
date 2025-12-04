@@ -680,6 +680,12 @@ class QuizEngine {
         
         // Seleziona domande teoriche necessarie per questa sessione
         const theoreticalCount = this.sessionPlan.filter(t => t === QUESTION_TYPES.THEORETICAL).length;
+        
+        // Ensure we have enough questions
+        if (THEORETICAL_QUESTIONS.length < theoreticalCount) {
+             console.warn('Not enough theoretical questions available');
+        }
+
         this.selectedTheoreticalQuestions = [...THEORETICAL_QUESTIONS]
             .sort(() => 0.5 - Math.random())
             .slice(0, theoreticalCount);
@@ -697,7 +703,7 @@ class QuizEngine {
         
         // Force at least 4 theoretical questions
         const theoreticalCount = 4;
-        const practicalCount = count - theoreticalCount;
+        const practicalCount = Math.max(0, count - theoreticalCount);
 
         for (let i = 0; i < theoreticalCount; i++) {
             plan.push(QUESTION_TYPES.THEORETICAL);
@@ -849,8 +855,10 @@ class QuizEngine {
         const simulatorSection = document.querySelector('.simulator-section');
         
         // Update section title
-        const sectionTitle = simulatorSection.querySelector('h3');
-        if (sectionTitle) sectionTitle.textContent = '🧠 Domanda Teorica';
+        if (simulatorSection) {
+            const sectionTitle = simulatorSection.querySelector('h3');
+            if (sectionTitle) sectionTitle.textContent = '🧠 Domanda Teorica';
+        }
 
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
         // Usiamo un indice che incrementa ogni volta che usiamo una domanda teorica
@@ -864,6 +872,15 @@ class QuizEngine {
         }
         
         const questionData = this.selectedTheoreticalQuestions[this.theoreticalQuestionIndex];
+        
+        if (!questionData) {
+            console.error('❌ Errore: Nessuna domanda teorica disponibile all\'indice', this.theoreticalQuestionIndex);
+            // Fallback to a practical question if theory fails
+            this.currentQuestionType = QUESTION_TYPES.SOURCE_IDENTIFICATION;
+            this._generateSourceIdentificationQuestion({ width: 600, height: 600 });
+            return;
+        }
+
         this.theoreticalQuestionIndex++; // Incrementa per la prossima volta
         
         this.currentTheoreticalQuestion = questionData;
@@ -1163,7 +1180,11 @@ class QuizEngine {
 
         } while (attempt < maxAttempts);
 
-        events.push(event);
+        if (event) {
+            events.push(event);
+        } else {
+            console.error('❌ Failed to generate event after', maxAttempts, 'attempts');
+        }
 
         if (hillas && hillas.valid) {
             this.currentHillasParams.push(hillas);
@@ -1176,7 +1197,9 @@ class QuizEngine {
             setTimeout(() => canvas.classList.remove('flash'), 400);
         }
 
-        this.renderers[0].renderEvent(event, true);
+        if (event) {
+            this.renderers[0].renderEvent(event, true);
+        }
 
         if (hillas && hillas.valid) {
             this.renderers[0].renderHillasOverlay(hillas);
@@ -2150,8 +2173,12 @@ class QuizEngine {
 let quizEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Caricamento Quiz Engine...');
+    console.log('🎮 Caricamento Quiz Engine... v2.5 (DEBUG)');
     
+    if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
+        console.error('❌ THEORETICAL_QUESTIONS not loaded or empty!');
+    }
+
     quizEngine = new QuizEngine();
     quizEngine.initialize();
     

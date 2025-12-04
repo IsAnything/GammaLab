@@ -1405,6 +1405,9 @@ class CanvasRenderer {
         // Force light style for quiz cameras to prevent black screen issues
         if (this.canvas && this.canvas.id && this.canvas.id.startsWith('quiz')) {
             this.lightStyle = true;
+            // Ensure noise suppression is OFF for quiz unless explicitly requested
+            // This ensures at least something is drawn if the event is faint
+            if (this.suppressNoise === undefined) this.suppressNoise = false;
         }
         
         // Safety check for canvas dimensions
@@ -1460,7 +1463,7 @@ class CanvasRenderer {
                     this.renderBackgroundNoise();
                 }
 
-                if (event.showGrid) {
+                if (event && event.showGrid) {
                     this.drawGrid();
                 }
 
@@ -1468,14 +1471,14 @@ class CanvasRenderer {
                     this.colorPalette.drawEnergyLegend(this.canvas, 'top-right');
                 }
 
-                if (showLegend) {
+                if (showLegend && event) {
                     this.renderEnergyHistogram(event);
                 }
             }
         });
 
         // Renderizza le tracce con clipping esagonale per mostrare solo quelle dentro la camera
-        if (!this.showEllipseOnly) {
+        if (!this.showEllipseOnly && event && event.tracks) {
             this._withHexClip(() => {
                 const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
                 sortedTracks.forEach(track => {
@@ -2057,7 +2060,10 @@ class CanvasRenderer {
         let densityMin = 0.7;
         let densityMax = 1.0;
 
-        switch (this.sourceType) {
+        // Fallback for sourceType if null
+        const effectiveSourceType = this.sourceType || (track ? track.sourceType : 'crab');
+
+        switch (effectiveSourceType) {
             case 'pevatron':
                 longMultiplier = 25;
                 shortMultiplier = 5.0;
@@ -2274,6 +2280,8 @@ class CanvasRenderer {
         }
 
         pixels.forEach(pixel => {
+            if (!isFinite(pixel.x) || !isFinite(pixel.y)) return;
+
             this.ctx.fillStyle = `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.alpha})`;
             this.ctx.beginPath();
             this.ctx.arc(pixel.x, pixel.y, pixelRadius, 0, 2 * Math.PI);
