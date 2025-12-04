@@ -490,6 +490,9 @@ class QuizEngine {
         this.currentCorrectAnswer = null;
         this.currentTheoreticalQuestion = null;
         this.selectedTheoreticalQuestions = [];
+        
+        // Tracciamento domande per evitare duplicati
+        this.usedSourceTypes = new Set();
     }
 
     /**
@@ -662,6 +665,9 @@ class QuizEngine {
         Object.keys(this.sourceStats).forEach(key => {
             this.sourceStats[key] = { attempts: 0, correct: 0 };
         });
+        
+        // Reset tracciamento duplicati
+        this.usedSourceTypes.clear();
         
         // Reset indice domande teoriche
         this.theoreticalQuestionIndex = 0;
@@ -883,11 +889,21 @@ class QuizEngine {
         }
 
         // Seleziona sorgente random (escludi muon per questa domanda)
-        // If quizGammaOnly is enabled, force a gamma-only profile for clearer Hillas examples
-        this.currentProfile = this.quizGammaOnly ? getRandomSourceProfile(false) : getRandomSourceProfile(true);
+        // Evita ripetizioni se possibile
+        let profile = null;
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        do {
+            profile = this.quizGammaOnly ? getRandomSourceProfile(false) : getRandomSourceProfile(true);
+            attempts++;
+        } while (this.usedSourceTypes.has(profile.type) && attempts < maxAttempts);
+        
+        this.usedSourceTypes.add(profile.type);
+        this.currentProfile = profile;
         this.currentCorrectAnswer = this.currentProfile.type;
         
-    // Genera eventi per 3 camere (forza eventi centrati per didattica)
+        // Genera eventi per 3 camere (forza eventi centrati per didattica)
         this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
         
         // Imposta opzioni risposta (tutte le sorgenti)
