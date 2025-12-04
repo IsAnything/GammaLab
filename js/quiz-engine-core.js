@@ -873,14 +873,13 @@ class QuizEngine {
      * Genera domanda teorica
      */
     _generateTheoreticalQuestion() {
-        // Nascondi completamente la sezione simulatore per domande teoriche
+        // Nascondi solo la sezione simulatore, NON le opzioni di risposta
         const simulatorSection = document.querySelector('.simulator-section');
-        const quizMainLayout = document.querySelector('.quiz-main-layout');
         const theoreticalContainer = document.getElementById('theoreticalQuestionContainer');
         
-        if (quizMainLayout) {
-            // NASCONDI COMPLETAMENTE il layout con simulatore
-            quizMainLayout.style.display = 'none';
+        if (simulatorSection) {
+            // NASCONDI solo il simulatore (non le opzioni)
+            simulatorSection.style.display = 'none';
         }
         
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
@@ -917,6 +916,12 @@ class QuizEngine {
             }
         }
         
+        // Cambia il titolo delle opzioni
+        const questionTitle = document.getElementById('questionTitle');
+        if (questionTitle) {
+            questionTitle.textContent = '📝 Seleziona la risposta corretta:';
+        }
+        
         // Set options
         this._setAnswerOptions(questionData.options);
         
@@ -939,13 +944,7 @@ class QuizEngine {
             theoreticalContainer.style.display = 'none';
         }
         
-        // MOSTRA il layout con simulatore
-        const quizMainLayout = document.querySelector('.quiz-main-layout');
-        if (quizMainLayout) {
-            quizMainLayout.style.display = 'flex';
-        }
-        
-        // Ripristina visibilità elementi simulatore
+        // MOSTRA il simulatore
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
             simulatorSection.style.display = '';
@@ -966,6 +965,12 @@ class QuizEngine {
             instructionEl.style.padding = '';
             instructionEl.style.color = '';
             instructionEl.style.display = '';
+        }
+        
+        // Ripristina titolo opzioni
+        const questionTitle = document.getElementById('questionTitle');
+        if (questionTitle) {
+            questionTitle.textContent = '🎯 Quale sorgente hai osservato?';
         }
         
         // Mostra hints per domande pratiche
