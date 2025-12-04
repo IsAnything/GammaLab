@@ -873,22 +873,20 @@ class QuizEngine {
      * Genera domanda teorica
      */
     _generateTheoreticalQuestion() {
-        // Nascondi simulatore
+        // Nascondi completamente la sezione simulatore per domande teoriche
         const simulatorSection = document.querySelector('.simulator-section');
         
-        // Update section title
         if (simulatorSection) {
-            const sectionTitle = simulatorSection.querySelector('h3');
-            if (sectionTitle) sectionTitle.textContent = '🧠 Domanda Teorica';
+            // NASCONDI COMPLETAMENTE il simulatore (canvas, info box, tutto)
+            simulatorSection.style.display = 'none';
         }
 
         // Prendi la prossima domanda teorica disponibile dalla lista mescolata
-        // Usiamo un indice che incrementa ogni volta che usiamo una domanda teorica
         if (typeof this.theoreticalQuestionIndex === 'undefined') {
             this.theoreticalQuestionIndex = 0;
         }
         
-        // Se abbiamo esaurito le domande teoriche selezionate, ricominciamo (non dovrebbe succedere con la logica attuale)
+        // Se abbiamo esaurito le domande teoriche selezionate, ricominciamo
         if (this.theoreticalQuestionIndex >= this.selectedTheoreticalQuestions.length) {
             this.theoreticalQuestionIndex = 0;
         }
@@ -903,34 +901,24 @@ class QuizEngine {
             return;
         }
 
-        this.theoreticalQuestionIndex++; // Incrementa per la prossima volta
+        this.theoreticalQuestionIndex++;
         
         this.currentTheoreticalQuestion = questionData;
         this.currentCorrectAnswer = questionData.correctAnswer;
         
-        // Update UI
+        // Update UI - Mostra la domanda in modo prominente
         const instructionEl = document.getElementById('quizInstruction');
         
-        if (simulatorSection) {
-            simulatorSection.classList.remove('hidden');
-            // Nascondi il layout del quiz (camera + info box) per domande teoriche
-            const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
-            if (layoutContainer) layoutContainer.style.display = 'none';
-            
-            // Mostra istruzione
-            instructionEl.style.display = 'flex';
-            instructionEl.style.flexDirection = 'column';
-            instructionEl.style.justifyContent = 'center';
-            instructionEl.style.minHeight = '300px'; // Match camera height to prevent layout shift
+        if (instructionEl) {
+            instructionEl.innerHTML = `<div class="theoretical-question">
+                <span class="theory-icon">🧠</span>
+                <span class="theory-label">Domanda Teorica</span>
+                <p class="theory-text">${questionData.question}</p>
+            </div>`;
+            instructionEl.style.display = 'block';
+            instructionEl.style.textAlign = 'center';
+            instructionEl.style.padding = '20px';
         }
-        
-        instructionEl.textContent = questionData.question;
-        instructionEl.style.fontSize = '1.5em';
-        instructionEl.style.lineHeight = '1.4';
-        instructionEl.style.fontWeight = 'bold';
-        instructionEl.style.color = 'var(--accent-cyan)';
-        instructionEl.style.textAlign = 'center';
-        instructionEl.style.padding = '20px';
         
         // Set options
         this._setAnswerOptions(questionData.options);
@@ -948,20 +936,33 @@ class QuizEngine {
         console.log('🎯 _generateSourceIdentificationQuestion CALLED');
         console.log('   canvasSize:', canvasSize);
         
-        // Ripristina visibilità elementi simulatore
+        // Ripristina visibilità elementi simulatore (nascosti in domande teoriche)
         const simulatorSection = document.querySelector('.simulator-section');
         if (simulatorSection) {
+            // MOSTRA il simulatore
+            simulatorSection.style.display = '';
+            
             const layoutContainer = simulatorSection.querySelector('.quiz-layout-container');
             if (layoutContainer) layoutContainer.style.display = 'flex';
             
             // Restore title
             const sectionTitle = simulatorSection.querySelector('h3');
             if (sectionTitle) sectionTitle.textContent = '📷 Osservazione IACT';
-
-            document.getElementById('quizInstruction').style.textAlign = '';
-            document.getElementById('quizInstruction').style.padding = '';
-            document.getElementById('quizInstruction').style.color = '';
         }
+        
+        // Reset instruction element
+        const instructionEl = document.getElementById('quizInstruction');
+        if (instructionEl) {
+            instructionEl.style.textAlign = '';
+            instructionEl.style.padding = '';
+            instructionEl.style.color = '';
+            instructionEl.style.display = '';
+        }
+        
+        // Mostra hints per domande pratiche
+        document.getElementById('hint1Btn').style.display = 'inline-block';
+        document.getElementById('hint2Btn').style.display = 'inline-block';
+        document.getElementById('hint3Btn').style.display = 'inline-block';
 
         // Seleziona sorgente random (escludi muon per questa domanda)
         // Evita ripetizioni se possibile

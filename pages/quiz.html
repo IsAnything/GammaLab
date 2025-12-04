@@ -70,6 +70,67 @@
             max-height: none !important;
             overflow: visible !important;
         }
+        
+        /* ============ THEORETICAL QUESTION STYLING ============ */
+        .theoretical-question {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .theoretical-question .theory-icon {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .theoretical-question .theory-label {
+            display: block;
+            font-size: 0.9em;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        
+        .theoretical-question .theory-text {
+            font-size: 1.4em;
+            line-height: 1.5;
+            color: #e2e8f0;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        /* ============ COMPACT QUIZ LAYOUT ============ */
+        .quiz-main-layout {
+            gap: 15px !important;
+        }
+        
+        .camera-container {
+            flex: 0 0 300px !important;
+        }
+        
+        .canvas-wrapper {
+            width: 300px !important;
+            height: 300px !important;
+        }
+        
+        .quiz-controls-card {
+            flex: 1 1 300px !important;
+            max-height: none !important;
+        }
+        
+        .quiz-options {
+            gap: 6px !important;
+        }
+        
+        .quiz-option {
+            padding: 10px 12px !important;
+            font-size: 0.95em !important;
+        }
 
         /* Layout principale del quiz - SOLO quando NON è hidden */
         #quizScreen:not(.hidden) {
@@ -557,7 +618,7 @@
     <script src="../js/source-profiles.js?v=50"></script>
     <script src="../js/hillas-analysis.js?v=50"></script>
     <script src="../js/visualization-core.js?v=50"></script>
-    <script src="../js/quiz-engine-core.js?v=51"></script>
+    <script src="../js/quiz-engine-core.js?v=52"></script>
     <script src="../js/lightbox.js?v=50"></script>
     <!-- Quiz Engine si inizializza automaticamente -->
 </body>
