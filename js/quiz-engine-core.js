@@ -649,11 +649,21 @@ class QuizEngine {
      * Inizia il quiz
      */
     startQuiz() {
-        console.log('🚀 Start quiz! (v2.1)');
+        console.log('🚀 Start quiz! (v2.2)');
         
         // Nascondi start screen, mostra quiz screen
         document.getElementById('startScreen').classList.add('hidden');
         document.getElementById('quizScreen').classList.remove('hidden');
+        
+        // IMPORTANTE: Forza render iniziale del canvas per assicurarsi che sia visibile
+        // Questo risolve il problema del canvas vuoto all'avvio
+        this.renderers.forEach(renderer => {
+            if (renderer && renderer.clear) {
+                renderer.lightStyle = true;
+                renderer.clear();
+                console.log('🎨 Canvas inizializzato:', renderer.canvas?.id);
+            }
+        });
         
         // Reset stato
         this.currentQuestion = 0;
@@ -678,6 +688,23 @@ class QuizEngine {
         // Genera piano domande casuale (10 domande)
         this.sessionPlan = this._generateSessionPlan(QUIZ_CONFIG.totalQuestions);
         console.log('📋 Piano sessione:', this.sessionPlan);
+        
+        // FORZA LA PRIMA DOMANDA A ESSERE PRATICA (non teorica)
+        // Questo assicura che l'utente veda subito un evento visuale
+        if (this.sessionPlan[0] === QUESTION_TYPES.THEORETICAL) {
+            // Trova la prima domanda pratica e scambiala con la prima
+            const firstPracticalIdx = this.sessionPlan.findIndex(t => t !== QUESTION_TYPES.THEORETICAL);
+            if (firstPracticalIdx > 0) {
+                const temp = this.sessionPlan[0];
+                this.sessionPlan[0] = this.sessionPlan[firstPracticalIdx];
+                this.sessionPlan[firstPracticalIdx] = temp;
+                console.log('📋 Prima domanda scambiata: teorica → pratica');
+            } else {
+                // Se non ci sono domande pratiche, forza SOURCE_IDENTIFICATION
+                this.sessionPlan[0] = QUESTION_TYPES.SOURCE_IDENTIFICATION;
+            }
+        }
+        console.log('📋 Piano finale:', this.sessionPlan);
         
         // Seleziona domande teoriche necessarie per questa sessione
         const theoreticalCount = this.sessionPlan.filter(t => t === QUESTION_TYPES.THEORETICAL).length;
@@ -1140,10 +1167,9 @@ class QuizEngine {
         this.renderers.forEach(renderer => {
             renderer.sourceType = sourceType;
             renderer.lightStyle = true; // Assicura stile chiaro per il quiz
-            // Restore noise suppression for gamma events if quizGammaOnly is true
-            if (this.quizGammaOnly) {
-                renderer.suppressNoise = true;
-            }
+            // NON sopprimere il rumore per garantire che qualcosa sia sempre visibile
+            // Anche se l'evento è debole, il background deve apparire
+            renderer.suppressNoise = false;
         });
         
         const events = [];
@@ -1158,7 +1184,7 @@ class QuizEngine {
         // If caller requested forceCenter, try resampling events until CoG is near camera center
         // BUT do not force centering for hadronic or muonic events (their CoG can legitimately be far)
         const wantCentered = customParams && customParams.forceCenter && profile.type !== 'hadron' && profile.type !== 'muon';
-        const acceptRadiusPx = 12; // Accept if CoG within 12 px of center
+        const acceptRadiusPx = 80; // Accept if CoG within 80 px of center (aumentato da 12)
 
         do {
             event = this.engine.generateEvent(profile, 1, canvasSize, customParams);
@@ -2199,10 +2225,18 @@ class QuizEngine {
 let quizEngine;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Caricamento Quiz Engine... v2.5 (DEBUG)');
+    console.log('🎮 Caricamento Quiz Engine... v2.6 (FIX VISUAL)');
     
     if (typeof THEORETICAL_QUESTIONS === 'undefined' || THEORETICAL_QUESTIONS.length === 0) {
         console.error('❌ THEORETICAL_QUESTIONS not loaded or empty!');
+    }
+
+    // Verifica che i canvas esistano
+    const quizCanvas = document.getElementById('quizCam1');
+    if (!quizCanvas) {
+        console.error('❌ Canvas quizCam1 non trovato!');
+    } else {
+        console.log('✅ Canvas trovato:', quizCanvas.width, 'x', quizCanvas.height);
     }
 
     quizEngine = new QuizEngine();
