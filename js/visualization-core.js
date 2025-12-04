@@ -1399,6 +1399,8 @@ class CanvasRenderer {
     }
 
     renderEvent(event, showLegend = true) {
+        console.log('🔧 renderEvent CALLED on canvas:', this.canvas?.id, 'tracks:', event?.tracks?.length);
+        
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
 
@@ -1412,9 +1414,12 @@ class CanvasRenderer {
         
         // Safety check for canvas dimensions
         if (this.canvas.width === 0 || this.canvas.height === 0) {
+            console.warn('⚠️ Canvas has zero dimensions, setting to 600x600');
             this.canvas.width = 600;
             this.canvas.height = 600;
         }
+        
+        console.log('📐 Canvas dimensions:', this.canvas.width, 'x', this.canvas.height, 'lightStyle:', this.lightStyle);
 
         this._lastShowLegend = showLegend;
         this.sourceType = (event && (event.sourceType || (event.params && event.params.sourceType))) || null;

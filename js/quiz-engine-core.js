@@ -1231,8 +1231,18 @@ class QuizEngine {
             energy: event ? event.energy : 0
         });
 
+        // DEBUG: Verifica renderer
+        console.log('🖼️ Renderer check:', {
+            rendererExists: !!this.renderers[0],
+            canvasExists: !!this.renderers[0]?.canvas,
+            canvasId: this.renderers[0]?.canvas?.id,
+            canvasSize: this.renderers[0]?.canvas ? `${this.renderers[0].canvas.width}x${this.renderers[0].canvas.height}` : 'N/A'
+        });
+
         if (event && event.tracks && event.tracks.length > 0) {
+            console.log('🎨 Calling renderEvent with', event.tracks.length, 'tracks');
             this.renderers[0].renderEvent(event, true);
+            console.log('✅ renderEvent completed');
         } else {
             console.error('❌ Evento vuoto o senza tracce!');
             // Riprova a generare
