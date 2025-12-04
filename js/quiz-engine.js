@@ -1754,9 +1754,6 @@ class QuizEngine {
                 💡 <strong>Spiegazione:</strong>
             </p>
             ${suggestionHtml}
-            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); font-style: italic;">
-                La risposta corretta verrà rivelata alla fine del quiz.
-            </p>
         `;
     }
 
@@ -1781,9 +1778,6 @@ class QuizEngine {
                 <li>Concentrati sui parametri chiave: Alpha, Size, Length/Width</li>
                 <li>Guarda la coerenza tra le 3 camere</li>
             </ul>
-            <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); font-style: italic;">
-                La risposta corretta verrà rivelata alla fine del quiz.
-            </p>
         `;
     }
 
