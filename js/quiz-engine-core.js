@@ -1014,12 +1014,7 @@ class QuizEngine {
         this.currentProfile = profile;
         this.currentCorrectAnswer = this.currentProfile.type;
         
-        // Genera eventi per 3 camere (forza eventi centrati per didattica)
-        console.log('🎨 Calling _generateAndRenderEvents...');
-        this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
-        console.log('✅ _generateAndRenderEvents completed');
-        
-        // Imposta opzioni risposta (tutte le sorgenti)
+        // PRIMA imposta opzioni risposta (tutte le sorgenti) - così sono sempre visibili
         this._setAnswerOptions([
             { value: 'crab', label: '🦀 Crab Nebula' },
             { value: 'pevatron', label: '💥 Resto di Supernova' },
@@ -1031,6 +1026,11 @@ class QuizEngine {
         
         document.getElementById('quizInstruction').textContent = 
             `Analizza i parametri Hillas e identifica la sorgente. Hai ${QUIZ_CONFIG.timeLimit} secondi!`;
+        
+        // POI genera eventi per le camere (forza eventi centrati per didattica)
+        console.log('🎨 Calling _generateAndRenderEvents...');
+        this._generateAndRenderEvents(this.currentProfile, canvasSize, { forceCenter: true, onlyGamma: this.quizGammaOnly });
+        console.log('✅ _generateAndRenderEvents completed');
     }
     
     /**
@@ -1067,6 +1067,12 @@ class QuizEngine {
     _generateParticleTypeQuestion(canvasSize) {
         // Reset UI per domanda pratica
         this._resetUIForPracticalQuestion();
+        
+        // PRIMA imposta opzioni risposta - così sono sempre visibili
+        this._setAnswerOptions([
+            { value: 'gamma', label: '🌟 Fotone Gamma' },
+            { value: 'hadron', label: '⚛️ Adrone (Background)' }
+        ]);
 
         // 50% gamma, 50% hadron
         const isGamma = Math.random() < 0.5;
@@ -1095,11 +1101,6 @@ class QuizEngine {
             this.currentCorrectAnswer = 'hadron';
         }
         
-        this._setAnswerOptions([
-            { value: 'gamma', label: '🌟 Fotone Gamma' },
-            { value: 'hadron', label: '⚛️ Adrone (Background)' }
-        ]);
-        
         document.getElementById('quizInstruction').textContent = 
             `È un fotone gamma da una sorgente astrofisica o un adrone di background? (Osserva la forma dell'ellisse)`;
     }
@@ -1110,6 +1111,12 @@ class QuizEngine {
     _generateEnergyLevelQuestion(canvasSize) {
         // Reset UI per domanda pratica
         this._resetUIForPracticalQuestion();
+        
+        // PRIMA imposta opzioni risposta - così sono sempre visibili
+        this._setAnswerOptions([
+            { value: 'low', label: '📉 Bassa Energia (< 1 TeV)' },
+            { value: 'high', label: '📈 Alta Energia (> 1 TeV)' }
+        ]);
 
         // 50% bassa energia (100-500 GeV), 50% alta energia (2-5 TeV)
         const isHighEnergy = Math.random() < 0.5;
@@ -1121,12 +1128,7 @@ class QuizEngine {
         this.currentCorrectAnswer = isHighEnergy ? 'high' : 'low';
         
         // Genera con energia specifica
-    this._generateAndRenderEvents(this.currentProfile, canvasSize, { energy, forceCenter: true });
-        
-        this._setAnswerOptions([
-            { value: 'low', label: '📉 Bassa Energia (< 1 TeV)' },
-            { value: 'high', label: '📈 Alta Energia (> 1 TeV)' }
-        ]);
+        this._generateAndRenderEvents(this.currentProfile, canvasSize, { energy, forceCenter: true });
         
         document.getElementById('quizInstruction').textContent = 
             `L'evento ha energia alta o bassa? (Osserva il numero di fotoni e la lunghezza della traccia)`;
@@ -1138,6 +1140,12 @@ class QuizEngine {
     _generateMuonDetectionQuestion(canvasSize) {
         // Reset UI per domanda pratica
         this._resetUIForPracticalQuestion();
+        
+        // PRIMA imposta opzioni risposta - così sono sempre visibili
+        this._setAnswerOptions([
+            { value: 'yes', label: '✅ Sì, è un Muone' },
+            { value: 'no', label: '❌ No, non è un Muone' }
+        ]);
 
         const isMuon = Math.random() < 0.5;
         
@@ -1157,11 +1165,6 @@ class QuizEngine {
             this.currentCorrectAnswer = 'no';
         }
         
-        this._setAnswerOptions([
-            { value: 'yes', label: '✅ Sì, è un Muone' },
-            { value: 'no', label: '❌ No, non è un Muone' }
-        ]);
-        
         document.getElementById('quizInstruction').textContent = 
             `Questo evento è un muone? (I muoni producono tracce lineari e sottili)`;
     }
@@ -1172,6 +1175,12 @@ class QuizEngine {
     _generateShowerShapeQuestion(canvasSize) {
         // Reset UI per domanda pratica
         this._resetUIForPracticalQuestion();
+        
+        // PRIMA imposta opzioni risposta - così sono sempre visibili
+        this._setAnswerOptions([
+            { value: 'narrow', label: '↔️ Stretta (Gamma-like)' },
+            { value: 'wide', label: '⬌ Larga (Hadron-like)' }
+        ]);
 
         const isNarrow = Math.random() < 0.5;
         
@@ -1185,11 +1194,6 @@ class QuizEngine {
             this._generateAndRenderHadronicEvents(canvasSize);
             this.currentCorrectAnswer = 'wide';
         }
-        
-        this._setAnswerOptions([
-            { value: 'narrow', label: '↔️ Stretta (Gamma-like)' },
-            { value: 'wide', label: '⬌ Larga (Hadron-like)' }
-        ]);
         
         document.getElementById('quizInstruction').textContent = 
             `L'ellisse di Hillas è stretta o larga? (Rapporto lunghezza/larghezza)`;
