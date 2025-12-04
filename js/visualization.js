@@ -1230,6 +1230,14 @@ class CanvasRenderer {
     clear() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        // Remove energy indicator if present
+        if (this.canvas && this.canvas.parentElement) {
+            const indicator = this.canvas.parentElement.querySelector('.energy-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
         this._withHexClip(() => {
             // Background: light gray for light style, dark blue for dark style
             this.ctx.fillStyle = this.lightStyle ? '#e0e0e0' : '#000814';
@@ -1316,6 +1324,74 @@ class CanvasRenderer {
     /**
      * Renderizza evento con effetti glow
      */
+    /**
+     * Updates the energy indicator on the vertical scale
+     * @param {Number} energyGeV - Energy in GeV
+     */
+    updateEnergyIndicator(energyGeV) {
+        if (!this.canvas) return;
+        const container = this.canvas.parentElement ? this.canvas.parentElement.querySelector('.energy-scale-vertical') : null;
+        if (!container) return;
+
+        // Remove existing indicator if any
+        let indicator = container.querySelector('.energy-indicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.className = 'energy-indicator';
+            indicator.style.position = 'absolute';
+            indicator.style.left = '-5px';
+            indicator.style.width = '30px';
+            indicator.style.height = '3px';
+            indicator.style.backgroundColor = '#fff';
+            indicator.style.boxShadow = '0 0 8px #fff, 0 0 15px var(--accent-cyan)';
+            indicator.style.zIndex = '10';
+            indicator.style.transition = 'top 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+            indicator.style.borderRadius = '2px';
+            indicator.style.pointerEvents = 'none';
+            
+            // Add a label
+            const label = document.createElement('div');
+            label.className = 'energy-indicator-label';
+            label.style.position = 'absolute';
+            label.style.right = '105%';
+            label.style.top = '-8px';
+            label.style.color = '#fff';
+            label.style.fontSize = '11px';
+            label.style.fontWeight = 'bold';
+            label.style.whiteSpace = 'nowrap';
+            label.style.textShadow = '0 0 4px #000';
+            label.style.opacity = '0.9';
+            indicator.appendChild(label);
+
+            container.appendChild(indicator);
+        }
+
+        // Calculate position
+        // Scale is 0.1 TeV (100 GeV) to 100 TeV (100000 GeV)
+        const minLog = 2; // log10(100)
+        const maxLog = 5; // log10(100000)
+        const valLog = Math.log10(Math.max(100, Math.min(100000, energyGeV)));
+        
+        const percentage = (valLog - minLog) / (maxLog - minLog); // 0 at bottom, 1 at top
+        const topPos = (1 - percentage) * 100;
+
+        indicator.style.top = `${topPos}%`;
+        
+        // Update label
+        const label = indicator.querySelector('.energy-indicator-label');
+        if (label) {
+            const teV = energyGeV / 1000;
+            label.textContent = teV < 1 ? `${teV.toFixed(2)} TeV` : `${teV.toFixed(1)} TeV`;
+        }
+        
+        // Color based on energy
+        if (this.colorPalette) {
+             const color = this.colorPalette.getColor(energyGeV);
+             indicator.style.backgroundColor = color;
+             indicator.style.boxShadow = `0 0 8px ${color}, 0 0 15px ${color}`;
+        }
+    }
+
     renderEvent(event, showLegend = true) {
         // Keep a reference to the last rendered event so UI controls can re-render live
         try { this._lastEvent = event; } catch (e) {}
@@ -1325,6 +1401,10 @@ class CanvasRenderer {
 
         this.clear();
         this._updateSignatureHint();
+
+        if (event && event.energy) {
+            this.updateEnergyIndicator(event.energy);
+        }
 
         let embeddedHillas = (!this.showEllipseOnly && event && event.__embeddedHillas && event.__embeddedHillas.valid)
             ? event.__embeddedHillas
@@ -1404,6 +1484,10 @@ class CanvasRenderer {
 
         this.clear();
         this._updateSignatureHint();
+
+        if (event && event.energy) {
+            this.updateEnergyIndicator(event.energy);
+        }
 
         let embeddedHillas = (event && event.__embeddedHillas && event.__embeddedHillas.valid) ? event.__embeddedHillas : null;
 
