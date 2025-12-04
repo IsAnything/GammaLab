@@ -759,8 +759,6 @@ class CanvasRenderer {
         ctx.lineTo(x + width, y + height - r);
         ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
         ctx.lineTo(x + r, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-        ctx.lineTo(x, y + r);
         ctx.quadraticCurveTo(x, y, x + r, y);
     }
 
@@ -872,8 +870,8 @@ class CanvasRenderer {
         }
 
         let sumW = 0;
-        let sumXX = 0;
-        let sumYY = 0;
+        let sumX = 0;
+        let sumY = 0;
         let sumXY = 0;
 
         tracks.forEach(track => {
@@ -3379,5 +3377,3 @@ if (typeof window !== 'undefined') {
     window.renderHexCamera = renderHexCamera;
     window.drawHexagon = drawHexagon;
 }
-
-// Exposure/Sub-pixel UI helper rimosso (non più necessario)

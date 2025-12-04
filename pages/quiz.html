@@ -222,6 +222,20 @@
     </style>
 </head>
 <body>
+    <!-- DEBUG CONSOLE: Rimuovere in produzione -->
+    <div id="debug-console" style="background: #300; color: #f88; padding: 10px; border-bottom: 1px solid red; font-family: monospace; display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">
+        <strong>DEBUG LOG:</strong><br>
+    </div>
+    <script>
+        // Attiva debug visibile
+        const debugConsole = document.getElementById('debug-console');
+        window.onerror = function(msg, url, line, col, error) {
+            debugConsole.style.display = 'block';
+            debugConsole.innerHTML += `[ERROR] ${msg} <br> @ ${url}:${line}:${col}<br><br>`;
+            return false;
+        };
+        console.log('DEBUG: Page loaded');
+    </script>
     <header>
         <div class="header-content">
             <h1 class="site-title">🔭 GammaLab</h1>
