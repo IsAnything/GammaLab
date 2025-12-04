@@ -2060,3 +2060,177 @@ input[type="range"]::-webkit-slider-track {
   }
 }
 
+/* ==================== COMPACT QUIZ LAYOUT (NO SCROLL) ==================== */
+
+/* Forza il container del quiz a occupare l'altezza disponibile */
+.quiz-container {
+  max-width: 100% !important;
+  padding: 8px !important;
+  height: calc(100vh - 70px); /* Sottrae header sito */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Previene scroll sulla pagina principale */
+}
+
+/* Layout Grid per il Quiz Screen */
+#quizScreen {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Desktop: 50% Camera, 50% Domande */
+  grid-template-rows: auto 1fr; /* Header auto, resto flessibile */
+  gap: 12px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Header del Quiz (Score/Timer) */
+.quiz-header {
+  grid-column: 1 / -1;
+  padding: 8px 16px;
+  margin-bottom: 0;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+/* Sezione Simulatore (Sinistra su Desktop) */
+#quizScreen .simulator-section {
+  grid-column: 1;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Scroll interno se necessario */
+  padding: 12px;
+}
+
+/* Sezione Domande (Destra su Desktop) */
+#quizScreen .card:last-child {
+  grid-column: 2;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* Ottimizzazione Camera */
+#quizScreen .camera-container {
+  max-width: 100% !important;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+#quizScreen .camera-canvas {
+  max-height: 45vh; /* Limita altezza camera su desktop */
+  width: auto;
+  aspect-ratio: 1/1;
+}
+
+/* Nascondi elementi meno utili in modalità compatta */
+#quizInstruction, 
+#quizInfoContent p {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+/* Griglia Opzioni Risposta */
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colonne */
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.quiz-option {
+  padding: 12px 8px;
+  font-size: 0.95rem;
+  white-space: normal;
+  line-height: 1.2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ==================== MOBILE QUIZ OPTIMIZATION ==================== */
+
+@media (max-width: 900px) {
+  .quiz-container {
+    height: auto; /* Su mobile lasciamo scorrere se serve, ma proviamo a compattare */
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  #quizScreen {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 8px;
+  }
+
+  /* Riduci header */
+  .quiz-header {
+    padding: 6px 10px;
+  }
+  
+  .quiz-header strong {
+    font-size: 1.1em !important;
+  }
+
+  /* Camera molto più piccola su mobile */
+  #quizScreen .camera-canvas {
+    max-height: 30vh; 
+    max-width: 100%;
+  }
+  
+  /* Nascondi info box su mobile per risparmiare spazio */
+  .quiz-info-box {
+    display: none !important;
+  }
+  
+  /* Nascondi titolo sezione Hillas */
+  .hillas-panel h3 {
+    display: none;
+  }
+  
+  /* Parametri Hillas in riga singola */
+  .hillas-parameters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  /* Card Domande */
+  #quizScreen .card:last-child {
+    padding: 12px;
+    flex: 1;
+  }
+
+  #questionTitle {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .quiz-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .quiz-option {
+    padding: 10px 4px;
+    font-size: 0.85rem;
+  }
+  
+  /* Hint buttons più piccoli */
+  #hint1Btn, #hint2Btn, #hint3Btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin: 4px !important;
+  }
+}
+
+
