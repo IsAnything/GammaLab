@@ -12,9 +12,33 @@
         .telescope-camera canvas { width: 100%; height: auto; border-radius: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.3); clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%); }
         canvas[id$="-overlay"] { z-index: 5 !important; pointer-events: none; }
         .telescope-label-bottom { position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; font-size: 1.5rem; padding: 8px 16px; border-radius: 8px; border: 2px solid #666; z-index: 10; }
-        .energy-scale-vertical { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); height: 300px; width: 40px; }
-        .scale-bar { width: 20px; height: 100%; background: linear-gradient(to bottom, rgb(255, 200, 120) 0%, rgb(180, 220, 160) 20%, rgb(120, 200, 200) 40%, rgb(80, 160, 220) 60%, rgb(100, 120, 200) 80%, rgb(120, 80, 180) 100%); border: 1px solid #999; border-radius: 4px; }
-        .scale-tick { position: absolute; right: 25px; font-size: 0.75rem; color: var(--text-secondary); transform: translateY(-50%); }
+        .energy-scale-vertical {
+            position: absolute;
+            right: -90px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 300px;
+            width: 80px;
+        }
+        
+        .scale-bar {
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(to bottom, rgb(255, 200, 120) 0%, rgb(180, 220, 160) 20%, rgb(120, 200, 200) 40%, rgb(80, 160, 220) 60%, rgb(100, 120, 200) 80%, rgb(120, 80, 180) 100%);
+            border: 1px solid #999;
+            border-radius: 4px;
+            position: absolute;
+            left: 0;
+        }
+        
+        .scale-tick {
+            position: absolute;
+            left: 28px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            transform: translateY(-50%);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -52,19 +76,40 @@
                     <canvas id="cam1" width="600" height="600"></canvas>
                     <canvas id="cam1-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
                     <div class="telescope-label-bottom">T1</div>
-                    <div class="energy-scale-vertical"><div class="scale-bar"></div><div class="scale-tick" style="top: 0%;">50</div><div class="scale-tick" style="top: 25%;">15</div><div class="scale-tick" style="top: 50%;">5</div><div class="scale-tick" style="top: 75%;">1.5</div><div class="scale-tick" style="top: 100%;">0.2</div></div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">50 TeV</div>
+                        <div class="scale-tick" style="top: 25%;">15 TeV</div>
+                        <div class="scale-tick" style="top: 50%;">5 TeV</div>
+                        <div class="scale-tick" style="top: 75%;">1.5 TeV</div>
+                        <div class="scale-tick" style="top: 100%;">0.2 TeV</div>
+                    </div>
                 </div>
                 <div class="telescope-camera">
                     <canvas id="cam2" width="600" height="600"></canvas>
                     <canvas id="cam2-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
                     <div class="telescope-label-bottom">T2</div>
-                    <div class="energy-scale-vertical"><div class="scale-bar"></div><div class="scale-tick" style="top: 0%;">50</div><div class="scale-tick" style="top: 25%;">15</div><div class="scale-tick" style="top: 50%;">5</div><div class="scale-tick" style="top: 75%;">1.5</div><div class="scale-tick" style="top: 100%;">0.2</div></div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">50 TeV</div>
+                        <div class="scale-tick" style="top: 25%;">15 TeV</div>
+                        <div class="scale-tick" style="top: 50%;">5 TeV</div>
+                        <div class="scale-tick" style="top: 75%;">1.5 TeV</div>
+                        <div class="scale-tick" style="top: 100%;">0.2 TeV</div>
+                    </div>
                 </div>
                 <div class="telescope-camera">
                     <canvas id="cam3" width="600" height="600"></canvas>
                     <canvas id="cam3-overlay" width="600" height="600" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
                     <div class="telescope-label-bottom">T3</div>
-                    <div class="energy-scale-vertical"><div class="scale-bar"></div><div class="scale-tick" style="top: 0%;">50</div><div class="scale-tick" style="top: 25%;">15</div><div class="scale-tick" style="top: 50%;">5</div><div class="scale-tick" style="top: 75%;">1.5</div><div class="scale-tick" style="top: 100%;">0.2</div></div>
+                    <div class="energy-scale-vertical">
+                        <div class="scale-bar"></div>
+                        <div class="scale-tick" style="top: 0%;">50 TeV</div>
+                        <div class="scale-tick" style="top: 25%;">15 TeV</div>
+                        <div class="scale-tick" style="top: 50%;">5 TeV</div>
+                        <div class="scale-tick" style="top: 75%;">1.5 TeV</div>
+                        <div class="scale-tick" style="top: 100%;">0.2 TeV</div>
+                    </div>
                 </div>
             </div>
             <!-- Ricostruzione Stereoscopica: posizionata immediatamente sotto le camere per visibilità rapida -->
