@@ -635,7 +635,7 @@ class QuizEngine {
         });
         
         document.getElementById('reviewBtn').addEventListener('click', () => {
-            window.location.href = 'comparison.html';
+            window.location.href = 'intro-cherenkov.html';
         });
     }
 
@@ -1712,7 +1712,7 @@ class QuizEngine {
                 <li>Analizza attentamente i parametri di Hillas (Length, Width, Size, Alpha)</li>
                 <li>Confronta le tracce tra le 3 camere per valutare la coerenza</li>
                 <li>Usa gli <strong>Hint</strong> se hai bisogno di aiuto!</li>
-                <li>Rivedi la pagina di <a href="comparison.html" target="_blank" style="color: #0ea5e9;">confronto sorgenti</a></li>
+                <li>Rivedi la pagina di <a href="intro-cherenkov.html" target="_blank" style="color: #0ea5e9;">introduzione</a></li>
             </ul>`;
         }
 
