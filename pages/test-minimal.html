@@ -161,22 +161,56 @@
         function testFullEvent() {
             log('=== TEST FULL EVENT ===');
             try {
+                // Step 1: Verifica SOURCE_PROFILES
+                if (typeof SOURCE_PROFILES === 'undefined') {
+                    log('❌ SOURCE_PROFILES non definito globalmente!', true);
+                    return;
+                }
+                log('✅ SOURCE_PROFILES esiste');
+                log('   Keys: ' + Object.keys(SOURCE_PROFILES).join(', '));
+                
+                // Step 2: Ottieni profilo
+                const profile = SOURCE_PROFILES['crab'] || SOURCE_PROFILES.crab;
+                if (!profile) {
+                    log('❌ Profilo "crab" non trovato!', true);
+                    return;
+                }
+                log('✅ Profilo crab: type=' + profile.type);
+                
+                // Step 3: Crea engine
                 const engine = new SimulationEngine();
-                const profile = SOURCE_PROFILES['crab-nebula'];
+                log('✅ SimulationEngine creato');
+                
+                // Step 4: Genera evento
+                log('🔄 Chiamando generateEvent...');
                 const event = engine.generateEvent(profile, 1, { width: 600, height: 600 }, { energy: 2500 });
                 
-                log(`📊 Evento: ${event.tracks.length} tracce`);
+                if (!event) {
+                    log('❌ generateEvent ha restituito null!', true);
+                    return;
+                }
+                log('✅ Evento generato');
                 
+                if (!event.tracks || event.tracks.length === 0) {
+                    log('❌ Evento senza tracce! tracks=' + JSON.stringify(event.tracks), true);
+                    return;
+                }
+                log(`📊 Evento: ${event.tracks.length} tracce, energia ${event.energy} GeV`);
+                
+                // Step 5: Crea renderer
                 const renderer = new CanvasRenderer('testCanvas');
                 renderer.lightStyle = true;
                 renderer.suppressNoise = false;
+                log('✅ CanvasRenderer configurato');
                 
+                // Step 6: Renderizza
                 log('🎨 Chiamando renderEvent...');
                 renderer.renderEvent(event, true);
                 log('✅ renderEvent completato!');
                 
             } catch (e) {
                 log('❌ Errore: ' + e.message, true);
+                log('   Stack: ' + e.stack, true);
                 console.error(e);
             }
         }
