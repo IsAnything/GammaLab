@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Minimo Quiz</title>
+    <style>
+        body { 
+            background: #1a1a2e; 
+            color: white; 
+            font-family: sans-serif; 
+            padding: 20px;
+        }
+        canvas { 
+            border: 3px solid cyan; 
+            display: block; 
+            margin: 20px auto;
+            background: #e0e0e0;
+        }
+        .status { 
+            background: #222; 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .ok { color: #4ade80; }
+        .error { color: #f87171; }
+        button {
+            background: #22c55e;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Minimo Quiz</h1>
+    
+    <div id="status" class="status">Caricamento...</div>
+    
+    <canvas id="testCanvas" width="600" height="600"></canvas>
+    
+    <div>
+        <button onclick="testDraw()">🎨 Test Draw</button>
+        <button onclick="testEngine()">🚀 Test Engine</button>
+        <button onclick="testRenderer()">🖼️ Test Renderer</button>
+        <button onclick="testFullEvent()">⚡ Test Full Event</button>
+    </div>
+    
+    <div id="log" class="status" style="max-height: 300px; overflow-y: auto;"></div>
+
+    <!-- Carico solo gli script necessari -->
+    <script src="../js/core-simulation.js"></script>
+    <script src="../js/source-profiles.js"></script>
+    <script src="../js/hillas-analysis.js"></script>
+    <script src="../js/visualization-core.js"></script>
+    
+    <script>
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+        
+        function log(msg, isError = false) {
+            const p = document.createElement('p');
+            p.className = isError ? 'error' : 'ok';
+            p.textContent = msg;
+            logEl.appendChild(p);
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(msg);
+        }
+        
+        // Test 1: Disegno diretto sul canvas
+        function testDraw() {
+            log('=== TEST DRAW ===');
+            const canvas = document.getElementById('testCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Sfondo
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fillRect(0, 0, 600, 600);
+            
+            // Cerchio rosso
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(300, 300, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Testo
+            ctx.fillStyle = 'black';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Se vedi questo, il canvas funziona!', 300, 200);
+            
+            log('✅ Disegno completato');
+        }
+        
+        // Test 2: SimulationEngine
+        function testEngine() {
+            log('=== TEST ENGINE ===');
+            try {
+                if (typeof SimulationEngine === 'undefined') {
+                    log('❌ SimulationEngine non definito!', true);
+                    return;
+                }
+                const engine = new SimulationEngine();
+                log('✅ SimulationEngine creato');
+                
+                // Prova a generare un evento
+                const profile = SOURCE_PROFILES['crab'] || SOURCE_PROFILES.crab;
+                if (!profile) {
+                    log('❌ SOURCE_PROFILES[crab] non trovato!', true);
+                    log('Keys disponibili: ' + Object.keys(SOURCE_PROFILES || {}).join(', '), true);
+                    return;
+                }
+                log('✅ SOURCE_PROFILES disponibile');
+                
+                const event = engine.generateEvent(profile, 1, { width: 600, height: 600 }, { energy: 1500 });
+                if (!event) {
+                    log('❌ Evento nullo!', true);
+                    return;
+                }
+                log(`✅ Evento generato: ${event.tracks.length} tracce, energia ${event.energy} GeV`);
+                
+            } catch (e) {
+                log('❌ Errore: ' + e.message, true);
+            }
+        }
+        
+        // Test 3: CanvasRenderer
+        function testRenderer() {
+            log('=== TEST RENDERER ===');
+            try {
+                if (typeof CanvasRenderer === 'undefined') {
+                    log('❌ CanvasRenderer non definito!', true);
+                    return;
+                }
+                
+                const renderer = new CanvasRenderer('testCanvas');
+                log('✅ CanvasRenderer creato');
+                
+                if (!renderer.canvas) {
+                    log('❌ Renderer.canvas è null!', true);
+                    return;
+                }
+                log(`✅ Canvas: ${renderer.canvas.width}x${renderer.canvas.height}`);
+                
+                renderer.lightStyle = true;
+                renderer.clear();
+                log('✅ Clear chiamato');
+                
+            } catch (e) {
+                log('❌ Errore: ' + e.message, true);
+            }
+        }
+        
+        // Test 4: Full event rendering
+        function testFullEvent() {
+            log('=== TEST FULL EVENT ===');
+            try {
+                const engine = new SimulationEngine();
+                const profile = SOURCE_PROFILES['crab-nebula'];
+                const event = engine.generateEvent(profile, 1, { width: 600, height: 600 }, { energy: 2500 });
+                
+                log(`📊 Evento: ${event.tracks.length} tracce`);
+                
+                const renderer = new CanvasRenderer('testCanvas');
+                renderer.lightStyle = true;
+                renderer.suppressNoise = false;
+                
+                log('🎨 Chiamando renderEvent...');
+                renderer.renderEvent(event, true);
+                log('✅ renderEvent completato!');
+                
+            } catch (e) {
+                log('❌ Errore: ' + e.message, true);
+                console.error(e);
+            }
+        }
+        
+        // Verifica caricamento script
+        window.addEventListener('load', () => {
+            log('Pagina caricata');
+            
+            const checks = [
+                ['SimulationEngine', typeof SimulationEngine !== 'undefined'],
+                ['HillasAnalyzer', typeof HillasAnalyzer !== 'undefined'],
+                ['CanvasRenderer', typeof CanvasRenderer !== 'undefined'],
+                ['EnergyColorPalette', typeof EnergyColorPalette !== 'undefined'],
+                ['SOURCE_PROFILES', typeof SOURCE_PROFILES !== 'undefined'],
+            ];
+            
+            let allOk = true;
+            checks.forEach(([name, ok]) => {
+                log(`${ok ? '✅' : '❌'} ${name}`, !ok);
+                if (!ok) allOk = false;
+            });
+            
+            statusEl.innerHTML = allOk 
+                ? '<span class="ok">✅ Tutti gli script caricati correttamente</span>'
+                : '<span class="error">❌ Alcuni script mancanti</span>';
+            
+            if (allOk) {
+                log('🎯 Clicca i pulsanti per testare');
+            }
+        });
+    </script>
+</body>
+</html>

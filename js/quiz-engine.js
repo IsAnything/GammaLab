@@ -978,7 +978,7 @@ class QuizEngine {
                 SOURCE_PROFILES.pevatron,
                 SOURCE_PROFILES.blazar,
                 SOURCE_PROFILES.grb,
-                SOURCE_PROFILES.galacticCenter
+                SOURCE_PROFILES['galactic-center']
             ];
             this.currentProfile = gammaProfiles[Math.floor(Math.random() * gammaProfiles.length)];
             // If quizGammaOnly is enabled, ask for onlyGamma images (no hadron/muon, no noise)
