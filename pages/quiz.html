@@ -55,8 +55,20 @@
         /* ============ END EMERGENCY FIX ============ */
         
         /* Compact Quiz Layout */
-        body {
-            overflow-y: auto;
+        html, body {
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 100vh;
+        }
+        
+        .container, .quiz-container, main {
+            overflow: visible !important;
+            height: auto !important;
+        }
+        
+        #startScreen {
+            max-height: none !important;
+            overflow: visible !important;
         }
 
         /* Layout principale del quiz - SOLO quando NON è hidden */
