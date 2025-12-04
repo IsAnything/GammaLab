@@ -158,6 +158,9 @@
             ctx.fillText("Energia (TeV)", 0, 0);
             ctx.restore();
 
+            // X Axis Label
+            ctx.fillText("Eventi (ordinati per energia crescente)", canvas.width/2, canvas.height - margin/4);
+
             // Draw Ticks & Events
             const minVal = 0.1;
             const maxVal = 50;
