@@ -1310,7 +1310,7 @@ class CanvasRenderer {
     /**
      * Disegna singolo esagono
      */
-    drawHexagon(cx, cy, radius) {
+    drawHexagon(cx, cy, radius, fill = false) {
         this.ctx.beginPath();
         for (let i = 0; i < 6; i++) {
             const angle = (Math.PI / 3) * i - Math.PI / 6;
@@ -1323,7 +1323,11 @@ class CanvasRenderer {
             }
         }
         this.ctx.closePath();
-        this.ctx.stroke();
+        if (fill) {
+            this.ctx.fill();
+        } else {
+            this.ctx.stroke();
+        }
     }
 
     /**
@@ -2037,9 +2041,14 @@ class CanvasRenderer {
      * Renderizza fotone con pixel esagonali (stile light)
      */
     renderPhotonHexagonal(track) {
-        const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
-        const trackSourceTag = track.sourceType || this.sourceType;
-        const isHadronic = this._isHadronicSource(trackSourceTag);
+        try {
+            const intensityFactor = Math.max(0, Math.min(1, track.intensity || 0));
+            const trackSourceTag = track.sourceType || this.sourceType;
+            const isHadronic = this._isHadronicSource(trackSourceTag);
+
+            if (this.canvas.id && this.canvas.id.startsWith('quiz')) {
+                 // console.log('HexRender:', { intensity: track.intensity, x: track.x, y: track.y });
+            }
 
         // Parametri source-specific (default: Crab Nebula)
         let longMultiplier = 10;
@@ -2226,6 +2235,10 @@ class CanvasRenderer {
                 const tone = this.colorPalette.toneMap(energyNorm, exposureK);
                 colorRGB = this.colorPalette.mapNormalized(energyNorm);
                 
+                if (!Array.isArray(colorRGB) || colorRGB.length < 3 || isNaN(colorRGB[0])) {
+                    colorRGB = [100, 200, 255];
+                }
+
                 const brightness = Math.max(0.15, tone * exposureBoost * (0.8 + 0.4 * intensityFactor) * (0.6 + 0.4 * distanceFactor));
                 colorRGB = this.colorPalette.applyBrightnessToRGB(colorRGB, brightness);
             }
@@ -2254,6 +2267,10 @@ class CanvasRenderer {
                 b,
                 isWhite: isHotspot
             });
+        }
+
+        if (pixels.length === 0) {
+            // console.warn('⚠️ renderPhotonHexagonal: No pixels generated for track', track);
         }
 
         pixels.forEach(pixel => {
@@ -2295,6 +2312,9 @@ class CanvasRenderer {
         this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.7)';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
+        } catch (e) {
+            console.error('Error in renderPhotonHexagonal:', e);
+        }
     }
 
     _isHadronicSource(sourceTag) {
