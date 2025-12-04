@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GammaLab - Scale Energetiche</title>
+    <link rel="stylesheet" href="../css/main-style.css">
+    <style>
+        .visualization-canvas {
+            background: #000814;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 20px auto;
+            display: block;
+        }
+        .explanation-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .highlight {
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="site-title">🔭 GammaLab</h1>
+            <p class="site-subtitle">Guida alle Scale Energetiche</p>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="../index.html">🏠 Home</a></li>
+                    <li><a href="intro-cherenkov.html">💡 Introduzione</a></li>
+                    <li><a href="energy-scales.html" class="active">📊 Scale & TeV</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>⚡ L'Energia nell'Universo Estremo</h2>
+            <p>
+                Nei simulatori di GammaLab incontrerai spesso l'unità di misura <strong>TeV</strong> e vedrai grafici con scale particolari. 
+                Questa pagina ti aiuterà a capire cosa significano questi numeri e perché li rappresentiamo in questo modo.
+            </p>
+
+            <div class="explanation-box">
+                <h3>1. Cosa significa TeV?</h3>
+                <p>
+                    In fisica delle particelle, l'energia si misura in <strong>elettronvolt (eV)</strong>. 
+                    È l'energia guadagnata da un singolo elettrone quando attraversa una differenza di potenziale di 1 Volt.
+                </p>
+                <ul style="margin-top: 10px; line-height: 1.8;">
+                    <li><strong>1 eV</strong>: Energia tipica di una reazione chimica (es. una batteria).</li>
+                    <li><strong>1 keV (kilo-eV)</strong>: 1.000 eV (Raggi X medici).</li>
+                    <li><strong>1 MeV (Mega-eV)</strong>: 1.000.000 eV (Decadimento radioattivo nucleare).</li>
+                    <li><strong>1 GeV (Giga-eV)</strong>: 1.000.000.000 eV (Massa di un protone).</li>
+                    <li><strong>1 TeV (Tera-eV)</strong>: 1.000.000.000.000 eV (Energia di collisione al CERN o raggi gamma estremi).</li>
+                </ul>
+                <p style="margin-top: 10px;">
+                    Un raggio gamma da <span class="highlight">1 TeV</span> ha un'energia mille miliardi di volte superiore alla luce visibile!
+                </p>
+            </div>
+
+            <div class="explanation-box">
+                <h3>2. Perché scale diverse per sorgenti diverse?</h3>
+                <p>
+                    Non tutte le sorgenti cosmiche sono uguali. I nostri simulatori adattano la scala massima all'energia tipica della sorgente:
+                </p>
+                <ul style="margin-top: 10px;">
+                    <li><strong>Blazar (30 TeV)</strong>: Anche se potentissimi, i fotoni di energia estrema (>30 TeV) vengono spesso assorbiti viaggiando per miliardi di anni luce nello spazio intergalattico.</li>
+                    <li><strong>Centro Galattico (50 TeV)</strong>: È un candidato "PeVatron", un acceleratore naturale capace di raggiungere energie immense, quindi la scala si estende di più.</li>
+                    <li><strong>Crab Nebula (30 TeV)</strong>: La nostra "candela standard", emette stabilmente fino a energie molto alte.</li>
+                </ul>
+            </div>
+
+            <div class="explanation-box">
+                <h3>3. La Scala Logaritmica vs Lineare</h3>
+                <p>
+                    L'Universo segue una <strong>Legge di Potenza</strong>: per ogni fotone di altissima energia, ce ne sono migliaia di bassa energia.
+                    Se usassimo una scala normale (lineare), vedremmo solo i pochi eventi estremi in alto, mentre la stragrande maggioranza degli eventi (quelli comuni) sarebbe schiacciata in una linea sottile in basso.
+                </p>
+                <p>
+                    La <strong>Scala Logaritmica</strong> ci permette di vedere chiaramente sia gli eventi comuni (0.1 - 1 TeV) che quelli rari (10 - 50 TeV) nello stesso grafico.
+                </p>
+            </div>
+
+            <h3>📊 Visualizzazione Interattiva</h3>
+            <p>Il grafico qui sotto mostra la stessa distribuzione di eventi (punti blu) su due scale diverse.</p>
+            <canvas id="scaleCanvas" class="visualization-canvas" width="800" height="400"></canvas>
+            <div style="text-align: center; margin-top: 10px;">
+                <button id="toggleScaleBtn" class="btn btn-primary" style="padding: 10px 20px;">Cambia Scala (Lineare ↔ Logaritmica)</button>
+            </div>
+        </section>
+    </main>
+
+    <footer style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+        <p><strong>GammaLab</strong> - Guida alle Scale Energetiche</p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('scaleCanvas');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('toggleScaleBtn');
+        
+        let isLogarithmic = true;
+        
+        // Generiamo 50 eventi casuali seguendo una legge di potenza (più eventi a bassa energia)
+        const events = [];
+        for(let i=0; i<100; i++) {
+            // Power law distribution: E^-2.5
+            const r = Math.random();
+            const minE = 0.1;
+            const maxE = 50;
+            const index = 2.5;
+            // Inverse transform sampling
+            const energy = Math.pow((Math.pow(maxE, 1-index) - Math.pow(minE, 1-index)) * r + Math.pow(minE, 1-index), 1/(1-index));
+            events.push(energy);
+        }
+        events.sort((a,b) => a-b);
+
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#000814';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const margin = 60;
+            const w = canvas.width - margin * 2;
+            const h = canvas.height - margin * 2;
+            
+            // Draw Axes
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(margin, margin); // Top Y
+            ctx.lineTo(margin, canvas.height - margin); // Bottom Y (Origin)
+            ctx.lineTo(canvas.width - margin, canvas.height - margin); // Right X
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText(isLogarithmic ? "SCALA LOGARITMICA (Equilibrata)" : "SCALA LINEARE (Schiacciata)", canvas.width/2, margin/2);
+            
+            ctx.save();
+            ctx.translate(margin/2, canvas.height/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText("Energia (TeV)", 0, 0);
+            ctx.restore();
+
+            // Draw Ticks & Events
+            const minVal = 0.1;
+            const maxVal = 50;
+            
+            // Y Axis Ticks
+            ctx.textAlign = 'right';
+            ctx.font = '12px Courier New';
+            
+            if (isLogarithmic) {
+                // Log Scale Ticks: 0.1, 1, 10, 50
+                const ticks = [0.1, 1, 10, 50];
+                ticks.forEach(val => {
+                    const y = mapLog(val, minVal, maxVal, h);
+                    const screenY = canvas.height - margin - y;
+                    
+                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    ctx.beginPath();
+                    ctx.moveTo(margin, screenY);
+                    ctx.lineTo(canvas.width - margin, screenY);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(val + " TeV", margin - 10, screenY + 4);
+                });
+            } else {
+                // Linear Scale Ticks: 0, 10, 20, 30, 40, 50
+                const ticks = [0, 10, 20, 30, 40, 50];
+                ticks.forEach(val => {
+                    const y = mapLinear(val, 0, maxVal, h);
+                    const screenY = canvas.height - margin - y;
+                    
+                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    ctx.beginPath();
+                    ctx.moveTo(margin, screenY);
+                    ctx.lineTo(canvas.width - margin, screenY);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(val + " TeV", margin - 10, screenY + 4);
+                });
+            }
+            
+            // Draw Events
+            events.forEach((e, i) => {
+                let y;
+                if (isLogarithmic) {
+                    y = mapLog(e, minVal, maxVal, h);
+                } else {
+                    y = mapLinear(e, 0, maxVal, h);
+                }
+                
+                const screenY = canvas.height - margin - y;
+                // Spread X slightly to avoid overlap
+                const x = margin + (i / events.length) * w;
+                
+                // Color based on energy (using simple palette logic)
+                let color = '#0066ff'; // Low
+                if (e > 1) color = '#00ffff'; // Med
+                if (e > 10) color = '#00ff00'; // High
+                if (e > 30) color = '#ffff00'; // Extreme
+                
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, screenY, 5, 0, Math.PI*2);
+                ctx.fill();
+            });
+        }
+        
+        function mapLinear(val, min, max, height) {
+            return ((val - min) / (max - min)) * height;
+        }
+        
+        function mapLog(val, min, max, height) {
+            // log(val) mapped between log(min) and log(max)
+            const logVal = Math.log10(val);
+            const logMin = Math.log10(min);
+            const logMax = Math.log10(max);
+            return ((logVal - logMin) / (logMax - logMin)) * height;
+        }
+
+        btn.addEventListener('click', () => {
+            isLogarithmic = !isLogarithmic;
+            draw();
+        });
+
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>
