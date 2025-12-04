@@ -127,20 +127,23 @@
                 Clicca "Genera Evento" per simulare l'arrivo di un fotone gamma.
             </p>
 
-            <div style="border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; padding: 16px; background: rgba(15,23,42,0.6); color: var(--text-secondary); margin-bottom: 20px;">
-                <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">💡 Nota Scientifica: Crab vs SNR</p>
-                <p style="font-size: 0.95rem; margin-bottom: 12px;">
-                    Potresti notare che le tracce della Crab Nebula sono molto più <strong>piccole e compatte</strong> rispetto a quelle del simulatore "Supernova Remnants".
-                    Questo non è un errore! La Crab è una <strong>Pulsar Wind Nebula (PWN)</strong>: l'emissione proviene da una regione puntiforme attorno alla pulsar centrale.
-                    Al contrario, gli SNR classici emettono dall'intero guscio in espansione, creando tracce molto più estese e diffuse.
-                </p>
-                <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">💡 Come interagire con la traccia</p>
-                <ul style="margin-left: 20px; margin-bottom: 0;">
-                    <li style="margin-bottom: 6px;">Passa il mouse sopra l'ellisse per far comparire lo <strong>zoom circolare</strong>, le guide di Hillas e i parametri aggiornati.</li>
-                    <li style="margin-bottom: 6px;">Se vuoi chiudere lo zoom, fai click sul cerchio ingrandito: riapparirà appena sposti il mouse fuori e poi di nuovo sulla traccia.</li>
-                    <li style="margin-bottom: 0;">Quando l'animazione è attiva, attendi il completamento (≈2,5 s) prima che alpha e zoom mostrino il nuovo evento.</li>
-                </ul>
-            </div>
+            <details style="border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; background: rgba(15,23,42,0.6); color: var(--text-secondary); margin-bottom: 20px;">
+                <summary style="padding: 16px; cursor: pointer; font-weight: 600; color: var(--accent-cyan);">💡 Nota Scientifica & Istruzioni (Clicca per espandere)</summary>
+                <div style="padding: 0 16px 16px 16px;">
+                    <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">Nota Scientifica: Crab vs SNR</p>
+                    <p style="font-size: 0.95rem; margin-bottom: 12px;">
+                        Potresti notare che le tracce della Crab Nebula sono molto più <strong>piccole e compatte</strong> rispetto a quelle del simulatore "Supernova Remnants".
+                        Questo non è un errore! La Crab è una <strong>Pulsar Wind Nebula (PWN)</strong>: l'emissione proviene da una regione puntiforme attorno alla pulsar centrale.
+                        Al contrario, gli SNR classici emettono dall'intero guscio in espansione, creando tracce molto più estese e diffuse.
+                    </p>
+                    <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">Come interagire con la traccia</p>
+                    <ul style="margin-left: 20px; margin-bottom: 0;">
+                        <li style="margin-bottom: 6px;">Passa il mouse sopra l'ellisse per far comparire lo <strong>zoom circolare</strong>, le guide di Hillas e i parametri aggiornati.</li>
+                        <li style="margin-bottom: 6px;">Se vuoi chiudere lo zoom, fai click sul cerchio ingrandito: riapparirà appena sposti il mouse fuori e poi di nuovo sulla traccia.</li>
+                        <li style="margin-bottom: 0;">Quando l'animazione è attiva, attendi il completamento (≈2,5 s) prima che alpha e zoom mostrino il nuovo evento.</li>
+                    </ul>
+                </div>
+            </details>
 
             <!-- Controlli Interattivi -->
             <div class="controls-panel" style="background: linear-gradient(135deg, rgba(255,200,100,0.1), rgba(100,200,255,0.1)); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(100,150,255,0.3);">

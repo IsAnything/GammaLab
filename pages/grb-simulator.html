@@ -74,20 +74,22 @@
         <section class="card">
             <h2>🎮 Simulatore IACT - Gamma-Ray Bursts</h2>
             <p style="color: var(--text-secondary); margin-bottom: 24px;">Simulazione di un evento gamma da un <strong>GRB (afterglow TeV)</strong> osservato da <strong>3 telescopi Cherenkov</strong>. Le tracce hanno L/W ratio basso (~2) tipico dei GRB e decadono nel tempo.</p>
-            <div style="border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; padding: 16px; background: rgba(15,23,42,0.6); color: var(--text-secondary); margin-bottom: 20px;">
-                <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">💡 Come interagire con la traccia</p>
-                <ul style="margin-left: 20px; margin-bottom: 0;">
-                    <li style="margin-bottom: 6px;">Passa il mouse sopra l'ellisse per far comparire lo <strong>zoom circolare</strong>, le guide di Hillas e i parametri aggiornati.</li>
-                    <li style="margin-bottom: 6px;">Se vuoi chiudere lo zoom, fai click sul cerchio ingrandito: riapparirà appena sposti il mouse fuori e poi di nuovo sulla traccia.</li>
-                    <li style="margin-bottom: 0;">Quando l'animazione è attiva, attendi il completamento (≈2,5 s) prima che alpha e zoom mostrino il nuovo evento.</li>
-                </ul>
-            </div>
-            <div style="border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; padding: 16px; background: rgba(15,23,42,0.6); color: var(--text-secondary); margin-bottom: 20px;">
-                <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">💡 Nota Scientifica: Blazar e GRB: gemelli diversi?</p>
-                <p style="margin-bottom: 0; font-size: 0.95rem; line-height: 1.5;">
-                    Visivamente, le tracce di un Gamma-Ray Burst sono quasi identiche a quelle di un Blazar: entrambi sono sorgenti puntiformi extragalattiche. La vera differenza non è nella forma, ma nel <strong>tempo</strong> e nell'<strong>energia</strong>. Mentre un Blazar è una sorgente persistente, un GRB è un'esplosione improvvisa e breve. Se noti tracce particolarmente luminose, è dovuto all'energia estrema dei fotoni emessi durante il burst, ma la geometria rimane quella di una sorgente puntiforme.
-                </p>
-            </div>
+            <details style="border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; background: rgba(15,23,42,0.6); color: var(--text-secondary); margin-bottom: 20px;">
+                <summary style="padding: 16px; cursor: pointer; font-weight: 600; color: var(--accent-cyan);">💡 Istruzioni & Nota Scientifica (Clicca per espandere)</summary>
+                <div style="padding: 0 16px 16px 16px;">
+                    <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">Come interagire con la traccia</p>
+                    <ul style="margin-left: 20px; margin-bottom: 20px;">
+                        <li style="margin-bottom: 6px;">Passa il mouse sopra l'ellisse per far comparire lo <strong>zoom circolare</strong>, le guide di Hillas e i parametri aggiornati.</li>
+                        <li style="margin-bottom: 6px;">Se vuoi chiudere lo zoom, fai click sul cerchio ingrandito: riapparirà appena sposti il mouse fuori e poi di nuovo sulla traccia.</li>
+                        <li style="margin-bottom: 0;">Quando l'animazione è attiva, attendi il completamento (≈2,5 s) prima che alpha e zoom mostrino il nuovo evento.</li>
+                    </ul>
+
+                    <p style="margin-bottom: 8px; color: var(--accent-cyan); font-weight: 600;">Nota Scientifica: Blazar e GRB: gemelli diversi?</p>
+                    <p style="margin-bottom: 0; font-size: 0.95rem; line-height: 1.5;">
+                        Visivamente, le tracce di un Gamma-Ray Burst sono quasi identiche a quelle di un Blazar: entrambi sono sorgenti puntiformi extragalattiche. La vera differenza non è nella forma, ma nel <strong>tempo</strong> e nell'<strong>energia</strong>. Mentre un Blazar è una sorgente persistente, un GRB è un'esplosione improvvisa e breve. Se noti tracce particolarmente luminose, è dovuto all'energia estrema dei fotoni emessi durante il burst, ma la geometria rimane quella di una sorgente puntiforme.
+                    </p>
+                </div>
+            </details>
             <div style="text-align: center; margin: 24px 0;">
                 <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">💫 Genera Evento GRB</button>
                 <button id="clearBtn" class="btn btn-secondary" style="font-size: 1.2rem; padding: 16px 32px;">🗑️ Pulisci</button>
