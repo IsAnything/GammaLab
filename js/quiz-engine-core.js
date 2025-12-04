@@ -526,8 +526,9 @@ class QuizEngine {
             // In quiz vogliamo che le ellissi siano geometricamente aderenti
             renderer.respectExactHillas = true;
             renderer.subpixelEnabled = false;
-            // Modalità didattica: sopprimi rumore di background
-            if (this.quizGammaOnly) renderer.suppressNoise = true;
+            // Modalità didattica: NON sopprimi rumore per garantire visibilità
+            // Se l'evento è debole, almeno il background sarà visibile
+            renderer.suppressNoise = false;
 
             if (typeof renderer.enableHoverHillasMode === 'function') {
                 renderer.enableHoverHillasMode();
@@ -1191,14 +1192,29 @@ class QuizEngine {
         }
 
         // Aggiungi animazione flash
-        const canvas = document.getElementById('cam1');
+        const canvas = document.getElementById('quizCam1');
         if (canvas) {
             canvas.classList.add('flash');
             setTimeout(() => canvas.classList.remove('flash'), 400);
         }
 
-        if (event) {
+        // DEBUG: Log evento generato
+        console.log('🎯 Quiz Event:', {
+            sourceType: event ? event.sourceType : 'NULL',
+            tracks: event ? event.tracks.length : 0,
+            energy: event ? event.energy : 0
+        });
+
+        if (event && event.tracks && event.tracks.length > 0) {
             this.renderers[0].renderEvent(event, true);
+        } else {
+            console.error('❌ Evento vuoto o senza tracce!');
+            // Riprova a generare
+            event = this.engine.generateEvent(profile, 1, canvasSize, { ...customParams, energy: 2000 });
+            if (event && event.tracks) {
+                console.log('🔄 Retry successful, tracks:', event.tracks.length);
+                this.renderers[0].renderEvent(event, true);
+            }
         }
 
         if (hillas && hillas.valid) {
@@ -1240,13 +1256,23 @@ class QuizEngine {
         }
         
         // Aggiungi animazione flash
-        const canvas = document.getElementById('cam1');
+        const canvas = document.getElementById('quizCam1');
         if (canvas) {
             canvas.classList.add('flash');
             setTimeout(() => canvas.classList.remove('flash'), 400);
         }
         
-        this.renderers[0].renderEvent(event, true);
+        // DEBUG: Log evento adronico
+        console.log('⚛️ Hadronic Event:', {
+            tracks: event ? event.tracks.length : 0,
+            energy: event ? event.energy : 0
+        });
+
+        if (event && event.tracks && event.tracks.length > 0) {
+            this.renderers[0].renderEvent(event, true);
+        } else {
+            console.error('❌ Evento adronico vuoto!');
+        }
         
         if (hillas && hillas.valid) {
             this.renderers[0].renderHillasOverlay(hillas);

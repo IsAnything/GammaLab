@@ -1478,13 +1478,21 @@ class CanvasRenderer {
         });
 
         // Renderizza le tracce con clipping esagonale per mostrare solo quelle dentro la camera
-        if (!this.showEllipseOnly && event && event.tracks) {
+        if (!this.showEllipseOnly && event && event.tracks && event.tracks.length > 0) {
             this._withHexClip(() => {
                 const sortedTracks = [...event.tracks].sort((a, b) => a.intensity - b.intensity);
+                console.log(`🎨 Rendering ${sortedTracks.length} tracks on canvas ${this.canvas.id}`);
                 sortedTracks.forEach(track => {
                     this.renderPhoton(track);
                 });
             }, 0); // Ridotto inset per esagono più grande
+        } else if (!this.showEllipseOnly) {
+            // Se non ci sono tracce, disegna almeno un messaggio di debug
+            console.warn('⚠️ No tracks to render on', this.canvas.id);
+            this.ctx.fillStyle = 'rgba(255, 100, 100, 0.8)';
+            this.ctx.font = '14px monospace';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('No tracks', this.canvas.width / 2, this.canvas.height / 2);
         }
 
         // Bordo in primo piano
