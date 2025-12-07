@@ -380,14 +380,6 @@
             }, delay);
         }
 
-            displayHillasParameters(hillasParams);
-
-            if (hillasParams.length >= 2) {
-                const comparison = compareHillasAcrossCameras(hillasParams);
-                displayCoherence(comparison);
-            }
-        }
-
         function displayHillasParameters(hillasArray) {
             const container = document.getElementById('hillasDisplay');
             if (!container || hillasArray.length === 0) return;
