@@ -2262,7 +2262,9 @@ class CanvasRenderer {
                 colorRGB = this.colorPalette.applyBrightnessToRGB(colorRGB, brightness);
             }
 
-            const pixelAlpha = Math.min(0.95, (0.55 + 0.45 * intensityFactor) * Math.pow(Math.max(0, distanceFactor), 0.4));
+            const pixelAlpha = this.lightStyle 
+                ? Math.min(1.0, ((0.55 + 0.45 * intensityFactor) * Math.pow(Math.max(0, distanceFactor), 0.4)) + 0.2)
+                : Math.min(0.95, (0.55 + 0.45 * intensityFactor) * Math.pow(Math.max(0, distanceFactor), 0.4));
 
             let drawX = px;
             let drawY = py;
@@ -2273,9 +2275,25 @@ class CanvasRenderer {
             }
 
             const isHotspot = distanceFactor > 0.8 && Math.random() < 0.25;
-            const r = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[0]));
-            const g = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[1]));
-            const b = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[2]));
+            
+            let r, g, b;
+            if (this.lightStyle) {
+                // In light mode (Quiz), use dark colors for visibility against white background
+                if (isHotspot) {
+                    // Dark blue hotspot instead of white
+                    r = 0; g = 0; b = 120;
+                } else {
+                    // Darken the base color significantly to stand out on light gray
+                    r = Math.max(0, Math.round(colorRGB[0] * 0.4));
+                    g = Math.max(0, Math.round(colorRGB[1] * 0.4));
+                    b = Math.max(0, Math.round(colorRGB[2] * 0.4));
+                }
+            } else {
+                // Standard dark mode (Cherenkov style)
+                r = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[0]));
+                g = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[1]));
+                b = isHotspot ? 255 : Math.min(255, Math.round(colorRGB[2]));
+            }
 
             pixels.push({
                 x: drawX,
