@@ -153,8 +153,50 @@
 
             <!-- Controlli Interattivi -->
             <div class="controls-panel" style="background: linear-gradient(135deg, rgba(255,200,100,0.1), rgba(100,200,255,0.1)); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(100,150,255,0.3);">
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <!-- Selezione Sorgente -->
+                    <div class="control-group" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                        <label for="sourceSelect" style="display: block; color: var(--accent-cyan); margin-bottom: 8px; font-weight: bold;">Sorgente:</label>
+                        <select id="sourceSelect" style="width: 100%; padding: 8px; background: #0f172a; color: white; border: 1px solid var(--accent-cyan); border-radius: 4px;">
+                            <option value="random">🎲 Casuale</option>
+                            <option value="crab">🦀 Crab Nebula (PWN)</option>
+                            <option value="blazar">🌀 Blazar (AGN)</option>
+                            <option value="pevatron">💥 Supernova Remnant (PeVatron)</option>
+                            <option value="grb">⚡ GRB</option>
+                            <option value="galactic-center">⭐ Centro Galattico</option>
+                            <option value="hadron">⚛️ Background Adronico</option>
+                        </select>
+                    </div>
+
+                    <!-- Controllo Energia -->
+                    <div class="control-group" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label for="energyRange" style="color: var(--accent-cyan); font-weight: bold;">Energia:</label>
+                            <span id="energyDisplay" style="color: white;">Random</span>
+                        </div>
+                        <input type="range" id="energyRange" min="0.1" max="50" step="0.1" value="1" disabled style="width: 100%; cursor: pointer;">
+                        <div style="margin-top: 8px;">
+                            <input type="checkbox" id="energyRandom" checked style="cursor: pointer;">
+                            <label for="energyRandom" style="color: var(--text-secondary); cursor: pointer; font-size: 0.9rem;">Genera energia casuale</label>
+                        </div>
+                    </div>
+
+                    <!-- Controllo Zenith -->
+                    <div class="control-group" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label for="zenithRange" style="color: var(--accent-cyan); font-weight: bold;">Zenith:</label>
+                            <span id="zenithDisplay" style="color: white;">0°</span>
+                        </div>
+                        <input type="range" id="zenithRange" min="0" max="60" step="5" value="0" style="width: 100%; cursor: pointer;">
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">
+                            Angoli maggiori = più atmosfera attraversata
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Checkbox Animazione -->
-                <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; background: rgba(100,150,255,0.1); border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(100,150,255,0.1); border-radius: 8px;">
                     <input type="checkbox" id="animateCheckbox" checked style="width: 20px; height: 20px; cursor: pointer;">
                     <label for="animateCheckbox" style="cursor: pointer; user-select: none; font-weight: bold; color: var(--accent-purple);">
                         🎬 Anima arrivo fotoni Cherenkov (cascata temporale)
@@ -326,25 +368,68 @@
             });
 
             // Event listeners controlli
-            document.getElementById('generateBtn').addEventListener('click', generateRandomEvent);
+            document.getElementById('generateBtn').addEventListener('click', generateEventFromControls);
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
-            console.log('✅ Simulatore Crab Nebula con controlli inizializzato');
+            // UI Controls Listeners
+            const energyRange = document.getElementById('energyRange');
+            const energyDisplay = document.getElementById('energyDisplay');
+            const energyRandom = document.getElementById('energyRandom');
+            const zenithRange = document.getElementById('zenithRange');
+            const zenithDisplay = document.getElementById('zenithDisplay');
+
+            if (energyRange && energyDisplay) {
+                energyRange.addEventListener('input', (e) => {
+                    energyDisplay.textContent = `${e.target.value} TeV`;
+                });
+            }
+
+            if (energyRandom && energyRange && energyDisplay) {
+                energyRandom.addEventListener('change', (e) => {
+                    energyRange.disabled = e.target.checked;
+                    energyDisplay.textContent = e.target.checked ? 'Random' : `${energyRange.value} TeV`;
+                });
+            }
+
+            if (zenithRange && zenithDisplay) {
+                zenithRange.addEventListener('input', (e) => {
+                    zenithDisplay.textContent = `${e.target.value}°`;
+                });
+            }
+
+            console.log('✅ Simulatore Sandbox con controlli inizializzato');
             
             // Auto-genera primo evento
-            setTimeout(() => generateRandomEvent(), 500);
+            setTimeout(() => generateEventFromControls(), 500);
         });
 
 
-        function generateRandomEvent() {
-            const sources = ['crab', 'blazar', 'snr', 'grb', 'galactic_center'];
-            const randomSource = sources[Math.floor(Math.random() * sources.length)];
-            console.log(`🎲 Generazione evento Sandbox (${randomSource})...`);
-
-            const sourceProfile = getSourceProfile(randomSource);
+        function generateEventFromControls() {
+            // 1. Determina Sorgente
+            const sourceSelect = document.getElementById('sourceSelect');
+            let selectedSource = sourceSelect.value;
             
+            if (selectedSource === 'random') {
+                const sources = ['crab', 'blazar', 'pevatron', 'grb', 'galactic-center', 'hadron'];
+                selectedSource = sources[Math.floor(Math.random() * sources.length)];
+            }
+            
+            console.log(`🎲 Generazione evento Sandbox (${selectedSource})...`);
+            const sourceProfile = getSourceProfile(selectedSource);
+            
+            // 2. Determina Energia
+            const energyRandom = document.getElementById('energyRandom').checked;
+            let customEnergy = null;
+            if (!energyRandom) {
+                const energyTeV = parseFloat(document.getElementById('energyRange').value);
+                customEnergy = energyTeV * 1000; // Converti in GeV
+            }
+
+            // 3. Determina Zenith
+            const zenithAngle = parseInt(document.getElementById('zenithRange').value);
+
             // Update renderers source type
-            renderers.forEach(r => r.sourceType = randomSource);
+            renderers.forEach(r => r.sourceType = selectedSource);
             const shouldAnimate = document.getElementById('animateCheckbox').checked;
             const events = [];
             const hillasParams = [];
@@ -355,7 +440,15 @@
                 const cameraId = i + 1;
                 const camKey = `cam${cameraId}`;
                 
-                const event = engine.generateEvent(sourceProfile, cameraId, { width: 600, height: 600 });
+                // Prepare custom params
+                const customParams = {
+                    zenithAngle: zenithAngle
+                };
+                if (customEnergy) {
+                    customParams.energy = customEnergy;
+                }
+
+                const event = engine.generateEvent(sourceProfile, cameraId, { width: 600, height: 600 }, customParams);
                 events.push(event);
                 
                 // Renderizza con o senza animazione
