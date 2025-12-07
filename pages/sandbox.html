@@ -372,15 +372,53 @@
             document.getElementById('clearBtn').addEventListener('click', clearAllCanvases);
 
             // UI Controls Listeners
+            const sourceSelect = document.getElementById('sourceSelect');
             const energyRange = document.getElementById('energyRange');
             const energyDisplay = document.getElementById('energyDisplay');
             const energyRandom = document.getElementById('energyRandom');
             const zenithRange = document.getElementById('zenithRange');
             const zenithDisplay = document.getElementById('zenithDisplay');
 
+            // Aggiorna limiti energia quando cambia la sorgente
+            if (sourceSelect) {
+                sourceSelect.addEventListener('change', (e) => {
+                    const selectedSource = e.target.value;
+                    if (selectedSource === 'random') {
+                        // Reset ai limiti massimi generici
+                        energyRange.min = 0.1;
+                        energyRange.max = 50;
+                        energyRange.step = 0.1;
+                    } else {
+                        const profile = getSourceProfile(selectedSource);
+                        if (profile && profile.energyRange) {
+                            // Converti GeV -> TeV
+                            const minTeV = profile.energyRange.min / 1000;
+                            const maxTeV = profile.energyRange.max / 1000;
+                            
+                            energyRange.min = minTeV;
+                            energyRange.max = maxTeV;
+                            
+                            // Adatta step in base al range
+                            energyRange.step = (maxTeV - minTeV) > 10 ? 0.5 : 0.1;
+                            
+                            // Se il valore corrente è fuori range, correggilo
+                            let currentVal = parseFloat(energyRange.value);
+                            if (currentVal < minTeV) currentVal = minTeV;
+                            if (currentVal > maxTeV) currentVal = maxTeV;
+                            energyRange.value = currentVal;
+                            
+                            // Aggiorna display
+                            if (!energyRandom.checked) {
+                                energyDisplay.textContent = `${currentVal.toFixed(1)} TeV`;
+                            }
+                        }
+                    }
+                });
+            }
+
             if (energyRange && energyDisplay) {
                 energyRange.addEventListener('input', (e) => {
-                    energyDisplay.textContent = `${e.target.value} TeV`;
+                    energyDisplay.textContent = `${parseFloat(e.target.value).toFixed(1)} TeV`;
                 });
             }
 
