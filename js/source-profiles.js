@@ -115,7 +115,7 @@ const PEVATRON_PROFILE = {
     
     energyRange: {
         min: 500,       // GeV
-        max: 100000,    // GeV (100 TeV - PeV!)
+        max: 60000,     // GeV (60 TeV) - Limitato per evitare saturazione totale
         spectralIndex: 2.2  // Spettro più duro
     },
     
@@ -176,7 +176,7 @@ const BLAZAR_PROFILE = {
     
     energyRange: {
         min: 100,
-        max: 30000,     // GeV (30 TeV, attenuazione EBL)
+        max: 8000,      // GeV (8 TeV) - Cutoff tipico dovuto all'EBL
         spectralIndex: 2.5
     },
     
@@ -238,7 +238,7 @@ const GRB_PROFILE = {
     
     energyRange: {
         min: 200,
-        max: 20000,     // GeV (afterglow TeV)
+        max: 6000,      // GeV (6 TeV) - VHE GRB sono rari sopra pochi TeV
         spectralIndex: 2.3
     },
     
@@ -304,7 +304,7 @@ const GALACTIC_CENTER_PROFILE = {
     
     energyRange: {
         min: 200,
-        max: 50000,
+        max: 20000,     // GeV (20 TeV) - Limitato per chiarezza visiva
         spectralIndex: 2.4
     },
     
