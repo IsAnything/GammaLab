@@ -187,10 +187,13 @@ class TourGuide {
         this.isActive = false;
         this.overlay.classList.remove('active');
         this.tooltip.classList.remove('visible');
+        this.spotlight.classList.remove('active');
         
-        // Move spotlight offscreen
-        this.spotlight.style.top = '-9999px';
-        this.spotlight.style.left = '-9999px';
+        // Move spotlight offscreen after fade out
+        setTimeout(() => {
+            this.spotlight.style.top = '-9999px';
+            this.spotlight.style.left = '-9999px';
+        }, 400);
         
         // Optional callback
         if (this.onComplete) this.onComplete();
