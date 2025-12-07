@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sandbox Sperimentale - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
+    <link rel="stylesheet" href="../css/tour-style.css">
     <style>
         /* Stile specifico simulatore */
         .simulator-container {
@@ -108,6 +109,7 @@
         <div class="header-content">
             <h1 class="site-title"><a href="../index.html" style="text-decoration: none; color: inherit;">🔭 GammaLab</a></h1>
             <p class="site-subtitle">🧪 Sandbox Sperimentale</p>
+            <button id="startTourBtn" style="margin-left: 16px; padding: 6px 12px; background: var(--accent-cyan); color: #0f172a; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">❓ Tour Guidato</button>
             
             <nav>
                 <ul class="nav-menu">
@@ -288,6 +290,7 @@
     <script src="../js/visualization.js?v=99"></script>
     <script src="../js/stereo-reconstruction.js?v=8"></script>
     <script src="../js/lightbox.js"></script>
+    <script src="../js/tour-guide.js"></script>
     <script>
         // === SIMULATORE CRAB NEBULA ===
         let engine, renderers, hillasAnalyzer, colorPalette;
@@ -298,6 +301,48 @@
             hillasAnalyzer = new HillasAnalyzer();
             colorPalette = new EnergyColorPalette();
             engine.colorPalette = colorPalette;
+
+            // Inizializza Tour
+            const tour = new TourGuide([
+                {
+                    target: '.telescopes-row',
+                    title: 'Le Camere dei Telescopi',
+                    description: 'Questi tre pannelli mostrano cosa vedono i telescopi Cherenkov. Quando una particella colpisce l\'atmosfera, produce un lampo di luce blu che viene catturato qui.',
+                    placement: 'top'
+                },
+                {
+                    target: '.controls-panel',
+                    title: 'Pannello di Controllo',
+                    description: 'Qui sei tu al comando! Puoi scegliere quale sorgente cosmica osservare (come la Crab Nebula o un Blazar) e impostare l\'energia della particella.',
+                    placement: 'bottom'
+                },
+                {
+                    target: '#generateBtn',
+                    title: 'Genera Evento',
+                    description: 'Clicca questo pulsante per simulare l\'arrivo di un raggio gamma o di un raggio cosmico in tempo reale.',
+                    placement: 'top'
+                },
+                {
+                    target: '.hillas-panel',
+                    title: 'Analisi Scientifica',
+                    description: 'Dopo ogni evento, qui appariranno i "Parametri di Hillas". Questi numeri descrivono la forma della macchia di luce e sono fondamentali per capire la natura della particella.',
+                    placement: 'top'
+                },
+                {
+                    target: '.stereo-container',
+                    title: 'Visione Stereoscopica',
+                    description: 'Usando tre telescopi insieme, possiamo triangolare la direzione di arrivo del raggio gamma con grande precisione, proprio come fanno i nostri due occhi per la profondità.',
+                    placement: 'top'
+                }
+            ]);
+
+            document.getElementById('startTourBtn').addEventListener('click', () => tour.start());
+
+            // Check se è la prima visita (opzionale, per ora manuale)
+            // if (!localStorage.getItem('tourSeen')) {
+            //    setTimeout(() => tour.start(), 1000);
+            //    localStorage.setItem('tourSeen', 'true');
+            // }
 
             // Inizializza renderers per 3 telescopi con nuovo stile
             renderers = [
