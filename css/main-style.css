@@ -2425,7 +2425,7 @@ html, body {
     font-size: 0.95em !important;
 }
 
-/* Layout principale del quiz - SOLO quando NON è hidden */
+/* Layout principale del quiz - SOLO quando NON ï¿½ hidden */
 #quizScreen:not(.hidden) {
     display: flex;
     flex-direction: column;
@@ -2485,7 +2485,7 @@ html, body {
     display: block;
     width: 100% !important;
     height: 100% !important;
-    /* Background grigio chiaro per modalità quiz (lightStyle) */
+    /* Background grigio chiaro per modalitï¿½ quiz (lightStyle) */
     background: #e0e0e0; 
 }
 
@@ -2955,6 +2955,11 @@ html, body {
     border-radius: 8px;
     border-left: 4px solid #667eea; /* Default Purple */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    color: #1a1a1a; /* Dark text for white background */
+}
+
+.feature-card p, .feature-card ul, .feature-card li {
+    color: #333;
 }
 
 .feature-card h3 {
