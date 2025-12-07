@@ -536,8 +536,24 @@
             const energyRandom = document.getElementById('energyRandom').checked;
             let customEnergy = null;
             if (!energyRandom) {
-                const energyTeV = parseFloat(document.getElementById('energyRange').value);
-                customEnergy = energyTeV * 1000; // Converti in GeV
+                let energyTeV = parseFloat(document.getElementById('energyRange').value);
+                let energyGeV = energyTeV * 1000; // Converti in GeV
+
+                // Applica i limiti della sorgente specifica (anche se selezionata random)
+                if (sourceProfile && sourceProfile.energyRange) {
+                    const minGeV = sourceProfile.energyRange.min;
+                    const maxGeV = sourceProfile.energyRange.max;
+                    
+                    if (energyGeV < minGeV) {
+                        console.warn(`⚠️ Energia ${energyTeV} TeV sotto il minimo per ${selectedSource}. Corretto a ${minGeV/1000} TeV.`);
+                        energyGeV = minGeV;
+                    }
+                    if (energyGeV > maxGeV) {
+                        console.warn(`⚠️ Energia ${energyTeV} TeV sopra il massimo per ${selectedSource}. Corretto a ${maxGeV/1000} TeV.`);
+                        energyGeV = maxGeV;
+                    }
+                }
+                customEnergy = energyGeV;
             }
 
             // 3. Determina Zenith
