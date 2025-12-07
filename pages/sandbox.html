@@ -211,6 +211,8 @@
                 <button id="clearBtn" class="btn btn-secondary" style="font-size: 1.2rem; padding: 16px 32px;">
                     🗑️ Pulisci
                 </button>
+                <!-- Info Evento Generato -->
+                <div id="eventInfoDisplay" style="margin-top: 16px; font-size: 1.2rem; min-height: 1.5em; display: none;"></div>
             </div>
 
             <!-- 3 Telescopi in Riga -->
@@ -446,10 +448,40 @@
             // 1. Determina Sorgente
             const sourceSelect = document.getElementById('sourceSelect');
             let selectedSource = sourceSelect.value;
+            let isRandom = false;
             
             if (selectedSource === 'random') {
+                isRandom = true;
                 const sources = ['crab', 'blazar', 'pevatron', 'grb', 'galactic-center', 'hadron'];
                 selectedSource = sources[Math.floor(Math.random() * sources.length)];
+            }
+            
+            // Mappa nomi leggibili
+            const sourceNames = {
+                'crab': '🦀 Crab Nebula (PWN)',
+                'blazar': '🌀 Blazar (AGN)',
+                'pevatron': '💥 Supernova Remnant (PeVatron)',
+                'grb': '⚡ Gamma-Ray Burst (GRB)',
+                'galactic-center': '⭐ Centro Galattico',
+                'hadron': '⚛️ Background Adronico (Raggi Cosmici)'
+            };
+
+            // Mostra info evento
+            const infoDisplay = document.getElementById('eventInfoDisplay');
+            if (infoDisplay) {
+                const displayName = sourceNames[selectedSource] || selectedSource;
+                const color = selectedSource === 'hadron' ? '#ff6666' : '#00d9ff';
+                
+                infoDisplay.style.display = 'block';
+                infoDisplay.innerHTML = `
+                    <span style="color: var(--text-secondary);">Evento Generato:</span> 
+                    <strong style="color: ${color}; font-size: 1.4rem; margin-left: 8px;">${displayName}</strong>
+                `;
+                
+                // Animazione fade-in
+                infoDisplay.style.opacity = '0';
+                infoDisplay.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => infoDisplay.style.opacity = '1', 50);
             }
             
             console.log(`🎲 Generazione evento Sandbox (${selectedSource})...`);
@@ -595,6 +627,11 @@
             document.getElementById('hillasDisplay').innerHTML = 
                 '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Genera un evento per visualizzare i parametri di Hillas</p>';
             
+            const infoDisplay = document.getElementById('eventInfoDisplay');
+            if (infoDisplay) {
+                infoDisplay.style.display = 'none';
+            }
+
             console.log('🧹 Canvas puliti');
         }
     </script>
