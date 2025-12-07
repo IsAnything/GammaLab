@@ -143,6 +143,14 @@
             </details>
 
             <div style="text-align: center; margin: 24px 0;">
+                <!-- Checkbox Animazione -->
+                <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px 24px; background: rgba(100,150,255,0.1); border-radius: 8px; border: 1px solid rgba(100,150,255,0.2);">
+                    <input type="checkbox" id="animateCheckbox" checked style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="animateCheckbox" style="cursor: pointer; user-select: none; font-weight: bold; color: var(--accent-purple);">
+                        🎬 Anima arrivo fotoni Cherenkov (cascata temporale)
+                    </label>
+                </div>
+                <br>
                 <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">
                     🌀 Genera Evento Blazar
                 </button>
@@ -314,6 +322,7 @@
             console.log('🌀 Generazione evento Blazar...');
 
             const blazarProfile = getSourceProfile('blazar');
+            const shouldAnimate = document.getElementById('animateCheckbox').checked;
             const events = [];
             const hillasParams = [];
             const hillasMap = {};
@@ -325,28 +334,51 @@
                 const event = engine.generateEvent(blazarProfile, cameraId, { width: 600, height: 600 });
                 events.push(event);
 
-                renderers[i].renderEvent(event, i === 0);
+                // Renderizza con o senza animazione
+                if (shouldAnimate) {
+                    renderers[i].renderEventAnimated(event, i === 0);
+                } else {
+                    renderers[i].renderEvent(event, i === 0);
+                }
                 console.log(`🎨 Telescopio T${cameraId}: ${event.tracks.length} fotoni renderizzati`);
 
                 const hillas = hillasAnalyzer.analyze(event);
                 if (hillas && hillas.valid) {
                     hillasParams.push(hillas);
                     hillasMap[camKey] = hillas;
-                    renderers[i].renderHillasOverlay(hillas);
+                    
+                    // Renderizza ellisse dopo animazione o subito
+                    if (shouldAnimate) {
+                        setTimeout(() => renderers[i].renderHillasOverlay(hillas), 2500);
+                    } else {
+                        renderers[i].renderHillasOverlay(hillas);
+                    }
                 }
             }
 
-            const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas && hillasParams.length >= 2) {
-                if (typeof window.renderStereoReconstruction === 'function') {
-                    window.renderStereoReconstruction(stereoCanvas, hillasMap, {
-                        showGeometry: true,
-                        showCameraPositions: true,
-                        showArrows: true,
-                        showArrivalDirection: true
-                    });
+            // Mostra parametri e stereo con delay se animato
+            const delay = shouldAnimate ? 2500 : 0;
+            setTimeout(() => {
+                displayHillasParameters(hillasParams);
+
+                if (hillasParams.length >= 2) {
+                    const comparison = compareHillasAcrossCameras(hillasParams);
+                    displayCoherence(comparison);
                 }
-            }
+
+                const stereoCanvas = document.getElementById('stereo');
+                if (stereoCanvas && hillasParams.length >= 2) {
+                    if (typeof window.renderStereoReconstruction === 'function') {
+                        window.renderStereoReconstruction(stereoCanvas, hillasMap, {
+                            showGeometry: true,
+                            showCameraPositions: true,
+                            showArrows: true,
+                            showArrivalDirection: true
+                        });
+                    }
+                }
+            }, delay);
+        }
 
             displayHillasParameters(hillasParams);
 

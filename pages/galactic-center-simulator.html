@@ -85,6 +85,14 @@
                 </div>
             </details>
             <div style="text-align: center; margin: 24px 0;">
+                <!-- Checkbox Animazione -->
+                <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px 24px; background: rgba(100,150,255,0.1); border-radius: 8px; border: 1px solid rgba(100,150,255,0.2);">
+                    <input type="checkbox" id="animateCheckbox" checked style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="animateCheckbox" style="cursor: pointer; user-select: none; font-weight: bold; color: var(--accent-purple);">
+                        🎬 Anima arrivo fotoni Cherenkov (cascata temporale)
+                    </label>
+                </div>
+                <br>
                 <button id="generateBtn" class="btn btn-primary" style="font-size: 1.2rem; padding: 16px 32px;">🌌 Genera Evento GC</button>
                 <button id="clearBtn" class="btn btn-secondary" style="font-size: 1.2rem; padding: 16px 32px;">🗑️ Pulisci</button>
             </div>
@@ -222,19 +230,41 @@
         });
         function generateGCEvent() {
             const gcProfile = getSourceProfile('galactic-center');
+            const shouldAnimate = document.getElementById('animateCheckbox').checked;
             const events = [], hillasParams = [], hillasMap = {};
+            
             for (let i = 0; i < 3; i++) {
                 const cameraId = i + 1, camKey = `cam${cameraId}`;
                 const event = engine.generateEvent(gcProfile, cameraId, { width: 600, height: 600 });
                 events.push(event);
-                renderers[i].renderEvent(event, i === 0);
+                
+                if (shouldAnimate) {
+                    renderers[i].renderEventAnimated(event, i === 0);
+                } else {
+                    renderers[i].renderEvent(event, i === 0);
+                }
+                
                 const hillas = hillasAnalyzer.analyze(event);
-                if (hillas && hillas.valid) { hillasParams.push(hillas); hillasMap[camKey] = hillas; renderers[i].renderHillasOverlay(hillas); }
+                if (hillas && hillas.valid) { 
+                    hillasParams.push(hillas); 
+                    hillasMap[camKey] = hillas; 
+                    
+                    if (shouldAnimate) {
+                        setTimeout(() => renderers[i].renderHillasOverlay(hillas), 2500);
+                    } else {
+                        renderers[i].renderHillasOverlay(hillas);
+                    }
+                }
             }
-            const stereoCanvas = document.getElementById('stereo');
-            if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) window.renderStereoReconstruction(stereoCanvas, hillasMap, {showGeometry: true, showCameraPositions: true, showArrows: true, showArrivalDirection: true});
-            displayHillasParameters(hillasParams);
-            if (hillasParams.length >= 2) displayCoherence(compareHillasAcrossCameras(hillasParams));
+            
+            const delay = shouldAnimate ? 2500 : 0;
+            setTimeout(() => {
+                const stereoCanvas = document.getElementById('stereo');
+                if (stereoCanvas && hillasParams.length >= 2 && window.renderStereoReconstruction) 
+                    window.renderStereoReconstruction(stereoCanvas, hillasMap, {showGeometry: true, showCameraPositions: true, showArrows: true, showArrivalDirection: true});
+                displayHillasParameters(hillasParams);
+                if (hillasParams.length >= 2) displayCoherence(compareHillasAcrossCameras(hillasParams));
+            }, delay);
         }
         function displayHillasParameters(hillasArray) {
             const container = document.getElementById('hillasDisplay');
