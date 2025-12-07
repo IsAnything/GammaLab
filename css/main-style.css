@@ -2236,3 +2236,827 @@ input[type="range"]::-webkit-slider-track {
 }
 
 
+
+/* ==================== QUIZ SPECIFIC STYLES (Moved from quiz.html) ==================== */
+
+/* ============ CRITICAL FIX - HIDDEN CLASS MUST WORK ============ */
+.hidden {
+    display: none !important;
+}
+
+/* ============ EMERGENCY FIX - FORCE VISIBILITY ============ */
+#startScreen:not(.hidden) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background: #111827 !important;
+    color: #e2e8f0 !important;
+    padding: 30px !important;
+    margin: 20px !important;
+    border-radius: 12px !important;
+}
+
+#startScreen * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#startScreen h2, #startScreen h3 {
+    color: #06b6d4 !important;
+}
+
+#startScreen p, #startScreen li {
+    color: #e2e8f0 !important;
+}
+
+#startQuizBtn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #22c55e !important;
+    color: white !important;
+    padding: 16px 32px !important;
+    font-size: 1.2em !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+}
+
+/* ============ END EMERGENCY FIX ============ */
+
+/* Compact Quiz Layout */
+html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+}
+
+.container, .quiz-container, main {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+#startScreen {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* ============ THEORETICAL QUESTION STYLING ============ */
+/* Layout affiancato per domande teoriche */
+#theoreticalQuestionContainer {
+    margin-bottom: 20px;
+}
+
+.theoretical-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+/* Box domanda teorica (sinistra) */
+.theoretical-question-box {
+    flex: 1 1 400px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.theoretical-question-box .theory-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.theoretical-question-box .theory-label {
+    font-size: 0.9em;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.theoretical-question-box .theory-text {
+    font-size: 1.3em;
+    line-height: 1.5;
+    color: #e2e8f0;
+    margin: 0;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Box risposte teoriche (destra) */
+.theoretical-answers-box {
+    flex: 1 1 350px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.theoretical-answers-box h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--accent-cyan);
+}
+
+.theoretical-answers-box .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.theoretical-answers-box .quiz-option {
+    padding: 14px 18px;
+    font-size: 1em;
+    text-align: left;
+}
+
+/* Legacy support - hide old theoretical question div */
+.theoretical-question {
+    display: none;
+}
+
+.theoretical-question .theory-text {
+    font-size: 1.4em;
+    line-height: 1.5;
+    color: #e2e8f0;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ============ COMPACT QUIZ LAYOUT ============ */
+.quiz-main-layout {
+    gap: 15px !important;
+}
+
+.camera-container {
+    flex: 0 0 300px !important;
+}
+
+.canvas-wrapper {
+    width: 300px !important;
+    height: 300px !important;
+}
+
+.quiz-controls-card {
+    flex: 1 1 300px !important;
+    max-height: none !important;
+}
+
+.quiz-options {
+    gap: 6px !important;
+}
+
+.quiz-option {
+    padding: 10px 12px !important;
+    font-size: 0.95em !important;
+}
+
+/* Layout principale del quiz - SOLO quando NON è hidden */
+#quizScreen:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    /* Remove fixed height to avoid clipping and overlap */
+    min-height: 600px;
+    padding-bottom: 40px;
+}
+
+.quiz-header {
+    flex: 0 0 auto;
+    margin-bottom: 10px;
+}
+
+/* Wrapper per mettere simulatore e controlli affiancati */
+.quiz-main-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+/* Sezione Simulatore (Sinistra) */
+.simulator-section {
+    flex: 1 1 500px; /* Grow, shrink, basis */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0 !important;
+    min-width: 300px;
+}
+
+.quiz-layout-container {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.camera-container {
+    flex: 0 0 350px; /* Fixed width for camera container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+}
+
+.canvas-wrapper {
+    position: relative;
+    width: 350px; /* Explicit width */
+    height: 350px; /* Explicit height */
+    margin: 0 auto;
+    overflow: visible; /* Assicura che il contenuto sia visibile */
+}
+
+.camera-canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    /* Background grigio chiaro per modalità quiz (lightStyle) */
+    background: #e0e0e0; 
+}
+
+.overlay-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Sezione Controlli/Risposte (Destra) */
+.quiz-controls-card {
+    flex: 0 0 350px; /* Fixed width */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0 !important;
+    /* Sticky positioning for desktop */
+    position: sticky;
+    top: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.quiz-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.quiz-option {
+    padding: 12px;
+    font-size: 1em;
+    text-align: left;
+}
+
+/* Info box dentro il simulatore */
+.quiz-info-box {
+    font-size: 0.95em;
+    padding: 16px !important;
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Adattamento per schermi piccoli */
+@media (max-width: 1000px) {
+    .quiz-main-layout {
+        flex-direction: column;
+    }
+
+    .quiz-controls-card {
+        flex: 1;
+        width: 100%;
+        position: static; /* Disable sticky on mobile */
+        max-height: none;
+    }
+
+    .quiz-options {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .camera-container {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .canvas-wrapper {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+        aspect-ratio: 1/1;
+    }
+}
+
+.quiz-container {
+    padding-top: 10px;
+    padding-bottom: 40px;
+    max-width: 100% !important;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Ensure feedback panel is visible */
+.feedback-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(20, 30, 50, 0.95);
+    border-radius: 8px;
+    border: 2px solid var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 100;
+}
+
+/* Make next button very prominent */
+#nextQuestionBtn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.2em;
+    margin-top: 10px;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+#nextQuestionBtn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+/* === FIXES FOR USER REPORTED ISSUES === */
+
+/* 1. Fix 'Black Band' covering title */
+.quiz-container {
+    margin-top: 40px; /* Push content down below header */
+    position: relative;
+    z-index: 5;
+}
+
+/* 2. Fix 'Hidden Next Button' */
+.feedback-panel {
+    z-index: 1000; /* Ensure it's on top */
+    position: relative;
+    background: rgba(20, 30, 50, 0.98); /* More opaque */
+}
+
+#nextQuestionBtn {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    z-index: 1001;
+    position: relative;
+}
+
+/* 3. Fix 'Black Camera' visibility */
+.camera-container {
+    background: #000; /* Fallback background */
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    min-height: 350px; /* Ensure height */
+}
+
+.canvas-wrapper {
+    background: #e0e0e0; /* Visible background if canvas fails */
+    border-radius: 8px; /* Angoli arrotondati, NON circolare */
+}
+
+/* Ensure sticky controls don't get covered */
+.quiz-controls-card {
+    z-index: 90;
+    background: var(--bg-card);
+}
+
+
+/* ==================== INFO PAGES SPECIFIC STYLES (Moved from crab-nebula.html etc) ==================== */
+
+.highlight-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.highlight-box h3 {
+    margin-top: 0;
+    color: white;
+}
+
+.process-card {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.process-card h3 {
+    color: #1a1a1a;
+    margin-top: 0;
+}
+
+.process-card p {
+    color: #333;
+    line-height: 1.6;
+}
+
+.instruments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+
+/* ==================== CRAB NEBULA SPECIFIC ==================== */
+
+.image-content {
+    position: sticky;
+    top: 20px;
+}
+
+.image-content img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.image-content figcaption {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.highlight-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.highlight-box h3 {
+    margin-top: 0;
+    color: white;
+}
+
+.process-card {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.process-card h3 {
+    color: #1a1a1a;
+    margin-top: 0;
+}
+
+.process-card p {
+    color: #333;
+    line-height: 1.6;
+}
+
+.instruments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.instrument-tag {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+}
+
+/* Timeline Styles */
+.timeline-container {
+    position: relative;
+    margin: 3rem 0;
+    padding: 2rem 0;
+}
+
+.timeline-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.timeline-btn:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.timeline-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
+}
+
+.timeline-line {
+    position: relative;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    margin: 2rem 0;
+    border-radius: 2px;
+}
+
+.timeline-progress {
+    position: absolute;
+    height: 100%;
+    background: #ffd700;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.timeline-events {
+    position: relative;
+    min-height: 300px;
+}
+
+.timeline-event {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+    pointer-events: none;
+}
+
+.timeline-event.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.event-marker {
+    position: absolute;
+    top: -30px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 4px solid #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.event-marker:hover {
+    transform: scale(1.3);
+    border-color: #764ba2;
+}
+
+.event-marker.active {
+    background: #ffd700;
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.event-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-left: 4px solid #667eea;
+}
+
+.event-date {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.event-title {
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.event-description {
+    color: #333;
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+
+.event-image {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.event-image img {
+    max-width: 60%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+
+/* ==================== INFO PAGES COMMON & VARIANTS ==================== */
+
+.hero-section {
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.hero-images {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-images img {
+    width: 32%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.content-with-image {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+    align-items: start;
+}
+
+.content-with-image.reverse {
+    grid-template-columns: 1fr 1.5fr;
+}
+
+.content-with-image.reverse .text-content {
+    order: 2;
+}
+
+.content-with-image.reverse .image-content {
+    order: 1;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.feature-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea; /* Default Purple */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.feature-card h3 {
+    color: #1a1a1a;
+    margin-top: 0;
+}
+
+/* Highlight Box Variants */
+.highlight-box.cyan {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.highlight-box.orange {
+    background: linear-gradient(135deg, #ff6644 0%, #ff8866 100%);
+    box-shadow: 0 4px 15px rgba(255, 102, 68, 0.3);
+}
+
+/* Feature Card Variants */
+.feature-card.cyan {
+    border-left-color: #4facfe;
+}
+
+.feature-card.orange {
+    border-left-color: #ff6644;
+}
+
+
+/* Magenta Variant (Galactic Center) */
+.highlight-box.magenta {
+    background: linear-gradient(135deg, #aa66ff 0%, #cc88ff 100%);
+    box-shadow: 0 4px 15px rgba(170, 102, 255, 0.3);
+}
+
+.feature-card.magenta {
+    border-left-color: #aa66ff;
+}
+
+/* Single Hero Image (GRB) */
+.hero-image {
+    width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    background: #ffffff;
+}
+
+
+/* GRB Specific */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.animated-section {
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.animated-section img {
+    max-width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    display: inline-block;
+    background: #f0f0f0;
+}
+
+.animated-section .gif-container {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.stat-box .number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.stat-box .label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+

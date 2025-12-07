@@ -5,168 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRB (Gamma-Ray Burst) - GammaLab</title>
     <link rel="stylesheet" href="../css/main-style.css">
-    <style>
-        .hero-section {
-            position: relative;
-            margin-bottom: 2rem;
-        }
-        
-        .hero-image {
-            width: 100%;
-            max-height: 350px;
-            object-fit: contain;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            background: #ffffff;
-        }
-        
-        .content-with-image {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
-            align-items: start;
-        }
-        
-        .content-with-image.reverse {
-            grid-template-columns: 1fr 1.5fr;
-        }
-        
-        .content-with-image.reverse .text-content {
-            order: 2;
-        }
-        
-        .content-with-image.reverse .image-content {
-            order: 1;
-        }
-        
-        .image-content {
-            position: sticky;
-            top: 20px;
-        }
-        
-        .image-content img {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            background: #ffffff;
-        }
-        
-        .image-content figcaption {
-            margin-top: 0.5rem;
-            font-style: italic;
-            color: #1a1a1a;
-            font-size: 0.9rem;
-            text-align: center;
-            font-weight: 500;
-        }
-        // File rinominato: grb-new.html -> grb.html
-        
-        .highlight-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 2rem 0;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .highlight-box h3 {
-            margin-top: 0;
-            color: white;
-        }
-        
-        .highlight-box ul {
-            color: white;
-        }
-        
-        .type-card {
-            background: #ffffff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .type-card h3 {
-            color: #1a1a1a;
-            margin-top: 0;
-        }
-        
-        .type-card p {
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .type-card ul {
-            color: #1a1a1a;
-            font-weight: 500;
-        }
-        
-        .type-card ul li {
-            margin: 0.5rem 0;
-            color: #000;
-        }
-        
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .animated-section {
-            text-align: center;
-            margin: 3rem 0;
-        }
-        
-        .animated-section img {
-            max-width: 80%;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            display: inline-block;
-            background: #f0f0f0;
-        }
-        
-        .animated-section .gif-container {
-            margin: 2rem 0;
-            padding: 1rem;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .stat-box {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-        }
-        
-        .stat-box .number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 0.5rem 0;
-        }
-        
-        .stat-box .label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-    </style>
+    <!-- Styles moved to main-style.css -->
 </head>
 <body>
     <header>
@@ -189,6 +28,11 @@
                     <li><a href="quiz.html">🎮 Quiz</a></li>
                 </ul>
             </nav>
+            <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <a href="grb-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
+                    🎮 Vai al Simulatore GRB
+                </a>
+            </div>
             <div class="page-simulator-cta" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
                 <a href="grb-simulator.html" class="btn btn-primary" style="font-size: 1rem;">
                     🎮 Vai al Simulatore GRB
@@ -256,7 +100,7 @@
             <h2>🔍 Due Tipologie Principali</h2>
             
             <div class="comparison-grid">
-                <div class="type-card">
+                <div class="feature-card">
                     <h3>⏱️ GRB Brevi (Short GRB)</h3>
                     <p><strong>Durata:</strong> < 2 secondi (T₉₀)</p>
                     <p><strong>Origine:</strong> Fusione di stelle di neutroni o di una stella di neutroni con un buco nero</p>
@@ -271,7 +115,7 @@
                     </ul>
                 </div>
                 
-                <div class="type-card">
+                <div class="feature-card">
                     <h3>⏳ GRB Lunghi (Long GRB)</h3>
                     <p><strong>Durata:</strong> > 2 secondi (tipicamente 10-100 s)</p>
                     <p><strong>Origine:</strong> Collasso di stelle massicce (>25 masse solari) - Ipernove o Collapsar</p>
@@ -699,3 +543,4 @@
     </script>
 </body>
 </html>
+

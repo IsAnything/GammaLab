@@ -3381,3 +3381,84 @@ if (typeof window !== 'undefined') {
 }
 
 // Exposure/Sub-pixel UI helper rimosso (non più necessario)
+
+/**
+ * Export canvas to image (merging overlay if present)
+ * @param {string} canvasId - The ID of the main canvas to export
+ */
+function exportCanvas(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error('Canvas not found:', canvasId);
+        return;
+    }
+
+    // Create a temporary link
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.download = `GammaLab_${canvasId}_${timestamp}.png`;
+    
+    const overlay = document.getElementById(`${canvasId}-overlay`);
+    
+    if (overlay) {
+        // Create a temporary canvas to merge
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+        
+        // Fill black background just in case
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        // Draw main canvas
+        ctx.drawImage(canvas, 0, 0);
+        
+        // Draw overlay
+        ctx.drawImage(overlay, 0, 0);
+        
+        link.href = tempCanvas.toDataURL('image/png');
+    } else {
+        link.href = canvas.toDataURL('image/png');
+    }
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// === EXPORT BUTTON AUTO-INJECTION ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all telescope camera containers (support both class names)
+    const cameras = document.querySelectorAll('.telescope-camera, .camera-container');
+    
+    cameras.forEach(camera => {
+        // Find the main canvas (not overlay)
+        const canvas = camera.querySelector('canvas:not([id$="-overlay"])');
+        
+        if (canvas && canvas.id) {
+            // Create button container
+            const btnContainer = document.createElement('div');
+            btnContainer.style.textAlign = 'center';
+            btnContainer.style.marginTop = '10px';
+            
+            // Create button
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-secondary';
+            btn.innerHTML = '\uD83D\uDCF8 Scarica Immagine';
+            btn.style.padding = '6px 12px';
+            btn.style.fontSize = '0.85rem';
+            btn.style.width = '100%'; // Full width to match canvas
+            btn.style.marginTop = '5px';
+            
+            // Add click handler
+            btn.onclick = function() { exportCanvas(canvas.id); };
+            
+            // Append to container
+            btnContainer.appendChild(btn);
+            
+            // Append container to camera div
+            camera.appendChild(btnContainer);
+        }
+    });
+});
