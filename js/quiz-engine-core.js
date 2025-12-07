@@ -653,7 +653,13 @@ class QuizEngine {
         
         // Nascondi start screen, mostra quiz screen
         document.getElementById('startScreen').classList.add('hidden');
-        document.getElementById('quizScreen').classList.remove('hidden');
+        const quizScreen = document.getElementById('quizScreen');
+        quizScreen.classList.remove('hidden');
+        
+        // Scroll automatico in cima alla sezione quiz
+        setTimeout(() => {
+            quizScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
         
         // IMPORTANTE: Forza render iniziale del canvas per assicurarsi che sia visibile
         // Questo risolve il problema del canvas vuoto all'avvio
