@@ -53,7 +53,7 @@ const CRAB_NEBULA_PROFILE = {
     // Parametri energetici
     energyRange: {
         min: 100,      // GeV
-        max: 50000,    // GeV (50 TeV)
+        max: 15000,    // GeV (15 TeV) - Limitato per mantenere la firma visiva tipica
         spectralIndex: 2.6  // Γ tipico
     },
     
