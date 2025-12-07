@@ -20,6 +20,8 @@
 /* Spotlight effect using box-shadow on a pseudo-element or separate div */
 .tour-spotlight {
     position: absolute;
+    top: -9999px; /* Move off-screen initially to prevent shadow from covering page */
+    left: -9999px;
     border-radius: 8px;
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
     z-index: 9999;

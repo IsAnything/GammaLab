@@ -77,21 +77,42 @@ class TourGuide {
             return;
         }
 
-        // Scroll to element
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // Update Tooltip Content
+        // Update Tooltip Content first to get dimensions if needed (though hidden)
         this.titleEl.textContent = step.title;
         this.descEl.textContent = step.description;
         this.stepCountEl.textContent = `${index + 1} / ${this.steps.length}`;
         this.nextBtn.textContent = index === this.steps.length - 1 ? 'Finito!' : 'Avanti';
 
+        // Smart Scroll: Ensure both target and tooltip area are visible
+        // We estimate tooltip height (approx 200px) or use a safe margin
+        const placement = step.placement || 'bottom';
+        const rect = targetEl.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const absoluteTop = rect.top + scrollTop;
+        
+        let scrollTarget = absoluteTop;
+        
+        // If tooltip is on top, we need space above the element
+        if (placement === 'top') {
+            // Scroll to (Element Top - Tooltip Height - Margin)
+            // Assuming tooltip is roughly 250px max height
+            scrollTarget = absoluteTop - 300; 
+        } else {
+            // Center the element
+            scrollTarget = absoluteTop - (window.innerHeight / 2) + (rect.height / 2);
+        }
+
+        window.scrollTo({
+            top: Math.max(0, scrollTarget),
+            behavior: 'smooth'
+        });
+
         // Position Spotlight & Tooltip after a small delay to allow scroll to finish
         setTimeout(() => {
             this.positionSpotlight(targetEl);
-            this.positionTooltip(targetEl, step.placement || 'bottom');
+            this.positionTooltip(targetEl, placement);
             this.tooltip.classList.add('visible');
-        }, 400);
+        }, 450);
     }
 
     positionSpotlight(element) {
