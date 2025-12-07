@@ -64,6 +64,7 @@ class TourGuide {
         this.isActive = true;
         this.currentStepIndex = 0;
         this.overlay.classList.add('active');
+        this.spotlight.classList.add('active');
         this.showStep(0);
     }
 
