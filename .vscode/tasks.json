@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "append_css",
+			"type": "shell",
+			"command": "Add-Content",
+			"args": [
+				"css/main-style.css",
+				"\n/* ==================== VIDEO RESPONSIVE ==================== */\n.video-section {\n  margin: 32px 0;\n  text-align: center;\n}\n\n.video-container {\n  position: relative;\n  width: 100%;\n  max-width: 900px; /* Limit width for better viewing on large screens */\n  margin: 0 auto;\n  border-radius: 12px;\n  overflow: hidden;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);\n  border: 1px solid var(--border-color);\n  background: #000;\n}\n\n.video-container video {\n  width: 100%;\n  height: auto;\n  display: block;\n}\n"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
