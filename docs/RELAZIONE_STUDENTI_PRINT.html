@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relazione GammaLab</title>
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #16a085;
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .header-info {
+            margin-bottom: 40px;
+            font-style: italic;
+            color: #666;
+        }
+        @media print {
+            body {
+                padding: 0;
+                font-size: 12pt;
+            }
+            a {
+                text-decoration: none;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GammaLab: Il Nostro Viaggio nell'Universo dei Raggi Gamma</h1>
+    
+    <div class="header-info">
+        <p><strong>Progetto realizzato dalla Classe [Inserire Classe]</strong></p>
+    </div>
+
+    <h2>1. L'Idea: Perché GammaLab?</h2>
+    <p>
+        Quando abbiamo deciso di partecipare a questo concorso, volevamo creare qualcosa che non fosse solo una semplice ricerca scolastica, ma uno strumento "vivo". A scuola studiamo la fisica sui libri, ma spesso ci manca il contatto con la scienza di frontiera, quella che si fa oggi nei grandi osservatori internazionali.
+    </p>
+    <p>
+        Così è nato <strong>GammaLab</strong>. Ci siamo chiesti: "Come fanno gli scienziati a 'vedere' i raggi gamma se sono invisibili ai nostri occhi?". La risposta ci ha affascinato: usano l'atmosfera come un gigantesco rivelatore e telescopi che catturano lampi di luce bluastra (luce Cherenkov) che durano pochi nanosecondi.
+    </p>
+    <p>
+        Il nostro obiettivo era ambizioso: <strong>costruire un laboratorio virtuale</strong> che permettesse a chiunque, anche ai nostri compagni di altre classi, di sedersi alla console di controllo di un telescopio Cherenkov e capire, provando con mano, come si fa astrofisica delle alte energie.
+    </p>
+
+    <h2>2. Cosa Abbiamo Realizzato</h2>
+    <p>
+        Il cuore del nostro progetto è un sito web interattivo che simula, in tempo reale, quello che succede quando un raggio gamma colpisce l'atmosfera terrestre. Non volevamo usare video preregistrati, così abbiamo programmato un motore di simulazione che genera eventi casuali sempre diversi.
+    </p>
+
+    <h3>Il Simulatore</h3>
+    <p>Abbiamo lavorato sodo per ricreare l'esperienza di un vero osservatorio:</p>
+    <ul>
+        <li><strong>Vedere l'invisibile</strong>: Abbiamo programmato il sistema per disegnare gli "sciami" di particelle e la luce che producono.</li>
+        <li><strong>Stereoscopia</strong>: Abbiamo capito che un solo telescopio non basta. Nel nostro simulatore ce ne sono tre! Abbiamo dovuto studiare un po' di geometria per far sì che il sistema calcolasse la direzione della sorgente incrociando le linee di vista dei tre telescopi.</li>
+        <li><strong>Analisi Dati</strong>: Questa è la parte di cui andiamo più fieri. Il nostro codice calcola in tempo reale i "Parametri di Hillas" (la forma dell'immagine). È stato difficile capire la matematica che c'era dietro, ma ora vedere quelle ellissi che si disegnano sulle tracce ci dà grande soddisfazione.</li>
+    </ul>
+
+    <h3>Le Nostre Tappe Spaziali</h3>
+    <p>Abbiamo creato diverse pagine, ognuna dedicata a un oggetto celeste che ci ha colpito:</p>
+    <ol>
+        <li>La <strong>Crab Nebula</strong>, che abbiamo imparato essere il "faro" di riferimento per tutti gli astronomi.</li>
+        <li>I <strong>Resti di Supernova</strong>, dove le particelle vengono accelerate a velocità incredibili.</li>
+        <li>I <strong>Blazar</strong> e i <strong>GRB</strong>, i mostri energetici dell'universo.</li>
+        <li>Il <strong>Centro Galattico</strong>, un posto caotico e affascinante.</li>
+        <li>Infine, il <strong>Background Adronico</strong>: abbiamo voluto inserire anche il "rumore" di fondo, perché abbiamo imparato che la vera sfida per gli scienziati è distinguere il segnale utile dal caos dei raggi cosmici.</li>
+    </ol>
+    <p>
+        Per rendere tutto più divertente, abbiamo aggiunto un <strong>Quiz Finale</strong> per sfidare gli utenti a vedere quanto hanno imparato.
+    </p>
+
+    <h2>3. Come lo Abbiamo Costruito (La Parte Tecnica)</h2>
+    <p>
+        Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice usando <strong>HTML, CSS e JavaScript</strong>.
+    </p>
+    <p>
+        La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, con migliaia di fotoni sullo schermo. Abbiamo scoperto e utilizzato le <strong>Canvas API</strong>, una tecnologia che permette al browser di disegnare grafica complessa molto velocemente. È stato impegnativo ottimizzare il codice per farlo girare bene anche sui computer meno potenti della scuola o sui cellulari, ma il risultato finale ci ripaga della fatica.
+    </p>
+    <p>
+        Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
+    </p>
+
+    <h2>4. Cosa Abbiamo Imparato</h2>
+    <p>
+        Lavorare a GammaLab ci ha insegnato tantissimo.
+        Da un lato c'è la <strong>fisica</strong>: ora concetti come "sciame elettromagnetico" o "radiazione Cherenkov" non sono più parole astratte per noi, ma fenomeni che abbiamo visualizzato e modellato.
+        Dall'altro c'è il <strong>lavoro di squadra e la tecnica</strong>: abbiamo imparato a dividerci i compiti, a risolvere bug che sembravano impossibili e a trasformare formule matematiche in codice funzionante.
+    </p>
+    <p>
+        Speriamo che GammaLab possa trasmettere agli altri la stessa curiosità e meraviglia che abbiamo provato noi nel realizzarlo. Non è solo un sito web, è il nostro modo di guardare il cielo con occhi nuovi.
+    </p>
+
+</body>
+</html>
