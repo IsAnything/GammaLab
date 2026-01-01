@@ -41,10 +41,10 @@ Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il s
 
 ### 3.1 Sotto il Cofano: Algoritmi e Matematica
 Volevamo che la simulazione fosse il più realistica possibile, quindi abbiamo implementato alcuni concetti avanzati:
-*   **Image Cleaning**: Prima di analizzare le immagini, il nostro codice applica un filtro per rimuovere i pixel con pochi fotoni, simulando la pulizia del segnale dal rumore del cielo notturno, proprio come nei veri telescopi.
-*   **Matematica Avanzata**: Per calcolare l'orientamento dello sciame, abbiamo utilizzato l'algebra lineare. Il codice costruisce la "matrice dei momenti" della distribuzione di luce e la diagonalizza per trovare gli assi principali dell'ellisse.
-*   **Heatmap Energetica**: Abbiamo creato una palette di colori dinamica (tramite variabili CSS) che cambia in base all'energia dei fotoni: dal blu per le basse energie fino al bianco/rosso per quelle più intense, creando una vera mappa termica dello sciame.
-*   **Parallasse Stereoscopica**: La visione 3D non è un trucco grafico. Abbiamo calcolato la posizione delle immagini su ogni telescopio applicando il corretto offset geometrico (parallasse) basato sulla posizione reale dei telescopi nell'array.
+*   **Image Cleaning (Pulizia dell'Immagine)**: I veri telescopi vedono anche la luce delle stelle e il chiarore notturno, che disturbano l'immagine. Noi abbiamo simulato questo processo: il nostro codice "pulisce" l'immagine digitale cancellando i pixel troppo deboli, lasciando visibile solo il segnale netto del raggio gamma. È come togliere il rumore di fondo da una registrazione audio per sentire meglio la voce.
+*   **Matematica Avanzata**: Per capire da dove arriva un raggio gamma, dobbiamo analizzare la forma della macchia di luce che lascia sulla telecamera. Abbiamo usato l'algebra lineare (calcolo dei momenti statistici) per disegnare un'ellisse perfetta attorno allo sciame. Questo ci permette di misurarne la lunghezza e la larghezza con precisione matematica.
+*   **Heatmap Energetica**: Non tutti i fotoni sono uguali. Abbiamo programmato una "mappa di calore" visiva: i fotoni meno energetici appaiono blu, mentre quelli più energetici diventano bianchi o rossi. È un po' come guardare una fiamma: il colore ci dice subito quanto è intensa l'energia in quel punto.
+*   **Visione Stereoscopica (Parallasse)**: Proprio come noi usiamo due occhi per percepire la profondità, il nostro simulatore usa tre telescopi distanziati tra loro. Abbiamo calcolato la "parallasse", cioè il piccolo spostamento apparente dell'immagine vista da posizioni diverse. Incrociando queste tre visioni diverse, riusciamo a triangolare la posizione esatta della sorgente nel cielo.
 
 ## 4. Cosa Abbiamo Imparato
 
