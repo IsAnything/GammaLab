@@ -12,7 +12,7 @@ Il nostro obiettivo era ambizioso: **costruire un laboratorio virtuale** che per
 
 ## 2. Cosa Abbiamo Realizzato
 
-Il cuore del nostro progetto è un sito web interattivo che simula, in tempo reale, quello che succede quando un raggio gamma colpisce l'atmosfera terrestre. Non volevamo usare video preregistrati, così abbiamo programmato un motore di simulazione che genera eventi casuali sempre diversi.
+Il cuore del nostro progetto è un sito web interattivo che simula, in tempo reale, la risposta di un telescopio Cherenkov quando un raggio gamma colpisce l'atmosfera terrestre. Non volevamo usare video preregistrati, così abbiamo programmato un motore di simulazione che genera eventi casuali sempre diversi.
 
 ### Il Simulatore
 Abbiamo lavorato sodo per ricreare l'esperienza di un vero osservatorio:
