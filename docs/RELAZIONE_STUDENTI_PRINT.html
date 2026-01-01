@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -102,7 +102,7 @@
         Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice nativo usando <strong>HTML5, CSS3 e JavaScript (ES6+)</strong>.
     </p>
     <p>
-        La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le <strong>Canvas API</strong> per il rendering grafico, ottimizzando il ciclo di disegno con <code>requestAnimationFrame</code> per mantenere i 60 fps. Abbiamo strutturato il codice utilizzando la <strong>Programmazione a Oggetti (OOP)</strong> per gestire le entità del simulatore (Telescopi, Fotoni, Sorgenti) in modo ordinato e modulare.
+        La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le <strong>Canvas API</strong> per il rendering grafico. Sebbene le API stesse forniscano oggetti per disegnare, operano in "Immediate Mode" (disegnano pixel e non mantengono memoria degli oggetti). Per gestire la complessità, abbiamo quindi strutturato il nostro codice applicativo con la <strong>Programmazione a Oggetti (OOP)</strong>: abbiamo creato classi per le entità del simulatore (Telescopi, Fotoni, Sorgenti) che mantengono il proprio stato e si ridisegnano ad ogni ciclo di <code>requestAnimationFrame</code>.
     </p>
     <p>
         Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
