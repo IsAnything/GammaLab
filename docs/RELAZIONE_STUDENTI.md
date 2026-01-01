@@ -34,7 +34,7 @@ Per rendere tutto più divertente, abbiamo aggiunto un **Quiz Finale** per sfida
 
 Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice nativo usando **HTML5, CSS3 e JavaScript (ES6+)**.
 
-La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le **Canvas API** per il rendering grafico, ottimizzando il ciclo di disegno con `requestAnimationFrame` per mantenere i 60 fps. Abbiamo strutturato il codice utilizzando la **Programmazione a Oggetti (OOP)** per gestire le entità del simulatore (Telescopi, Fotoni, Sorgenti) in modo ordinato e modulare.
+La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le **Canvas API** per il rendering grafico. Sebbene le API stesse forniscano oggetti per disegnare, operano in "Immediate Mode" (disegnano pixel e non mantengono memoria degli oggetti). Per gestire la complessità, abbiamo quindi strutturato il nostro codice applicativo con la **Programmazione a Oggetti (OOP)**: abbiamo creato classi per le entità del simulatore (Telescopi, Fotoni, Sorgenti) che mantengono il proprio stato e si ridisegnano ad ogni ciclo di `requestAnimationFrame`.
 
 Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
 
