@@ -16,7 +16,7 @@ Il cuore del nostro progetto è un sito web interattivo che simula, in tempo rea
 
 ### Il Simulatore
 Abbiamo lavorato sodo per ricreare l'esperienza di un vero osservatorio:
-*   **Vedere l'invisibile**: Abbiamo programmato il sistema per disegnare gli "sciami" di particelle e la luce che producono.
+*   **Vedere l'invisibile**: Abbiamo programmato il sistema per simulare i fotoni ultravioletti (luce Cherenkov) che arrivano al rivelatore, riproducendo fedelmente l'immagine che questi formano sulla telecamera.
 *   **Stereoscopia**: Abbiamo capito che un solo telescopio non basta. Nel nostro simulatore ce ne sono tre! Abbiamo dovuto studiare un po' di geometria per far sì che il sistema calcolasse la direzione della sorgente incrociando le linee di vista dei tre telescopi.
 *   **Analisi Dati**: Questa è la parte di cui andiamo più fieri. Il nostro codice calcola in tempo reale i "Parametri di Hillas" (la forma dell'immagine). È stato difficile capire la matematica che c'era dietro, ma ora vedere quelle ellissi che si disegnano sulle tracce ci dà grande soddisfazione.
 
