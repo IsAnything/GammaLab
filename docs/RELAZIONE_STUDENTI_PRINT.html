@@ -65,23 +65,23 @@
         Quando abbiamo deciso di partecipare a questo concorso, volevamo creare qualcosa che non fosse solo una semplice ricerca scolastica, ma uno strumento "vivo". A scuola studiamo la fisica sui libri, ma spesso ci manca il contatto con la scienza di frontiera, quella che si fa oggi nei grandi osservatori internazionali.
     </p>
     <p>
-        Così è nato <strong>GammaLab</strong>. Ci siamo chiesti: "Come fanno gli scienziati a 'vedere' i raggi gamma se sono invisibili ai nostri occhi?". La risposta ci ha affascinato: usano l'atmosfera come un gigantesco rivelatore e telescopi che catturano lampi di luce bluastra (luce Cherenkov) che durano pochi nanosecondi.
+        Così è nato <strong>GammaLab</strong>. Ci siamo chiesti: "Come fanno gli scienziati a 'vedere' i raggi gamma di altissima energia (VHE) se sono invisibili ai nostri occhi?". La risposta ci ha affascinato: usano l'atmosfera come un calorimetro naturale e telescopi che catturano lampi di luce bluastra (luce Cherenkov) che durano pochi nanosecondi.
     </p>
     <p>
-        Il nostro obiettivo era ambizioso: <strong>costruire un laboratorio virtuale</strong> che permettesse a chiunque, anche ai nostri compagni di altre classi, di sedersi alla console di controllo di un telescopio Cherenkov e capire, provando con mano, come si fa astrofisica delle alte energie.
+        Il nostro obiettivo era ambizioso: <strong>costruire un laboratorio virtuale</strong> che permettesse a chiunque, anche ai nostri compagni di altre classi, di sedersi alla console di controllo di un array di telescopi Cherenkov (IACT) e capire, provando con mano, come si fa astrofisica delle alte energie.
     </p>
 
     <h2>2. Cosa Abbiamo Realizzato</h2>
     <p>
-        Il cuore del nostro progetto è un sito web interattivo che simula, in tempo reale, la risposta di un telescopio Cherenkov quando un raggio gamma colpisce l'atmosfera terrestre. Non volevamo usare video preregistrati, così abbiamo programmato un motore di simulazione che genera eventi casuali sempre diversi.
+        Il cuore del nostro progetto è un sito web interattivo che simula, in tempo reale, la risposta di un telescopio Cherenkov quando un raggio gamma colpisce l'atmosfera terrestre. Non volevamo usare video preregistrati, così abbiamo programmato un motore di simulazione procedurale (ispirato ai metodi Monte Carlo) che genera eventi casuali sempre diversi.
     </p>
 
     <h3>Il Simulatore</h3>
     <p>Abbiamo lavorato sodo per ricreare l'esperienza di un vero osservatorio:</p>
     <ul>
-        <li><strong>Vedere l'invisibile</strong>: Abbiamo programmato il sistema per simulare i fotoni ultravioletti (luce Cherenkov) che arrivano al rivelatore, riproducendo fedelmente l'immagine che questi formano sulla telecamera.</li>
-        <li><strong>Stereoscopia</strong>: Abbiamo capito che un solo telescopio non basta. Nel nostro simulatore ce ne sono tre! Abbiamo dovuto studiare un po' di geometria per far sì che il sistema calcolasse la direzione della sorgente incrociando le linee di vista dei tre telescopi.</li>
-        <li><strong>Analisi Dati</strong>: Questa è la parte di cui andiamo più fieri. Il nostro codice calcola in tempo reale i "Parametri di Hillas" (la forma dell'immagine). È stato difficile capire la matematica che c'era dietro, ma ora vedere quelle ellissi che si disegnano sulle tracce ci dà grande soddisfazione.</li>
+        <li><strong>Vedere l'invisibile</strong>: Abbiamo programmato il sistema per simulare i fotoni ultravioletti (luce Cherenkov) che arrivano al rivelatore, riproducendo fedelmente l'immagine pixelizzata che questi formano sulla telecamera.</li>
+        <li><strong>Stereoscopia</strong>: Abbiamo capito che un solo telescopio non basta. Nel nostro simulatore ce ne sono tre! Abbiamo implementato un algoritmo geometrico che calcola la direzione di arrivo (Sorgente) intersecando gli assi maggiori delle ellissi rilevate dai diversi telescopi.</li>
+        <li><strong>Analisi Dati</strong>: Questa è la parte di cui andiamo più fieri. Il nostro codice calcola in tempo reale i "Parametri di Hillas" (Width, Length, Alpha). È stato difficile capire la matematica dei momenti statistici, ma ora vedere quelle ellissi che parametrizzano lo sciame ci dà grande soddisfazione.</li>
     </ul>
 
     <h3>Le Nostre Tappe Spaziali</h3>
@@ -99,10 +99,10 @@
 
     <h2>3. Come lo Abbiamo Costruito (La Parte Tecnica)</h2>
     <p>
-        Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice usando <strong>HTML, CSS e JavaScript</strong>.
+        Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice nativo usando <strong>HTML5, CSS3 e JavaScript (ES6+)</strong>.
     </p>
     <p>
-        La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, con migliaia di fotoni sullo schermo. Abbiamo scoperto e utilizzato le <strong>Canvas API</strong>, una tecnologia che permette al browser di disegnare grafica complessa molto velocemente. È stato impegnativo ottimizzare il codice per farlo girare bene anche sui computer meno potenti della scuola o sui cellulari, ma il risultato finale ci ripaga della fatica.
+        La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le <strong>Canvas API</strong> per il rendering grafico, ottimizzando il ciclo di disegno con <code>requestAnimationFrame</code> per mantenere i 60 fps. Abbiamo strutturato il codice utilizzando la <strong>Programmazione a Oggetti (OOP)</strong> per gestire le entità del simulatore (Telescopi, Fotoni, Sorgenti) in modo ordinato e modulare.
     </p>
     <p>
         Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
