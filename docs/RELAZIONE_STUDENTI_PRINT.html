@@ -108,6 +108,15 @@
         Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
     </p>
 
+    <h3>3.1 Sotto il Cofano: Algoritmi e Matematica</h3>
+    <p>Volevamo che la simulazione fosse il più realistica possibile, quindi abbiamo implementato alcuni concetti avanzati:</p>
+    <ul>
+        <li><strong>Image Cleaning</strong>: Prima di analizzare le immagini, il nostro codice applica un filtro per rimuovere i pixel con pochi fotoni, simulando la pulizia del segnale dal rumore del cielo notturno, proprio come nei veri telescopi.</li>
+        <li><strong>Matematica Avanzata</strong>: Per calcolare l'orientamento dello sciame, abbiamo utilizzato l'algebra lineare. Il codice costruisce la "matrice dei momenti" della distribuzione di luce e la diagonalizza per trovare gli assi principali dell'ellisse.</li>
+        <li><strong>Heatmap Energetica</strong>: Abbiamo creato una palette di colori dinamica (tramite variabili CSS) che cambia in base all'energia dei fotoni: dal blu per le basse energie fino al bianco/rosso per quelle più intense, creando una vera mappa termica dello sciame.</li>
+        <li><strong>Parallasse Stereoscopica</strong>: La visione 3D non è un trucco grafico. Abbiamo calcolato la posizione delle immagini su ogni telescopio applicando il corretto offset geometrico (parallasse) basato sulla posizione reale dei telescopi nell'array.</li>
+    </ul>
+
     <h2>4. Cosa Abbiamo Imparato</h2>
     <p>
         Lavorare a GammaLab ci ha insegnato tantissimo.

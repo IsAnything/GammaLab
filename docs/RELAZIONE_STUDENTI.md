@@ -34,9 +34,17 @@ Per rendere tutto più divertente, abbiamo aggiunto un **Quiz Finale** per sfida
 
 Per realizzare GammaLab ci siamo messi alla prova come programmatori web. Abbiamo scelto di non usare piattaforme già pronte, ma di scrivere il codice nativo usando **HTML5, CSS3 e JavaScript (ES6+)**.
 
-La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le **Canvas API** per il rendering grafico. Sebbene le API stesse forniscano oggetti per disegnare, operano in "Immediate Mode" (disegnano pixel e non mantengono memoria degli oggetti). Per gestire la complessità, abbiamo quindi strutturato il nostro codice applicativo con la **Programmazione a Oggetti (OOP)**: abbiamo creato classi per le entità del simulatore (Telescopi, Fotoni, Sorgenti) che mantengono il proprio stato e si ridisegnano ad ogni ciclo di equestAnimationFrame.
+La sfida più grande è stata la grafica. Volevamo che le animazioni fossero fluide, gestendo centinaia di particelle contemporaneamente. Abbiamo utilizzato le **Canvas API** per il rendering grafico. Sebbene le API stesse forniscano oggetti per disegnare, operano in "Immediate Mode" (disegnano pixel e non mantengono memoria degli oggetti). Per gestire la complessità, abbiamo quindi strutturato il nostro codice applicativo con la **Programmazione a Oggetti (OOP)**: abbiamo creato classi per le entità del simulatore (Telescopi, Fotoni, Sorgenti) che mantengono il proprio stato e si ridisegnano ad ogni ciclo di 
+equestAnimationFrame.
 
 Abbiamo anche curato molto il design (Responsive Design), assicurandoci che il sito fosse bello da vedere e facile da navigare sia da PC che da smartphone.
+
+### 3.1 Sotto il Cofano: Algoritmi e Matematica
+Volevamo che la simulazione fosse il più realistica possibile, quindi abbiamo implementato alcuni concetti avanzati:
+*   **Image Cleaning**: Prima di analizzare le immagini, il nostro codice applica un filtro per rimuovere i pixel con pochi fotoni, simulando la pulizia del segnale dal rumore del cielo notturno, proprio come nei veri telescopi.
+*   **Matematica Avanzata**: Per calcolare l'orientamento dello sciame, abbiamo utilizzato l'algebra lineare. Il codice costruisce la "matrice dei momenti" della distribuzione di luce e la diagonalizza per trovare gli assi principali dell'ellisse.
+*   **Heatmap Energetica**: Abbiamo creato una palette di colori dinamica (tramite variabili CSS) che cambia in base all'energia dei fotoni: dal blu per le basse energie fino al bianco/rosso per quelle più intense, creando una vera mappa termica dello sciame.
+*   **Parallasse Stereoscopica**: La visione 3D non è un trucco grafico. Abbiamo calcolato la posizione delle immagini su ogni telescopio applicando il corretto offset geometrico (parallasse) basato sulla posizione reale dei telescopi nell'array.
 
 ## 4. Cosa Abbiamo Imparato
 
